@@ -177,53 +177,45 @@ namespace printing_tools {
             {
                 switch(info.tag){
                     case type_tag::uint64_tag:
-                    std::pair<extented_type_info, uint64_t>* temp= new std::pair<extented_type_info, long double>
-                    {    info.tag
-                        ,read_from_string<uint64_t>(string_to_read_from, pos);
-                    };
+                    std::pair<extented_type_info, uint64_t>* temp= new std::pair<extented_type_info, uint64_t>{info.tag,read_from_string<uint64_t>(string_to_read_from, pos)};
                     ptr= static_cast<std::pair<extented_type_info,void*>*>(temp);
-                    break;
+                    return;
                     case type_tag::long_double_tag:
-                    std::pair<extented_type_info, long double>* temp= new std::pair<extented_type_info, long double>
-                    {    info.tag
-                        ,read_from_string<long double>(string_to_read_from, pos);
-                    };
+                    std::pair<extented_type_info, long double>* temp= new std::pair<extented_type_info, long double>{info.tag,read_from_string<long double>(string_to_read_from, pos)};
                     ptr= static_cast<std::pair<extented_type_info,void*>*>(temp);
-                    break;
+                    return;
                     case type_tag::string_tag:
-                    std::pair<extented_type_info, std::string>* temp= 
-                        new std::pair<extented_type_info, std::string>
-                    {    info.tag
-                        ,read_from_string<std::string>(string_to_read_from, pos);
-                    };  
+                    std::pair<extented_type_info, std::string>* temp= new std::pair<extented_type_info, std::string>{info.tag,read_from_string<std::string>(string_to_read_from, pos)};  
                     ptr= static_cast<std::pair<extented_type_info,void*>*>(temp);
                     ptr->second= &(temp->second);
-                    break;
-
-                    case type_tag::vector_containing_types:
-                    auto& vector_containing_nested_type_info= vector_containing_types[info.index];
-                    void** array_ptr = new void*[length];
-                     ptr = new std::pair<extented_type_info, void*>{ info.tag, static_cast<void*>(array_ptr) };
-                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
-                        ptr[i]= Extented_types{vector_containing_nested_type_info[i].tag,source, location };
-                    }
-                    break;
-                    case type_tag::type_in_map_tag:
-                    auto& vector_containing_nested_type_info= map_containing_types[info.index];
-                    void** array_ptr = new void*[length];
-                    ptr = new std::pair<extented_type_info, void*>{ info.tag, static_cast<void*>(array_ptr) };                   
-                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
-                        ptr[i]= Extented_types{vector_containing_nested_type_info[i].tag,source, location };
-                    }
-                    break;
-                    case type_tag::type_in_hash_map_tag:
-                    auto& vector_containing_nested_type_info= unordered_map_containing_types[info.index];
-                    void** array_ptr = new void*[length];
-                    ptr = new std::pair<extented_type_info, void*>{ info.tag, static_cast<void*>(array_ptr) };                   
-                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
-                        ptr[i]= Extented_types{vector_containing_nested_type_info[i].tag,source, location };
-                    }  
+                    return;
                 }
+                vector<extented_type_info>* extra_info_for_extented_types;
+                switch(info.tag){
+                    case type_tag::vector_containing_types:
+                    extra_info_for_extented_types= vector_containing_types[info.index];
+                    [[fallthrough]]
+                    case type_tag::type_in_map_tag:
+                    extra_info_for_extented_types= map_containing_types[info.index];
+                    [[fallthrough]]
+                    case type_tag::type_in_hash_map_tag:
+                    extra_info_for_extented_types= unordered_map_containing_types[info.index];
+                    [[fallthrough]]
+                    default:
+                    uint64_t array_size_in_bytes= (sizeof(std::pair<extented_type_info, Extented_types>*)*vector_containing_nested_type_info.length()); 
+                    uint64_t element_size_in_bytes=(sizeof(std::pair<extented_type_info, Extented_types>)*vector_containing_nested_type_info.length());
+                    char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(extented_type_info)];
+                    new (reinterpret_cast<extented_type_info*>) extented_type_info{info};
+                    std::pair<extented_type_info, Extented_types>* array= reinterpret_cast< std::pair<extented_type_info, Extented_types>*>(raw_mem+sizeof(extented_type_info));
+                        
+                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+                        array[i]=array+array_size_in_bytes+(i*element_size_in_bytes); 
+                        new (array[i]) Extented_types{vector_containing_nested_type_info[i].tag,source, location };
+                    }
+                    ptr= reinterpret_cast<std::pair<extented_type_info,void*>*>(raw_mem);
+                    ptr->second= reinterpret_cast<void*>(array);
+                }
+                  
             }
             inline std::string get(){
                 return *ptr;
@@ -235,13 +227,33 @@ namespace printing_tools {
             switch(ptr->first){
                 case type_tag::uint64_tag:
                     delete static_cast<std::pair<extented_type_info, uint64_t>*>(ptr);
+                    break;
                 case type_tag::long_double_tag:
                     delete static_cast<std::pair<extented_type_info, long double>*>(ptr);
+                    break;
                 case type_tag::uint64_tag:
-                    delete static_cast<std::pair<extented_type_info, uint64_t>*>(ptr);
+                    delete static_cast<std::pair<extented_type_info, std::string>*>(ptr);
+                    break;
+                
+            }
+            vector<extented_type_info>* extra_info_for_extented_types;
+            switch(ptr->first){
+                case type_tag::vector_containing_types:
+                    extra_info_for_extented_types= vector_containing_types[info.index];
+                    [[fallthrough]]
+                    case type_tag::type_in_map_tag:
+                    extra_info_for_extented_types= map_containing_types[info.index];
+                    [[fallthrough]]
+                    case type_tag::type_in_hash_map_tag:
+                    extra_info_for_extented_types= unordered_map_containing_types[info.index];
+                    [[fallthrough]]
+                default:
+                 for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+                        ptr[i]= Extented_types{vector_containing_nested_type_info[i].tag,source, location };
+                    }
+                    break;
             }
             }
-
             };
 
             struct polymorphic_strings{
@@ -507,6 +519,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
