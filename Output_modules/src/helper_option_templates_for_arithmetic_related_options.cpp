@@ -163,12 +163,13 @@ namespace printing_tools {
             struct extented_type_info{
             type_tag tag;
             uint64_t index;
-            }           
-            struct dynamic_array{
-            type_tag* ptr;
-            dynamic_array()
-            }
-            std::vector<std::pair<uint64_t, dynamic_array>, >
+            };       
+            
+            std::vector<std::vector<extented_type_info>> vector_containing_types;
+            std::map<uint64_t,std::vector<extented_type_info>> map_containing_types;
+            std::unordered_map<uint64_t,std::vector<extented_type_info>> 
+            unordered_map_containing_types;
+
             struct Extented types{
             void* ptr;
             polymorphic_strings(extented_type_info info, const std::string& source, 
@@ -468,6 +469,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
