@@ -792,7 +792,7 @@ namespace printing_tools {
                      all_variable_hashed_storage.erase(variable_name);
                  }
                  else if (store_in_hashed_or_non_hashed_or_linear==_nuteral){
-                     all_variable_linear_storage.erase(variable_name);
+                     all_variable_linear_storage.pop_back();
                  }
             }
 
