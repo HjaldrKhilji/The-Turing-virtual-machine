@@ -171,6 +171,7 @@ namespace printing_tools {
             unordered_map_containing_types;
 
             struct Extented_types{
+            using extended_type_array= std::pair<extented_type_info, Extented_types>*;
              std::pair<extented_type_info,void*>* ptr;
             Extented_types(extented_type_info info, const std::string& source, 
                 std::string:size_type* location )
@@ -248,10 +249,12 @@ namespace printing_tools {
                     extra_info_for_extented_types= unordered_map_containing_types[info.index];
                     [[fallthrough]]
                 default:
-                 for(int i=0; i<vector_containing_nested_type_info.length(); i++){
-                        ptr[i]= Extented_types{vector_containing_nested_type_info[i].tag,source, location };
-                    }
-                    break;
+                  uint64_t array_size_in_bytes= (sizeof(std::pair<extented_type_info, Extented_types>*)*vector_containing_nested_type_info.length()); 
+                  uint64_t element_size_in_bytes=(sizeof(std::pair<extented_type_info, Extented_types>)*vector_containing_nested_type_info.length());
+                  std::pair<extented_type_info, Extented_types>* array= 
+                for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+   
+                    
             }
             }
             };
@@ -519,6 +522,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
