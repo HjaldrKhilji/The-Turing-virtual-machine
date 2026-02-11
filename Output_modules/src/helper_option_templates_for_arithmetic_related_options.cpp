@@ -170,28 +170,52 @@ namespace printing_tools {
             std::unordered_map<uint64_t,std::vector<extented_type_info>> 
             unordered_map_containing_types;
 
-            struct Extented types{
+            struct Extented_types{
             void* ptr;
-            polymorphic_strings(extented_type_info info, const std::string& source, 
-                std::string:size_type* location ): 
+            Extented_types(extented_type_info info, const std::string& source, 
+                std::string:size_type* location )
             {
                 switch(info.tag){
                     case type_tag::uint64_tag:
-                    ptr= static_cast<void*>(  new int{
-                        read_from_string<uint64_t>(string_to_read_from, pos);
+                    ptr= static_cast<void*>(  new std::pair<extented_type_info, uint64_t>
+                    {    info.tag
+                        ,read_from_string<uint64_t>(string_to_read_from, pos);
                     }  );
+                    break;
                     case type_tag::long_double_tag:
-                    ptr= static_cast<void*>(  new long double{
-                        read_from_string<long double>(string_to_read_from, pos);
+                    ptr= static_cast<void*>(  new std::pair<extented_type_info, long double>
+                    {    info.tag
+                        ,read_from_string<long double>(string_to_read_from, pos);
                     }  );
+                    break;
                     case type_tag::string_tag:
-                    ptr= static_cast<void*>(  std::string{
-                        read_from_string<std::string>(string_to_read_from, pos);
-                    }  );
-                    case type_tag::string_tag:
-                    ptr= static_cast<void*>(  std::string{
-                        read_from_string<std::string>(string_to_read_from, pos);
-                    }  );
+                    ptr= static_cast<void*>(  new std::pair<extented_type_info, std::string>
+                    {    info.tag
+                        ,read_from_string<std::string>(string_to_read_from, pos);
+                    }  );               
+                    break;
+
+                    case type_tag::vector_containing_types:
+                    auto& vector_containing_nested_type_info= vector_containing_types[info.index];
+                    void** array_ptr = new void*[length];
+                    auto* ptr = new std::pair<extented_type_info, void**>{ info.tag, array_ptr };
+                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+                        ptr[i]= Extented_types{vector_containing_nested_type_info[i].tag,source, location };
+                    }
+                    break;
+                    case type_tag::type_in_map_tag:
+                    auto& vector_containing_nested_type_info= map_containing_types[info.index];
+                    void** array_ptr = new void*[length];
+                    auto* ptr = new std::pair<extented_type_info, void**>{ info.tag, array_ptr };                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+                        ptr[i]= Extented_types{vector_containing_nested_type_info[i].tag,source, location };
+                    }
+                    break;
+                    case type_tag::type_in_hash_map_tag:
+                    auto& vector_containing_nested_type_info= unordered_map_containing_types[info.index];
+                    void** array_ptr = new void*[length];
+                    auto* ptr = new std::pair<extented_type_info, void**>{ info.tag, array_ptr };                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+                        ptr[i]= Extented_types{vector_containing_nested_type_info[i].tag,source, location };
+                    }    
                 }
             }
             inline std::string get(){
@@ -200,8 +224,8 @@ namespace printing_tools {
             inline std::string get_moved(){
                 return std::move(*ptr);
             }
-            ~polymorphic_strings(){
-                delete ptr;
+            ~Extented_types(){
+                
             }
 
             };
@@ -469,6 +493,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
