@@ -177,22 +177,27 @@ namespace printing_tools {
             {
                 switch(info.tag){
                     case type_tag::uint64_tag:
-                    ptr= new std::pair<extented_type_info, void*>
+                    std::pair<extented_type_info, uint64_t>* temp= new std::pair<extented_type_info, long double>
                     {    info.tag
-                        ,static_cast<void*>(read_from_string<uint64_t>(string_to_read_from, pos));
+                        ,read_from_string<uint64_t>(string_to_read_from, pos);
                     };
+                    ptr= static_cast<std::pair<extented_type_info,void*>*>(temp);
                     break;
                     case type_tag::long_double_tag:
-                    ptr= new std::pair<extented_type_info, long double>
+                    std::pair<extented_type_info, long double>* temp= new std::pair<extented_type_info, long double>
                     {    info.tag
-                        ,static_cast<void*>(read_from_string<long double>(string_to_read_from, pos));
+                        ,read_from_string<long double>(string_to_read_from, pos);
                     };
+                    ptr= static_cast<std::pair<extented_type_info,void*>*>(temp);
                     break;
                     case type_tag::string_tag:
-                    ptr=  new std::pair<extented_type_info, std::string>
+                    std::pair<extented_type_info, std::string>* temp= 
+                        new std::pair<extented_type_info, std::string>
                     {    info.tag
-                        ,static_cast<void*>(read_from_string<std::string>(string_to_read_from, pos));
-                    };               
+                        ,read_from_string<std::string>(string_to_read_from, pos);
+                    };  
+                    ptr= static_cast<std::pair<extented_type_info,void*>*>(temp);
+                    ptr->second= &(temp->second);
                     break;
 
                     case type_tag::vector_containing_types:
@@ -227,9 +232,13 @@ namespace printing_tools {
                 return std::move(*ptr);
             }
             ~Extented_types(){
-            switch(){
+            switch(ptr->first){
                 case type_tag::uint64_tag:
-                
+                    delete static_cast<std::pair<extented_type_info, uint64_t>*>(ptr);
+                case type_tag::long_double_tag:
+                    delete static_cast<std::pair<extented_type_info, long double>*>(ptr);
+                case type_tag::uint64_tag:
+                    delete static_cast<std::pair<extented_type_info, uint64_t>*>(ptr);
             }
             }
 
@@ -498,6 +507,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
