@@ -158,6 +158,53 @@ namespace printing_tools {
                     return false;
                 }
             }
+            enum class type_tag{uint64_tag=1, long_double_tag=2, string_tag=3,
+            type_in_vector_tag=4, type_in_map_tag=5, type_in_hash_map_tag=6};
+            struct extented_type_info{
+            type_tag tag;
+            uint64_t index;
+            }           
+            struct dynamic_array{
+            type_tag* ptr;
+            dynamic_array()
+            }
+            std::vector<std::pair<uint64_t, dynamic_array>, >
+            struct Extented types{
+            void* ptr;
+            polymorphic_strings(extented_type_info info, const std::string& source, 
+                std::string:size_type* location ): 
+            {
+                switch(info.tag){
+                    case type_tag::uint64_tag:
+                    ptr= static_cast<void*>(  new int{
+                        read_from_string<uint64_t>(string_to_read_from, pos);
+                    }  );
+                    case type_tag::long_double_tag:
+                    ptr= static_cast<void*>(  new long double{
+                        read_from_string<long double>(string_to_read_from, pos);
+                    }  );
+                    case type_tag::string_tag:
+                    ptr= static_cast<void*>(  std::string{
+                        read_from_string<std::string>(string_to_read_from, pos);
+                    }  );
+                    case type_tag::string_tag:
+                    ptr= static_cast<void*>(  std::string{
+                        read_from_string<std::string>(string_to_read_from, pos);
+                    }  );
+                }
+            }
+            inline std::string get(){
+                return *ptr;
+            }
+            inline std::string get_moved(){
+                return std::move(*ptr);
+            }
+            ~polymorphic_strings(){
+                delete ptr;
+            }
+
+            };
+
             struct polymorphic_strings{
             std::string* ptr;
             polymorphic_strings(std::string string_to_build_it_with): 
@@ -390,7 +437,7 @@ namespace printing_tools {
               
                     if (is_char_digit(string_to_read_from[*pos])) 
                         {
-                            return Polymorphic_accumulator{ read_from_string<long long int>(string_to_read_from, pos) };
+                            return Polymorphic_accumulator{ read_from_string<uint64_t>(string_to_read_from, pos) };
 
                          }
                     else if (string_to_read_from[*pos] == '.') {
@@ -421,6 +468,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
