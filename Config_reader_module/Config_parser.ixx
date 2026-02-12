@@ -149,7 +149,7 @@ export   namespace config_parsing_tools {
             
             Config_reader(Config_reader&) = default;
             Config_reader(Config_reader&&) = default;
-             absolute_base::All_non_terminal_entries& get_all_entries_by_l_reference() const {
+             absolute_base::All_non_terminal_entries<config,config_for_semantic_entries> & get_all_entries_by_l_reference() const {
                 return all_entries;
             }
         private:
