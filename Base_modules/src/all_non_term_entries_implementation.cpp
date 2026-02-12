@@ -12,7 +12,8 @@ module;
 #include <functional>       // For std::reference_wrapper
 #include <algorithm>        // For iterator arithmetic and algorithms
 #include <limits>       // For std::numeric_limits<T>::max(), ::min(), ::lowest()
-
+#include <cstdint>  // For uintptr_t
+using std::uintptr_t;
 // I used AI to keep track of the headers needed
 
 
@@ -59,9 +60,9 @@ void All_non_terminal_entries::remove_semantic_rule_of_entry(absolute_base::Non_
 template<typename config>
 void absolute_base::check_pattern(const std::vector < Semantical_analyzer_config_entry<config> >& semantical_checks, const std::string& text)  {
     std::string failed_matches{};
-    uint64_t semantic_entry_index{};
+    uintptr_t semantic_entry_index{};
     for (auto& x : semantical_checks) {
-        uint64_t number_of_matches{};
+        uintptr_t number_of_matches{};
         while(x.the_pattern_to_check.regex_match(text)){
             number_of_matches++;
         }
@@ -138,7 +139,7 @@ void All_non_terminal_entries::print_all_content()  {
     }
 }
 template<typename config>
-void All_non_terminal_entries::add_non_term_symbol_name(uint64_tname)  {
+void All_non_terminal_entries::add_non_term_symbol_name(uintptr_tname)  {
   //precondition: "name" paremeter can not be empty
   //precondition: list_of_all_non_term_entries_for_fast_traversal is in a valid state 
   //postcondition: an entry is added to the "traversal list" only, hence you can only access the entry by traversing the deque,
@@ -170,7 +171,7 @@ template<typename config>
 
   }
 template<typename config>
-  config& All_non_terminal_entries::get_pattern_of_nested_non_term_symbol_pattern(uint64_t sub_symbol_name)  {
+  config& All_non_terminal_entries::get_pattern_of_nested_non_term_symbol_pattern(uintptr_t sub_symbol_name)  {
   //precondition: "sub_symbol_name" paremeter can not be empty
   //precondition: map_for_fast_retrival_of_entries is in a valid state and is not empty
   //postcondition: the entry corrsponding to the key "sub_symbol_name" from map_for_fast_retrival_of_entries, and the copy of the 
@@ -185,7 +186,7 @@ template<typename config>
   }
 
 template<typename config>
-  void All_non_terminal_entries::add_nested_non_term_symbol_to_the_newest_entry(uint64_t sub_symbol_name)  {
+  void All_non_terminal_entries::add_nested_non_term_symbol_to_the_newest_entry(uintptr_t sub_symbol_name)  {
     //precondition: "sub_symbol_name" paremeter can not be empty
     //precondition: map_for_fast_retrival_of_entries is in a valid state and is not empty
     //precondition: list_of_all_non_term_entries_for_fast_traversal is in a valid state and contains atleast a single entry
