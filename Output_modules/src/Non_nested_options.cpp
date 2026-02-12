@@ -227,7 +227,7 @@ namespace printing_tools {
                 //in my defense it is okay, since I am doing some arithmetic in this function, so suck it up.
                 size_t number_to_subract = read_from_string<size_t, read_from_config_or_output>(output_config, output_data, position, output_data_position);
                 if (output_data_position = > number_to_subract) {
-                    *(static_cast<uint64_t*>(output_data_position)) -= number_to_subract;
+                    *(static_cast<uintptr_t*>(output_data_position)) -= number_to_subract;
                 }
                 else if (number_to_subract == std::numeric_limits<std::size_t>::max()) {
                     //means the user gave -1 as input
@@ -531,7 +531,7 @@ namespace printing_tools {
                 //in my defense it is okay, since I am doing some arithmetic in this function, so suck it up.
                 size_t number_to_subract = read_from_string<size_t, read_from_config_or_output>(output_config, output_data, position, output_data_position);
                 if (output_data_position = > number_to_subract) {
-                    *(static_cast<uint64_t*>(output_data_position)) -= number_to_subract;
+                    *(static_cast<uintptr_t*>(output_data_position)) -= number_to_subract;
                 }
                 else if (number_to_subract == std::numeric_limits<std::size_t>::max()) {
                     //means the user gave -1 as input
@@ -710,15 +710,15 @@ namespace printing_tools {
         constexpr ternary_state operator"" _false() {
             return 0;
         }
-        std::map<uint64_t, printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator> all_variable_ordered_storage{};
-        std::unordered_map<uint64_t, printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator> all_variable_hashed_storage{};
+        std::map<uintptr_t, printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator> all_variable_ordered_storage{};
+        std::unordered_map<uintptr_t, printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator> all_variable_hashed_storage{};
         std::vector< printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator> all_variable_linear_storage;
         
         template<bool source_is_output_config_or_output_data, ternary_state store_in_hashed_or_non_hashed_or_linear>
         void store_variable(const std::string& output_config, std::string::size_type* position, std::string* output_data, std::string::size_type* output_data_position) {
             try {
                 using helper_templates_for_options::helpers_for_arithmetic_options::read_from_string;
-                uint64_t variable_name = helper_templates_for_options::read_from_string<uint64_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
+                uintptr_t variable_name = helper_templates_for_options::read_from_string<uintptr_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
                  if constexpr(store_in_hashed_or_non_hashed_or_linear==_true) {
                     all_variable_ordered_storage[variable_name] = helper_templates_for_options::helpers_for_arithmetic_options::read_polymorphically_from_string
                         <source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
@@ -752,7 +752,7 @@ namespace printing_tools {
                 using helper_templates_for_options::helpers_for_arithmetic_options::read_from_string;
                 using helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator;
                 Polymorphic_accumulator value;
-                uint64_t variable_name = helper_templates_for_options::read_from_string<uint64_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
+                uintptr_t variable_name = helper_templates_for_options::read_from_string<uintptr_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
                 if constexpr(store_in_hashed_or_non_hashed_or_linear==_true) {
                     value = all_variable_ordered_storage.at(variable_name);
                 }
@@ -784,7 +784,7 @@ namespace printing_tools {
         void remove_polymorphic(const std::string& output_config, std::string::size_type* position, std::string* output_data, std::string::size_type* output_data_position) {
             try {
                 using helper_templates_for_options::helpers_for_arithmetic_options::read_from_string;
-                uint64_t variable_name = helper_templates_for_options::read_from_string<uint64_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
+                uintptr_t variable_name = helper_templates_for_options::read_from_string<uintptr_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
                  if constexpr(store_in_hashed_or_non_hashed_or_linear==_true) {
                      all_variable_ordered_storage.erase(variable_name);
                  }
@@ -807,8 +807,8 @@ namespace printing_tools {
         }
 template<bool source_is_output_config_or_output_data, ternary_state store_in_hashed_or_non_hashed_or_linear>
 void  get_from_cache(const std::string& output_config, std::string::size_type* position, std::string* output_data, std::string::size_type* output_data_position) {
-    uint64_t cache_name = helper_templates_for_options::read_from_string<uint64_t>(output_config, position);
-     *position= helper_templates_for_options::read_from_string<uint64_t>(output_config, position);
+    uintptr_t cache_name = helper_templates_for_options::read_from_string<uintptr_t>(output_config, position);
+     *position= helper_templates_for_options::read_from_string<uintptr_t>(output_config, position);
 
      if constexpr(source_is_output_config_or_output_data) {
 
@@ -838,8 +838,8 @@ void  get_from_cache(const std::string& output_config, std::string::size_type* p
 }
 template<bool source_is_output_config_or_output_data, ternary_state store_in_hashed_or_non_hashed_or_linear>
 void store_in_cache(const std::string& output_config, std::string::size_type* position, std::string* output_data, std::string::size_type* output_data_position) {
-     uint64_t cache_name = helper_templates_for_options::read_from_string<uint64_t>(output_config, position);
-     *position= helper_templates_for_options::read_from_string<uint64_t>(output_config, position);
+     uintptr_t cache_name = helper_templates_for_options::read_from_string<uintptr_t>(output_config, position);
+     *position= helper_templates_for_options::read_from_string<uintptr_t>(output_config, position);
 
      if constexpr(source_is_output_config_or_output_data) {
 
@@ -879,11 +879,11 @@ template<char& Printer::*delimeter,Printer* obj, bool source_is_output_config_or
 void change_input_delimeter(const std::string& output_config, std::string::size_type* position, std::string* output_data, std::string::size_type* output_data_position) {
      if constexpr(source_is_output_config_or_output_data){
           *(obj->delimeter) =output_config[*position];
-        static_cast<uint64_t>(*position)++;
+        static_cast<uintptr_t>(*position)++;
     }
     else{
          *(obj->delimeter) =(*output_data)[*output_data_position];
-        static_cast<uint64_t>(*output_data_position)++;
+        static_cast<uintptr_t>(*output_data_position)++;
     }
 }
 template<bool change_config_or_data>
@@ -908,15 +908,15 @@ void escape_charactor(const std::string& output_config, std::string::size_type* 
     char slash_alternative;
     if(source_is_output_config_or_output_data){
         char_to_escape=output_config[*position];
-        static_cast<uint64_t>(*position)++;
+        static_cast<uintptr_t>(*position)++;
         slash_alternative=output_config[*position];
-        static_cast<uint64_t>(*position)++;
+        static_cast<uintptr_t>(*position)++;
     }
     else{
         char_to_escape=(*output_data)[*output_data_position];
-        static_cast<uint64_t>(*output_data_position)++;
+        static_cast<uintptr_t>(*output_data_position)++;
         slash_alternative=(*output_data)[*output_data_position];
-        static_cast<uint64_t>(*output_data_position)++;
+        static_cast<uintptr_t>(*output_data_position)++;
     }
     char doube_slash_alternative= slash_alternative+slash_alternative;
     absolute_base::escape_string(
