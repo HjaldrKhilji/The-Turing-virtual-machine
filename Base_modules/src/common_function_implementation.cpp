@@ -12,6 +12,8 @@ module;
 #include <cstdlib>      // For std::strtoll and std::strtold
 #include <stdexcept>    // For std::runtime_error
 #include<charconv>
+#include <cstdint>  // For uintptr_t
+using std::uintptr_t;
 // I used AI to keep track of the headers needed 
 
 module all_declarations;
@@ -54,7 +56,7 @@ T common_functions::read_number_from_string_at_a_position(const std::string& sou
     if (ec == std::errc{}) {
         //SUCCESSS
         // Advance the position based on how many characters were consumed
-        *(static_cast<uint64_t*>(position)) += (read_till - start);
+        *(static_cast<uintptr_t*>(position)) += (read_till - start);
 
         return result;
     }
@@ -104,6 +106,7 @@ inline char common_functions::convert_to_char(const std::string& input_str, std:
 	 return result;
 
  }
+
 
 
 
