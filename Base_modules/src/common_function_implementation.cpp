@@ -91,7 +91,7 @@ catch(std::out_of_range){
  inline bool common_functions::convert_to_bool(const std::string& input_str, std::string::size_type* position) {
     
 	 bool result = input_str.at(*position) == '1';
-     static_cast<uint64>_t& > (*position) += 1;
+     *position += 1;
 	 return result;
 
  }
@@ -102,10 +102,11 @@ catch(std::out_of_range){
 inline char common_functions::convert_to_char(const std::string& input_str, std::string::size_type* position) {
     
 	 char result = input_str.at(*position);
-     static_cast<uint64>_t& > (*position) += 1;
+     *position += 1;
 	 return result;
 
  }
+
 
 
 
