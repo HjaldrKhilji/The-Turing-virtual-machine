@@ -8,6 +8,8 @@ module;
 #include <memory>       // For std::unique_ptr
 #include <stdexcept>    // For std::runtime_error
 #include <utility>      // For std::move
+#include <cstdint>  // For uintptr_t
+using std::uintptr_t;
 // I used AI to keep track of the headers needed
 
 export module Config_parser;
@@ -19,15 +21,15 @@ export   namespace config_parsing_tools {
 	struct line_stream{
 	std::string string_buffer;
 	std::string::size_type position;
-	void operator>>(uint64_t& dest) const {
-	dest= absolute_base::read_number_from_string_at_a_position<uint64>(string_buffer, &position);
+	void operator>>(uintptr_t_t& dest) const {
+	dest= absolute_base::read_number_from_string_at_a_position<uintptr_t>(string_buffer, &position);
 	}
 	void operator>>(std::string& dest) const {
 	dest= absolute_base::read_number_from_string_at_a_position<std::string>(string_buffer, &position);
 	}
 	void operator>>(char &dest) const {
 	dest= string_buffer[position];
-	static_cast<uint64_t>(position)++;
+	static_cast<uintptr_t_t>(position)++;
 	}
 	};
 
@@ -67,7 +69,7 @@ export   namespace config_parsing_tools {
         }
         
         template<typename config>
-         inline void semantical_analyzer_entry_reader(const uint64_t non_terminal_name_to_search_inside, absolute_base::All_non_terminal_entries<config>* all_entries, std::istream* extra_input) {
+         inline void semantical_analyzer_entry_reader(const uintptr_t_t non_terminal_name_to_search_inside, absolute_base::All_non_terminal_entries<config>* all_entries, std::istream* extra_input) {
              
 			config semantic_pattern_to_check{};
 	        read_input(line_stream, semantic_pattern_to_check, all_non_term_entries, extra_input);
@@ -100,7 +102,7 @@ export   namespace config_parsing_tools {
         inline void parse_raw_input(absolute_base::All_non_terminal_entries<config>* all_entries, const line_stream& input_stream, std::istream* extra_input) {
 
             constexpr size_t size_of_common_escape_charactors = 2;
-			uint64_t non_terminal_name;
+			uintptr_t_t non_terminal_name;
             input_stream>>non_terminal_name;
 			all_entries->add_non_term_symbol_name(non_terminal_name);
             config non_terminal_pattern;
