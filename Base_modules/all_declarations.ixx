@@ -183,7 +183,7 @@ export module All_declarations;//for c++ noobs, including myself, the module nam
             }
 
         };
-        template<typename config>
+        template<typename config, typename config_for_semantic_entries=config>
         struct Non_terminal_name_entry {
             
             uint64_t name;
@@ -195,7 +195,7 @@ export module All_declarations;//for c++ noobs, including myself, the module nam
             };
             using sub_entry_type = std::vector < std::reference_wrapper < Non_terminal_name_entry<config> >>; 
             sub_entry_type sub_entries;
-            using all_semantical_analysis_rules_type =  std::vector < Semantical_analyzer_config_entry<config>>;
+            using all_semantical_analysis_rules_type =  std::vector < Semantical_analyzer_config_entry<config_for_semantic_entries>>;
             is_moved_from_bool is_moved_from;
             all_semantical_analysis_rules_type all_semantical_analysis_rules;
             ~Non_terminal_name_entry() {}//for supressing warnings of implicitly deleted destructor
