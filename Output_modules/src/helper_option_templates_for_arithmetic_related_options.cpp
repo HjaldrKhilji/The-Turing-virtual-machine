@@ -113,12 +113,12 @@ namespace printing_tools {
                     if constexpr (!std::is_same_v<std::string, Internal_resperentation>) {
                         std::string to_pump = std::move(internal_data);
                         *string_to_pump_to += to_pump;
-                        *(static_cast<uintptr_t*>(output_string_position)) += to_pump.length();
+                        *output_string_position += to_pump.length();
                     }
                     else {
                         std::string to_pump = std::to_string(internal_data);
                         *string_to_pump_to += to_pump;
-                        *(static_cast<uintptr_t*>(output_string_position)) += to_pump.length();
+                        *output_string_position += to_pump.length();
 
                     }
                 }
@@ -173,23 +173,22 @@ namespace printing_tools {
 
             struct Extented_types{
             using extended_type_array= std::pair<extented_type_info, Extented_types>*;
-             std::pair<extented_type_info,void*>* ptr;
-            Extented_types(extented_type_info info, const std::string& source, 
-                std::string:size_type* location )
+             void* ptr;
+            Extented_types(extented_type_info info, const std::string& string_to_read_from, 
+                std::string:size_type* pos )
             {
                 switch(info.tag){
                     case type_tag::uintptr_tag:
                     std::pair<extented_type_info, uintptr_t>* temp= new std::pair<extented_type_info, uintptr_t>{info.tag,read_from_string<uintptr_t>(string_to_read_from, pos)};
-                    ptr= static_cast<std::pair<extented_type_info,void*>*>(temp);
+                    ptr= static_cast<void*>(temp);
                     return;
                     case type_tag::long_double_tag:
                     std::pair<extented_type_info, long double>* temp= new std::pair<extented_type_info, long double>{info.tag,read_from_string<long double>(string_to_read_from, pos)};
-                    ptr= static_cast<std::pair<extented_type_info,void*>*>(temp);
+                    ptr= static_cast<void*>(temp);
                     return;
                     case type_tag::string_tag:
                     std::pair<extented_type_info, std::string>* temp= new std::pair<extented_type_info, std::string>{info.tag,read_from_string<std::string>(string_to_read_from, pos)};  
-                    ptr= static_cast<std::pair<extented_type_info,void*>*>(temp);
-                    ptr->second= &(temp->second);
+                    ptr= static_cast<void*>(temp);
                     return;
                 }
                 vector<extented_type_info>* extra_info_for_extented_types;
@@ -214,8 +213,8 @@ namespace printing_tools {
                         array[i]=array+array_size_in_bytes+(i*element_size_in_bytes); 
                         new (array[i]) Extented_types{vector_containing_nested_type_info[i]->first,{vector_containing_nested_type_info[i].tag,source, location} };
                     }
-                    ptr= reinterpret_cast<std::pair<extented_type_info,void*>*>(raw_mem);
-                    ptr->second= reinterpret_cast<void*>(array);
+                    ptr= static_cast<void*>(raw_mem);
+                    
                 }
                   
             }
@@ -285,7 +284,7 @@ namespace printing_tools {
                         else {
                             std::string stringified_num=std::to_string(arg);
                            *string_to_pump_to += stringified_num;
-                           *(static_cast<uintptr_t*>(output_string_position)) += stringified_num.length();
+                           *output_string_position += stringified_num.length();
 
                         }
                         
@@ -302,7 +301,7 @@ namespace printing_tools {
                         else {
                             std::string stringified_num=std::to_string(arg);
                            *string_to_pump_to += stringified_num;
-                           *(static_cast<uintptr_t*>(output_string_position)) += stringified_num.length();
+                           *output_string_position += stringified_num.length();
 
                         }
                         }, internal_data);
@@ -328,7 +327,7 @@ namespace printing_tools {
                             std::string to_pump = std::to_string(arg);
                         }
                         *string_to_pump_to += to_pump;
-                        *(static_cast<uintptr_t*>(output_string_position)) += to_pump.length();
+                        *output_string_position += to_pump.length();
                         
                         }, internal_data);
                 }
@@ -531,6 +530,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
