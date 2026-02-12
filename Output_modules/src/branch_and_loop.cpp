@@ -5,7 +5,7 @@ module;
 // Required for std::tuple and std::get
 #include <tuple>
 
-// Required for uint64_t fixed-width integers
+// Required for uintptr_t fixed-width integers
 #include <cstdint>
 
 // Required if your accumulator uses engine-level regex
@@ -59,20 +59,20 @@ namespace loop_and_branch_helpers {
      try {
          //cache for optimization:
          static bool loop_cache_empty = true;
-         static std::tuple<uint64_t, char operator_name, uint64_t> loop_cache{ {},{},{} };
+         static std::tuple<uintptr_t, char operator_name, uintptr_t> loop_cache{ {},{},{} };
          using helper_templates_for_options::helpers_for_arithmetic_options::read_from_string;
          using printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator;
          std::string x{};
          char comparision_operator_name;
          std::string y{};
          if (loop_cache_empty) {
-             x = read_from_string<uint64_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
+             x = read_from_string<uintptr_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
              std::string& output_config_mutable = const_cast<std::string&>(output_config);
 
              comparision_operator_name = output_config_mutable.back();
              output_config_mutable.pop_back();
-             --(*(static_cast<uint64_t*>(position)));
-             y = read_from_string<uint64_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
+             --(*(static_cast<uintptr_t*>(position)));
+             y = read_from_string<uintptr_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
              
          }
          else {
@@ -104,7 +104,7 @@ namespace loop_and_branch_helpers {
              char loop_option = output_config_mutable.back();
              output_config_mutable.push_back(body_option);
              output_config_mutable.push_back(loop_option);
-             *(static_cast<uint64_t*>(position)) += 2;
+             *(static_cast<uintptr_t*>(position)) += 2;
 
 
              
@@ -112,7 +112,7 @@ namespace loop_and_branch_helpers {
          else {
              output_config_mutable.pop_back();
              output_config_mutable.pop_back();
-             *(static_cast<uint64_t*>(position))-=2;
+             *(static_cast<uintptr_t*>(position))-=2;
 
 
              if (!loop_cache_empty) {
@@ -148,11 +148,11 @@ namespace loop_and_branch_helpers {
      try {
          using helper_templates_for_options::helpers_for_arithmetic_options::read_from_string;
          using printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator;
-         std::string x = read_from_string<uint64_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
+         std::string x = read_from_string<uintptr_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
          std::string& output_config_mutable = const_cast<std::string&>(output_config);
          char comparision_operator_name = output_config_mutable.back();
          output_config_mutable.pop_back();
-         std::string y = read_from_string<uint64_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
+         std::string y = read_from_string<uintptr_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
          Polymorphic_accumulator x_value;
          Polymorphic_accumulator y_value;
          if constexpr(store_in_hashed_or_non_hashed_or_linear==_true) {
@@ -175,11 +175,11 @@ namespace loop_and_branch_helpers {
              output_config_mutable.pop_back();
              output_config_mutable.pop_back();
              output_config_mutable.push_back( lastChar); //letting the second last charactor be our branch.
-             --(*(static_cast<uint64_t*>(position)));
+             --(*(static_cast<uintptr_t*>(position)));
          }
          else {
              output_config_mutable.pop_back();
-             --(*(static_cast<uint64_t*>(position)));
+             --(*(static_cast<uintptr_t*>(position)));
 
          }
      }
