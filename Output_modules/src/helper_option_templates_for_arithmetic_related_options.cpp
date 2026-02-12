@@ -112,12 +112,12 @@ namespace printing_tools {
                     if constexpr (!std::is_same_v<std::string, Internal_resperentation>) {
                         std::string to_pump = std::move(internal_data);
                         *string_to_pump_to += to_pump;
-                        *(static_cast<uint64_t*>(output_string_position)) += to_pump.length();
+                        *(static_cast<uintptr_t*>(output_string_position)) += to_pump.length();
                     }
                     else {
                         std::string to_pump = std::to_string(internal_data);
                         *string_to_pump_to += to_pump;
-                        *(static_cast<uint64_t*>(output_string_position)) += to_pump.length();
+                        *(static_cast<uintptr_t*>(output_string_position)) += to_pump.length();
 
                     }
                 }
@@ -158,16 +158,16 @@ namespace printing_tools {
                     return false;
                 }
             }
-            enum class type_tag{uint64_tag=1, long_double_tag=2, string_tag=3,
+            enum class type_tag{uintptr_tag=1, long_double_tag=2, string_tag=3,
             type_in_vector_tag=4, type_in_map_tag=5, type_in_hash_map_tag=6};
             struct extented_type_info{
             type_tag tag;
-            uint64_t index;
+            uintptr_t index;
             };       
             
             std::vector<std::vector<extented_type_info>> vector_containing_types;
-            std::map<uint64_t,std::vector<extented_type_info>> map_containing_types;
-            std::unordered_map<uint64_t,std::vector<extented_type_info>> 
+            std::map<uintptr_t,std::vector<extented_type_info>> map_containing_types;
+            std::unordered_map<uintptr_t,std::vector<extented_type_info>> 
             unordered_map_containing_types;
 
             struct Extented_types{
@@ -177,8 +177,8 @@ namespace printing_tools {
                 std::string:size_type* location )
             {
                 switch(info.tag){
-                    case type_tag::uint64_tag:
-                    std::pair<extented_type_info, uint64_t>* temp= new std::pair<extented_type_info, uint64_t>{info.tag,read_from_string<uint64_t>(string_to_read_from, pos)};
+                    case type_tag::uintptr_tag:
+                    std::pair<extented_type_info, uintptr_t>* temp= new std::pair<extented_type_info, uintptr_t>{info.tag,read_from_string<uintptr_t>(string_to_read_from, pos)};
                     ptr= static_cast<std::pair<extented_type_info,void*>*>(temp);
                     return;
                     case type_tag::long_double_tag:
@@ -203,8 +203,8 @@ namespace printing_tools {
                     extra_info_for_extented_types= unordered_map_containing_types[info.index];
                     [[fallthrough]]
                     default:
-                    uint64_t array_size_in_bytes= sizeof(Extented_types*)*vector_containing_nested_type_info.length(); 
-                    uint64_t element_size_in_bytes=sizeof(Extented_types)*vector_containing_nested_type_info.length();
+                    uintptr_t array_size_in_bytes= sizeof(Extented_types*)*vector_containing_nested_type_info.length(); 
+                    uintptr_t element_size_in_bytes=sizeof(Extented_types)*vector_containing_nested_type_info.length();
                     char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(extented_type_info)];
                     new (reinterpret_cast<extented_type_info*>) extented_type_info{info};
                     Extented_types* array= reinterpret_cast<Extented_types*>(raw_mem+sizeof(extented_type_info));
@@ -221,13 +221,13 @@ namespace printing_tools {
             
             ~Extented_types(){
             switch(ptr->first){
-                case type_tag::uint64_tag:
-                    delete reinterpret_cast<std::pair<extented_type_info, uint64_t>*>(ptr);
+                case type_tag::uintptr_tag:
+                    delete reinterpret_cast<std::pair<extented_type_info, uintptr_t>*>(ptr);
                     break;
                 case type_tag::long_double_tag:
                     delete reinterpret_cast<std::pair<extented_type_info, long double>*>(ptr);
                     break;
-                case type_tag::uint64_tag:
+                case type_tag::uintptr_tag:
                     delete reinterpret_cast<std::pair<extented_type_info, std::string>*>(ptr);
                     break;
                 
@@ -241,8 +241,8 @@ namespace printing_tools {
                     case type_tag::type_in_hash_map_tag:
                     [[fallthrough]]
                 default:
-                  uint64_t array_size_in_bytes= (sizeof(std::pair<extented_type_info, Extented_types>*)*vector_containing_nested_type_info.length()); 
-                  uint64_t element_size_in_bytes=(sizeof(std::pair<extented_type_info, Extented_types>)*vector_containing_nested_type_info.length());
+                  uintptr_t array_size_in_bytes= (sizeof(std::pair<extented_type_info, Extented_types>*)*vector_containing_nested_type_info.length()); 
+                  uintptr_t element_size_in_bytes=(sizeof(std::pair<extented_type_info, Extented_types>)*vector_containing_nested_type_info.length());
                   Extented_types* array=  
                   reinterpret_cast<Extented_types*>(ptr->second);
                   
@@ -271,7 +271,7 @@ namespace printing_tools {
             };
            
             struct Polymorphic_accumulator {
-                std::variant<uint64_t, long double, polymorphic_strings> internal_data;
+                std::variant<uintptr_t, long double, polymorphic_strings> internal_data;
                 bool value_type;
 
                 void pump(std::string* string_to_pump_to, std::string::size_type* output_string_position) {
@@ -279,12 +279,12 @@ namespace printing_tools {
                         if constexpr (!std::is_same_v<polymorphic_strings, decltype(arg)>) {
                             const std::string& string_to_pump=  arg.get();
                             *string_to_pump_to += string_to_pump;
-                            *(static_cast<uint64_t*>(output_string_position)) += string_to_pump.length();
+                            *(static_cast<uintptr_t*>(output_string_position)) += string_to_pump.length();
                             }
                         else {
                             std::string stringified_num=std::to_string(arg);
                            *string_to_pump_to += stringified_num;
-                           *(static_cast<uint64_t*>(output_string_position)) += stringified_num.length();
+                           *(static_cast<uintptr_t*>(output_string_position)) += stringified_num.length();
 
                         }
                         
@@ -296,12 +296,12 @@ namespace printing_tools {
                       if constexpr (!std::is_same_v<polymorphic_strings, decltype(arg)>) {
                             const std::string string_to_pump=  arg.get_moved();
                             *string_to_pump_to += string_to_pump;
-                            *(static_cast<uint64_t*>(output_string_position)) += string_to_pump.length();
+                            *(static_cast<uintptr_t*>(output_string_position)) += string_to_pump.length();
                             }
                         else {
                             std::string stringified_num=std::to_string(arg);
                            *string_to_pump_to += stringified_num;
-                           *(static_cast<uint64_t*>(output_string_position)) += stringified_num.length();
+                           *(static_cast<uintptr_t*>(output_string_position)) += stringified_num.length();
 
                         }
                         }, internal_data);
@@ -313,12 +313,12 @@ namespace printing_tools {
                             if(move_or_copy){
                             const std::string& string_to_pump=  arg.get();
                             *string_to_pump_to += string_to_pump;
-                            *(static_cast<uint64_t*>(output_string_position)) += string_to_pump.length();
+                            *(static_cast<uintptr_t*>(output_string_position)) += string_to_pump.length();
                             }
                             else{
                             const std::string string_to_pump=  arg.get_moved();
                             *string_to_pump_to += string_to_pump;
-                            *(static_cast<uint64_t*>(output_string_position)) += string_to_pump.length();   
+                            *(static_cast<uintptr_t*>(output_string_position)) += string_to_pump.length();   
                             }
                             
                             
@@ -327,7 +327,7 @@ namespace printing_tools {
                             std::string to_pump = std::to_string(arg);
                         }
                         *string_to_pump_to += to_pump;
-                        *(static_cast<uint64_t*>(output_string_position)) += to_pump.length();
+                        *(static_cast<uintptr_t*>(output_string_position)) += to_pump.length();
                         
                         }, internal_data);
                 }
@@ -499,7 +499,7 @@ namespace printing_tools {
               
                     if (is_char_digit(string_to_read_from[*pos])) 
                         {
-                            return Polymorphic_accumulator{ read_from_string<uint64_t>(string_to_read_from, pos) };
+                            return Polymorphic_accumulator{ read_from_string<uintptr_t>(string_to_read_from, pos) };
 
                          }
                     else if (string_to_read_from[*pos] == '.') {
@@ -530,6 +530,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
