@@ -20,7 +20,7 @@ namespace helper_templates_for_options {
         try {
             auto entry_found = std::find_if(list_of_entries_to_find_it_in->begin(), list_of_entries_to_find_it_in->end(),
         }
-        catch (std::bad_alloc) {
+        catch (std::bad_alloc&) {
             //this is a very low level compiler error, in particular, it is an error in the usage of this tool or in the hardware/execution_environemnt of the user
             throw std::string{"memory allocation failure"};
         }
