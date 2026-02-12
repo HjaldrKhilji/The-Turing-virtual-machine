@@ -108,7 +108,7 @@ export   namespace config_parsing_tools {
             all_entries->add_non_term_pattern_for_newest_entry(non_terminal_pattern);
         }
         };
-        template<typename config>
+        template<typename config, typename config_for_semantic_entries=configs>
         class Config_reader  {
            
         private:
@@ -151,7 +151,7 @@ export   namespace config_parsing_tools {
                 return all_entries;
             }
         private:
-            absolute_base::All_non_terminal_entries<config> all_entries{};
+            absolute_base::All_non_terminal_entries<config, config_for_semantic_entries> all_entries{};
             line_stream current_input{{},{0}};
             std::unique_ptr<std::istream> input_stream;
            char delimeter;
