@@ -280,7 +280,7 @@ namespace printing_tools {
                         if constexpr (!std::is_same_v<polymorphic_strings, decltype(arg)>) {
                             const std::string& string_to_pump=  arg.get();
                             *string_to_pump_to += string_to_pump;
-                            *(static_cast<uintptr_t*>(output_string_position)) += string_to_pump.length();
+                            *output_string_position+=string_to_pump.length();
                             }
                         else {
                             std::string stringified_num=std::to_string(arg);
@@ -297,7 +297,7 @@ namespace printing_tools {
                       if constexpr (!std::is_same_v<polymorphic_strings, decltype(arg)>) {
                             const std::string string_to_pump=  arg.get_moved();
                             *string_to_pump_to += string_to_pump;
-                            *(static_cast<uintptr_t*>(output_string_position)) += string_to_pump.length();
+                            *output_string_position+=string_to_pump.length();
                             }
                         else {
                             std::string stringified_num=std::to_string(arg);
@@ -314,12 +314,12 @@ namespace printing_tools {
                             if(move_or_copy){
                             const std::string& string_to_pump=  arg.get();
                             *string_to_pump_to += string_to_pump;
-                            *(static_cast<uintptr_t*>(output_string_position)) += string_to_pump.length();
+                            *output_string_position+=string_to_pump.length();
                             }
                             else{
                             const std::string string_to_pump=  arg.get_moved();
                             *string_to_pump_to += string_to_pump;
-                            *(static_cast<uintptr_t*>(output_string_position)) += string_to_pump.length();   
+                            *output_string_position+=string_to_pump.length();   
                             }
                             
                             
