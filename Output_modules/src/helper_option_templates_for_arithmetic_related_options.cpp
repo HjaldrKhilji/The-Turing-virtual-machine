@@ -258,7 +258,7 @@ namespace printing_tools {
             std::string* ptr;
             polymorphic_strings(std::string string_to_build_it_with): 
             ptr{    new std::string{  std::move( string_to_build_it_with )  }    } {}
-            inline std::string& get(){
+            inline const std::string& get(){
                 return *ptr;
             }
             inline std::string get_moved(){
@@ -276,38 +276,51 @@ namespace printing_tools {
 
                 void pump(std::string* string_to_pump_to, std::string::size_type* output_string_position) {
                     std::visit([&](auto&& arg) {
-                        std::string to_pump{};
                         if constexpr (!std::is_same_v<polymorphic_strings, decltype(arg)>) {
-                            to_pump = arg.get();
-                        }
+                            const std::string& string_to_pump=  arg.get();
+                            *string_to_pump_to += string_to_pump;
+                            *(static_cast<uint64_t*>(output_string_position)) += string_to_pump.length();
+                            }
                         else {
-                            to_pump = std::to_string(arg);
+                            std::string stringified_num=std::to_string(arg);
+                           *string_to_pump_to += stringified_num;
+                           *(static_cast<uint64_t*>(output_string_position)) += stringified_num.length();
 
                         }
-                        *string_to_pump_to += to_pump;
-                        *(static_cast<uint64_t*>(output_string_position)) += to_pump.length();
+                        
                         }, internal_data);
                 }
                 void pump_move(std::string* string_to_pump_to, std::string::size_type* output_string_position) {
                     std::visit([&](auto&& arg) {
-                        if constexpr (!std::is_same_v<polymorphic_strings, decltype(arg)>) {
-                            std::string to_pump = std::move(arg.get());
-                            
-                        }
-                        else {
-                            std::string to_pump = std::to_string(arg);
-                        }
-                        *string_to_pump_to += to_pump;
-                        *(static_cast<uint64_t*>(output_string_position)) += to_pump.length();
                         
+                      if constexpr (!std::is_same_v<polymorphic_strings, decltype(arg)>) {
+                            const std::string string_to_pump=  arg.get_moved();
+                            *string_to_pump_to += string_to_pump;
+                            *(static_cast<uint64_t*>(output_string_position)) += string_to_pump.length();
+                            }
+                        else {
+                            std::string stringified_num=std::to_string(arg);
+                           *string_to_pump_to += stringified_num;
+                           *(static_cast<uint64_t*>(output_string_position)) += stringified_num.length();
+
+                        }
                         }, internal_data);
                 }
                 void pump_polymorphic_copy_semantics(std::string* string_to_pump_to, std::string::size_type* output_string_position) {
                     std::visit([&](auto&& arg) {
                         if constexpr (!std::is_same_v<polymorphic_strings, decltype(arg)>) {
                             bool move_or_copy=read_from_string<bool>(string_to_pump_to, output_string_position);
+                            if(move_or_copy){
+                            const std::string& string_to_pump=  arg.get();
+                            *string_to_pump_to += string_to_pump;
+                            *(static_cast<uint64_t*>(output_string_position)) += string_to_pump.length();
+                            }
+                            else{
+                            const std::string string_to_pump=  arg.get_moved();
+                            *string_to_pump_to += string_to_pump;
+                            *(static_cast<uint64_t*>(output_string_position)) += string_to_pump.length();   
+                            }
                             
-                            std::string to_pump = move_or_copy?std::move(arg.get()):arg.get() ;
                             
                         }
                         else {
@@ -517,6 +530,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
