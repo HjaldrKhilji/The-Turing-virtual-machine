@@ -891,11 +891,11 @@ void format_and_write_to_string(const std::string& output_config, std::string::s
 
 if(change_config_or_data){
 static_cast<std::string&>(output_config)=helper_templates_for_options::read_from_string<std::string>(output_data, output_data_position);
-position=0;
+*position=0;
 }
 else{
 output_data=helper_templates_for_options::read_from_string<std::string>(output_config, position);
-output_data_position=0;
+*output_data_position=0;
 }
     
 }
