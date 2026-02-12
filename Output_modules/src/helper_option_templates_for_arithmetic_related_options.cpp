@@ -7,7 +7,7 @@ module;
 #include <utility>
 #include <variant>
 #include <functional>
-
+#include <cstdint>  // For uintptr_t
 //i used AI to track the header files needed
 #include<utility>
 module Printer;
@@ -530,6 +530,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
