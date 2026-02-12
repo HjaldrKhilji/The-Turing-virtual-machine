@@ -72,7 +72,7 @@ namespace loop_and_branch_helpers {
 
              comparision_operator_name = output_config_mutable.back();
              output_config_mutable.pop_back();
-             --(*(static_cast<uintptr_t*>(position)));
+             --(*(position));
              y = read_from_string<uintptr_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
              
          }
@@ -105,7 +105,7 @@ namespace loop_and_branch_helpers {
              char loop_option = output_config_mutable.back();
              output_config_mutable.push_back(body_option);
              output_config_mutable.push_back(loop_option);
-             *(static_cast<uintptr_t*>(position)) += 2;
+             *(position) += 2;
 
 
              
@@ -113,7 +113,7 @@ namespace loop_and_branch_helpers {
          else {
              output_config_mutable.pop_back();
              output_config_mutable.pop_back();
-             *(static_cast<uintptr_t*>(position))-=2;
+             *(position)-=2;
 
 
              if (!loop_cache_empty) {
@@ -176,11 +176,11 @@ namespace loop_and_branch_helpers {
              output_config_mutable.pop_back();
              output_config_mutable.pop_back();
              output_config_mutable.push_back( lastChar); //letting the second last charactor be our branch.
-             --(*(static_cast<uintptr_t*>(position)));
+             --(*(position));
          }
          else {
              output_config_mutable.pop_back();
-             --(*(static_cast<uintptr_t*>(position)));
+             --(*(position));
 
          }
      }
