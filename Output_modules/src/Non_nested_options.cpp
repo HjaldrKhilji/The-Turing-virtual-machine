@@ -228,7 +228,7 @@ namespace printing_tools {
                 //in my defense it is okay, since I am doing some arithmetic in this function, so suck it up.
                 size_t number_to_subract = read_from_string<size_t, read_from_config_or_output>(output_config, output_data, position, output_data_position);
                 if (output_data_position = > number_to_subract) {
-                    *(static_cast<uintptr_t*>(output_data_position)) -= number_to_subract;
+                    *(output_data_position) -= number_to_subract;
                 }
                 else if (number_to_subract == std::numeric_limits<std::size_t>::max()) {
                     //means the user gave -1 as input
@@ -532,7 +532,7 @@ namespace printing_tools {
                 //in my defense it is okay, since I am doing some arithmetic in this function, so suck it up.
                 size_t number_to_subract = read_from_string<size_t, read_from_config_or_output>(output_config, output_data, position, output_data_position);
                 if (output_data_position = > number_to_subract) {
-                    *(static_cast<uintptr_t*>(output_data_position)) -= number_to_subract;
+                    *(output_data_position) -= number_to_subract;
                 }
                 else if (number_to_subract == std::numeric_limits<std::size_t>::max()) {
                     //means the user gave -1 as input
