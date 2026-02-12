@@ -218,12 +218,7 @@ namespace printing_tools {
                 }
                   
             }
-            inline std::string get(){
-                return *ptr;
-            }
-            inline std::string get_moved(){
-                return std::move(*ptr);
-            }
+            
             ~Extented_types(){
             switch(ptr->first){
                 case type_tag::uint64_tag:
@@ -263,7 +258,7 @@ namespace printing_tools {
             std::string* ptr;
             polymorphic_strings(std::string string_to_build_it_with): 
             ptr{    new std::string{  std::move( string_to_build_it_with )  }    } {}
-            inline std::string get(){
+            inline std::string& get(){
                 return *ptr;
             }
             inline std::string get_moved(){
@@ -522,6 +517,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
