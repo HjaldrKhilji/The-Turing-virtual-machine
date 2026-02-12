@@ -248,11 +248,11 @@ namespace printing_tools {
                 default:
                   uint64_t array_size_in_bytes= (sizeof(std::pair<extented_type_info, Extented_types>*)*vector_containing_nested_type_info.length()); 
                   uint64_t element_size_in_bytes=(sizeof(std::pair<extented_type_info, Extented_types>)*vector_containing_nested_type_info.length());
-                  std::pair<extented_type_info, Extented_types>* array=  
-                  reinterpret_cast<std::pair<extented_type_info, Extented_types>*>(ptr->second)
+                  Extented_types* array=  
+                  reinterpret_cast<Extented_types*>(ptr->second);
                   
                     for(int i=0; i<vector_containing_nested_type_info.length(); i++){
-                   
+                    delete array[i];
                     
             }
                  delete[] reinterpret_cast<char*>(ptr);
@@ -522,6 +522,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
