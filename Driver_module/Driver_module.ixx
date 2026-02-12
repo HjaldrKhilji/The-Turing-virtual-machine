@@ -71,7 +71,7 @@ export namespace driver {
 			try {
 
                 using All_entries_input = absolute_base::All_non_terminal_entries<estd::regex_pattern>;
-                using All_entries_output = absolute_base::All_non_terminal_entries<estd::processed_string>;
+                using All_entries_output = absolute_base::All_non_terminal_entries<estd::processed_string, string>;
 
                 Config_reader<estd::regex_pattern> read_input_stream_config = Config_reader<estd::regex_pattern>{ file_stream_intializater<std::ifstream>(input_config_file), default_input_config_delimeter };
                 std::unique_ptr<All_entries_input> input_config = std::make_unique<All_entries_input>();
@@ -92,7 +92,7 @@ export namespace driver {
                     }
                     } };
                 //as you can guess input config is shared because output needs to manage it(if the user asks by providing options) while input needs to use it
-                Config_reader<estd::processed_string> output_config_stream = Config_reader<estd::processed_string>{ file_stream_intializater<std::ofstream>(output_config_file), default_output_config_delimeter };
+                Config_reader<estd::processed_string, std::string> output_config_stream = Config_reader<estd::processed_string>{ file_stream_intializater<std::ofstream>(output_config_file), default_output_config_delimeter };
                 All_entries_output output_config{};
                 std::thread output_config_reader_thread{
                 [] {
