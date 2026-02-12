@@ -172,7 +172,12 @@ namespace printing_tools {
             unordered_map_containing_types;
 
             struct Extented_types{
-            using extended_type_array= std::pair<extented_type_info, Extented_types>*;
+//I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
+            using nested_type= std::pair<extented_type_info, Extented_types*>;
+            using ordinary_type_int= std::pair<extented_type_info, uintptr_t>;
+            using ordinary_type_double= std::pair<extented_type_info, long double>;
+            using ordinary_type_string= std::pair<extented_type_info, std::string>;
+
              void* ptr;
             Extented_types(extented_type_info info, const std::string& string_to_read_from, 
                 std::string:size_type* pos )
@@ -241,10 +246,8 @@ namespace printing_tools {
                     case type_tag::type_in_hash_map_tag:
                     [[fallthrough]]
                 default:
-                  uintptr_t array_size_in_bytes= (sizeof(std::pair<extented_type_info, Extented_types>*)*vector_containing_nested_type_info.length()); 
-                  uintptr_t element_size_in_bytes=(sizeof(std::pair<extented_type_info, Extented_types>)*vector_containing_nested_type_info.length());
-                  Extented_types* array=  
-                  reinterpret_cast<Extented_types*>(ptr->second);
+                   static_cast<std::pair<extented_type_info, Extented_types*>> formated= static_cast<std::pair<extented_type_info, Extented_types*>>(ptr);
+                    Extented_types* array=  formated->second;
                   
                     for(int i=0; i<vector_containing_nested_type_info.length(); i++){
                     delete array[i];
@@ -335,9 +338,9 @@ namespace printing_tools {
                 template<typename Op_type>
                 bool all_comparision_imp_generator(const Polymorphic_accumulator& lhs, const Polymorphic_accumulator& rhs, Op_type operator_name) {
                     Polymorphic_accumulator result = std::visit([&](auto&& a, auto&& b) -> Polymorphic_accumulator {
-                    if constexpr (std::is_same_v<std::string, decltype(a)>) {
-                        if constexpr (!std::is_same_v<std::string, decltype(b)>) {
-                            return operator_name(a, b);
+                    if constexpr (std::is_same_v<polymorphic_strings, decltype(a)>) {
+                        if constexpr (std::is_same_v<polymorphic_strings, decltype(b)>) {
+                            return operator_name(a, b.get());
 
                         }
                         else {
@@ -346,14 +349,17 @@ namespace printing_tools {
                         }
                     }
                     else {
-                        if constexpr (std::is_same_v<std::string, decltype(b)>) {
+                        if constexpr (std::is_same_v<polymorphic_strings, decltype(b)>) {
                             try {
                                 if constexpr (std::is_same_v<uintptr_t, decltype(a)>) {
-                                    return operator_name(a, convert_to_number<uintptr_t>(b));
+                                    return operator_name(a, convert_to_number<uintptr_t>(b.get()));
                                 }
                                 else if constexpr (std::is_same_v<long double, decltype(a)>) {
-                                    return operator_name(b, convert_to_number<uintptr_t>(b));
+                                    return operator_name(b, convert_to_number<uintptr_t>(b.get()));
 
+                                }
+                                else{
+                                return operator_name(b.get(), b.get());
                                 }
                             }
                                 catch (std::string& error_from_converter) {
@@ -396,25 +402,23 @@ namespace printing_tools {
                 inline Polymorphic_accumulator operator+(Polymorphic_accumulator polymorphic_accumulator) {
                     Polymorphic_accumulator result = std::visit([&](auto&& a, auto&& b) -> Polymorphic_accumulator {
 
-                        if constexpr (std::is_same_v<std::string, decltype(a)>) {
-                            if constexpr (!std::is_same_v<std::string, decltype(b)>) {
-                                return Polymorphic_accumulator{ a + b };//used std::move() because of strings
+                        if constexpr (std::is_same_v<polymorphic_strings, decltype(a)>) {
+                            if constexpr (!std::is_same_v<polymorphic_strings, decltype(b)>) {
+                                return Polymorphic_accumulator{ a.get() + b.get() };//used std::move() because of strings
 
                             }
                             else {
-                                return Polymorphic_accumulator{ a + std::to_string(b) };//used std::move() because of strings
+                                return Polymorphic_accumulator{ a.get() + std::to_string(b) };//used std::move() because of strings
 
                             }
                         }
                         else {
-                        if constexpr (std::is_same_v<std::string, decltype(b)>) {
-                        return Polymorphic_accumulator{ std::to_string(a) + b };//used std::move() because of strings
-
-                            }
-                            else {
-                                return Polymorphic_accumulator{ a+b };
-
-                            }
+                        if constexpr (std::is_same_v<polymorphic_strings, decltype(b)>) {
+                        return Polymorphic_accumulator{ std::to_string(a) + b.get() };//used std::move() because of strings
+                        }
+                        else {
+                        return Polymorphic_accumulator{ a.get()+b.get() };
+                        }
                         }
                         }, *this, polymorphic_accumulator);
                     return result;
@@ -530,6 +534,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
