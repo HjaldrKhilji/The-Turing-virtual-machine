@@ -99,7 +99,7 @@ export namespace printing_tools {
                 try {
                     absolute_base::semantic_checks(current_generation.get_semantic_rules_for_current_sibling(), output_data);
                 }
-                catch (std::string failed_matches) {
+                catch (std::string& failed_matches) {
                     throw std::string{ "OPTION TO DO SEMANTIC CHECKS: SEMANTIC CHECKS ENGINE: semantic errors. raw semantic errors are:" + failed_matches };
                 }
                 output_driver(std::move(output_data), current_generation.get_current_sibling(), current_sibling_index);
