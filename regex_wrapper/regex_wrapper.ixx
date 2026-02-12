@@ -69,17 +69,29 @@ namespace estd {
 	struct part_of_regex{
       bool ignore;
       bool optional;
+	  bool not_pack_of_charactors_bool;
       uint64_t minimum_number_of_time_to_match;
       uint64_t maximum_number_of_times_to_match;
       processed_string string_to_match;
       std::pair<bool, std::string::size_type>match(const std::string &string_to_match_it_in, std::string::size_type starting_position){
       std::string::size_type position=starting_position;
       uint64_t i=0;
-      for(; true;i++){
+		if(not_pack_of_charactors_bool){
+      for(; i<maximum_number_of_times_to_match;i++){
       if(!string_to_match_it_in.find(string_to_match, position)){
        break;
 	  }
 	  }
+		}
+	else{
+	   for(auto x:string_to_match){
+		for(; i<maximum_number_of_times_to_match;i++){
+      if(!string_to_match_it_in.find(std::string{x}, position)){
+       break;
+	  }
+	  }
+	}
+	}
       if(maximum_number_of_times_to_match!=0){
            //this outer if statement is to optimize the two checks inside
            //maximum number being 0 means that we wanted it to be ignored
