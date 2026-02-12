@@ -348,11 +348,11 @@ namespace printing_tools {
                     else {
                         if constexpr (std::is_same_v<std::string, decltype(b)>) {
                             try {
-                                if constexpr (std::is_same_v<long long int, decltype(a)>) {
-                                    return operator_name(a, convert_to_number<long long int>(b));
+                                if constexpr (std::is_same_v<uintptr_t, decltype(a)>) {
+                                    return operator_name(a, convert_to_number<uintptr_t>(b));
                                 }
                                 else if constexpr (std::is_same_v<long double, decltype(a)>) {
-                                    return operator_name(b, convert_to_number<long long int>(b));
+                                    return operator_name(b, convert_to_number<uintptr_t>(b));
 
                                 }
                             }
@@ -530,6 +530,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
