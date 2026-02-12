@@ -133,7 +133,7 @@ namespace loop_and_branch_helpers {
          }
      }
 
-     catch (std::string error_sent_by_reader)
+     catch (std::string& error_sent_by_reader)
      {
          throw std::string{ "LOOP: " + error_sent_by_reader };
      }
@@ -184,7 +184,7 @@ namespace loop_and_branch_helpers {
          }
      }
 
-     catch (std::string error_sent_by_reader)
+     catch (std::string& error_sent_by_reader)
      {
          throw std::string{ "BRANCH: " + error_sent_by_reader };
      }
