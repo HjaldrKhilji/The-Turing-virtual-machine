@@ -110,7 +110,7 @@ export   namespace config_parsing_tools {
             all_entries->add_non_term_pattern_for_newest_entry(non_terminal_pattern);
         }
         };
-        template<typename config, typename config_for_semantic_entries=configs>
+        template<typename config, typename config_for_semantic_entries=absolute_base::Semantical_analyzer_config_entry<configs>>
         class Config_reader  {
            
         private:
