@@ -64,6 +64,10 @@ namespace estd {
 	all_options::options[x](all_non_term_entries, stream, extra_input);
 	}
 	}
+template<typename config>
+	void read_input(const config_parsing_tools::line_stream& stream, std::string* str, absolute_base::All_non_terminal_entries <config>* all_non_term_entries,  std::istream *extra_input){
+	stream>>*str;
+	}
 	namespace helper_functions= printing_tools::helper_templates_for_options::helpers_for_arithmetic_options;
 	//aliases to change if you want to move away from boost
 	struct part_of_regex{
