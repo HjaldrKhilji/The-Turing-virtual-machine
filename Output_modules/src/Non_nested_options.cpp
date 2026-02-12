@@ -7,6 +7,7 @@ module;
 #include <limits>
 #include <stdexcept>
 #include <iostream>
+#include <cstdint>  // For uintptr_t
 // I used AI to keep track of the headers needed 
 
 module Printer;
