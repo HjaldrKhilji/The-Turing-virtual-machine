@@ -23,7 +23,7 @@ namespace printing_tools {
             try {
                 number_of_times_to_replicate = absolute_base::read_number_from_string_at_a_position<int>(output_config, &position);
             }
-            catch (std::string error_send_by_reader) {
+            catch (std::string& error_send_by_reader) {
 
                 throw std::string{ "OUTPUT REPLICATION OPTION:", error_send_by_reader };
             }
@@ -42,7 +42,7 @@ namespace printing_tools {
             file_name= read_from_string<std::string, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position),
             obj->output.switchToNewStream(new std::ofstream{ file_name });
             }
-            catch (std::string error_send_by_reader) {
+            catch (std::string& error_send_by_reader) {
 
                 throw std::string{ "OPTION TO CHANGE OUTPUT STREAM:", error_send_by_reader };
             }
@@ -60,7 +60,7 @@ namespace printing_tools {
             file_name= read_from_string<std::string, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position),
             obj->input.switchToNewStream(new std::ifstream{ file_name });
             }
-            catch (std::string error_send_by_reader) {
+            catch (std::string& error_send_by_reader) {
 
                 throw std::string{ "OPTION TO CHANGE INPUT STREAM:", error_send_by_reader };
             }
@@ -116,7 +116,7 @@ namespace printing_tools {
                 }
                 obj->list_of_entries_to_find_it_in->remove_entry(non_term_entry);
             }
-            catch (std::string error_sent_by_reporter) {
+            catch (std::string& error_sent_by_reporter) {
 
                 throw std::string{ "OPTION TO REMOVE NON TERMINAL ENTRY: " + error_sent_by_reporter };
 
@@ -140,7 +140,7 @@ namespace printing_tools {
                 }
                 config_parsing_tools::Config_reader_helper::push_latest_entry_as_sub_entry_of_an_entry(obj->list_of_entries_to_find_it_in,non_term_entry);
             }
-            catch (std::string error_sent_by_reporter) {
+            catch (std::string& error_sent_by_reporter) {
                 throw std::string{ "OPTION TO ADD NON TERMINAL ENTRY: " + error_sent_by_reporter };
 
             }
@@ -175,7 +175,7 @@ namespace printing_tools {
                     );
                 obj->list_of_entries_to_find_it_in->add_semantic_rule_to_entry(info_needed->non_term_entry, std::move(semantic_entry), info_needed.semantic_entry_index);
             }
-            catch (std::string error_sent_by_reporter) {
+            catch (std::string& error_sent_by_reporter) {
                 throw std::string{ "OPTION TO ADD SEMANTIC ENTRY TO THE NON TERMINAL ENTRY PASSED: " + error_sent_by_reporter };
 
             }
@@ -205,7 +205,7 @@ namespace printing_tools {
                 }
                 obj->list_of_entries_to_find_it_in->remove_semantic_rule_of_entry(info_needed->non_term_entry, info_needed.semantic_entry_index);
             }
-            catch (std::string error_sent_by_reporter) {
+            catch (std::string& error_sent_by_reporter) {
                 throw std::string{ "OPTION TO REMOVE SEMANTIC ENTRY FROM THE NON TERMINAL ENTRY PASSED: " + error_sent_by_reporter };
 
             }
@@ -238,7 +238,7 @@ namespace printing_tools {
                     throw std::string{ "COMPILER: number to subtract is bigger than current position" };
                 }
             }
-            catch (std::string error_sent_by_reporter) {
+            catch (std::string& error_sent_by_reporter) {
                 throw std::string{ "OPTION TO SUBTRACT FROM OUTPUT DATA POSITION PASSED: " + error_sent_by_reporter };
 
             }
@@ -283,7 +283,7 @@ namespace printing_tools {
                     static_assert(1, "wrong operator");
                 }
             }
-            catch (std::string error_sent_by_reader)
+            catch (std::string& error_sent_by_reader)
             {
                 throw std::string{ "STATIC ARETHIMETIC ENGINE: " + error_sent_by_reader };
             }
@@ -348,7 +348,7 @@ namespace printing_tools {
 
                 }
             }
-            catch (std::string engine_error_label) {
+            catch (std::string& engine_error_label) {
                 throw std::string{ engine_error_label + ":a string used as an operand to the " + operator_name + " operator" }
 
             }
@@ -392,7 +392,7 @@ namespace printing_tools {
             try {
                 file_name = absolute_base::read_string_from_string_at_a_position(output_config, &position);
             }
-            catch (std::string error_send_by_reader) {
+            catch (std::string& error_send_by_reader) {
 
                 throw std::string{ "OPTION TO CHANGE OUTPUT STREAM:", error_send_by_reader };
             }
@@ -409,7 +409,7 @@ namespace printing_tools {
             try {
                 file_name = absolute_base::read_string_from_string_at_a_position(output_config, &position);
             }
-            catch (std::string error_send_by_reader) {
+            catch (std::string& error_send_by_reader) {
 
                 throw std::string{ "OPTION TO CHANGE INPUT STREAM:", error_send_by_reader };
             }
@@ -450,7 +450,7 @@ namespace printing_tools {
                 Non_terminal_name_entry* non_term_entry = helper_templates_for_options::return_non_terminal_entry<search>(output_config, position, list_of_entries_to_find_it_in);
                 list_of_entries_to_find_it_in->remove_entry(non_term_entry);
             }
-            catch (std::string error_sent_by_reporter) {
+            catch (std::string& error_sent_by_reporter) {
 
                 throw std::string{ "OPTION TO REMOVE NON TERMINAL ENTRY: " + error_sent_by_reporter };
 
@@ -466,7 +466,7 @@ namespace printing_tools {
                 Non_terminal_name_entry* non_term_entry = helper_templates_for_options::return_non_terminal_entry<search>(output_config, position, list_of_entries_to_find_it_in);
                 config_parsing_tools::Config_reader_helper::push_latest_entry_as_sub_entry_of_an_entry(*list_of_entries_to_find_it_in,non_term_entry);
             }
-            catch (std::string error_sent_by_reporter) {
+            catch (std::string& error_sent_by_reporter) {
                 throw std::string{ "OPTION TO ADD NON TERMINAL ENTRY: " + error_sent_by_reporter };
 
             }
@@ -491,7 +491,7 @@ namespace printing_tools {
                     );
                 list_of_entries_to_find_it_in->add_semantic_rule_to_entry(info_needed.non_term_entry, std::move(semantic_entry), info_needed.sibling_index, info_needed.semantic_entry_index);
             }
-            catch (std::string error_sent_by_reporter) {
+            catch (std::string& error_sent_by_reporter) {
                 throw std::string{ "OPTION TO ADD SEMANTIC ENTRY TO THE NON TERMINAL ENTRY PASSED: " + error_sent_by_reporter };
 
             }
@@ -509,7 +509,7 @@ namespace printing_tools {
                     (output_config, position, list_of_entries_to_find_it_in);
                 list_of_entries_to_find_it_in->remove_latest_semantic_rule_for_entry(info_needed.non_term_entry, info_needed.sibling_index, info_needed.semantic_entry_index);
             }
-            catch (std::string error_sent_by_reporter) {
+            catch (std::string& error_sent_by_reporter) {
                 throw std::string{ "OPTION TO REMOVE SEMANTIC ENTRY FROM THE NON TERMINAL ENTRY PASSED: " + error_sent_by_reporter };
 
             }
@@ -542,7 +542,7 @@ namespace printing_tools {
                     throw std::string{ "COMPILER: number to subtract is bigger than current position" };
                 }
             }
-            catch (std::string error_sent_by_reporter) {
+            catch (std::string& error_sent_by_reporter) {
                 throw std::string{ "OPTION TO SUBTRACT FROM OUTPUT DATA POSITION PASSED: " + error_sent_by_reporter };
 
             }
@@ -587,7 +587,7 @@ namespace printing_tools {
                     static_assert(1, "wrong operator");
                 }
             }
-            catch (std::string error_sent_by_reader)
+            catch (std::string& error_sent_by_reader)
             {
                 throw std::string{ "STATIC ARETHIMETIC ENGINE: " + error_sent_by_reader };
             }
@@ -661,7 +661,7 @@ namespace printing_tools {
                     static_assert(1, "invalid operation used to instantiate template");
                 }
             }
-            catch (std::string engine_error_label) {
+            catch (std::string& engine_error_label) {
                 throw std::string{ engine_error_label + ":a string used as an operand to the " + operator_name + " operator" }
 
             }
@@ -735,7 +735,7 @@ namespace printing_tools {
                 }
             }
 
-            catch (std::string error_sent_by_reader)
+            catch (std::string& error_sent_by_reader)
             {
                 throw std::string{ "POLYMORPHIC VARIABLE STORAGE: " + error_sent_by_reader };
             }
@@ -771,7 +771,7 @@ namespace printing_tools {
                 
             }
 
-            catch (std::string error_sent_by_reader)
+            catch (std::string& error_sent_by_reader)
             {
                 throw std::string{ "POLYMORPHIC VARIABLE GET: " + error_sent_by_reader };
             }
@@ -796,7 +796,7 @@ namespace printing_tools {
                  }
             }
 
-            catch (std::string error_sent_by_reader)
+            catch (std::string& error_sent_by_reader)
             {
                 throw std::string{ "POLYMORPHIC VARIABLE REMOVE: " + error_sent_by_reader };
             }
