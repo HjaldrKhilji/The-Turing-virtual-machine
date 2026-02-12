@@ -9,7 +9,7 @@ module;
 #include <iostream>
 #include <cstdint>  // For uintptr_t
 // I used AI to keep track of the headers needed 
-
+using std::uintptr_t;
 module Printer;
 import Driver;
 import all_declarations;
