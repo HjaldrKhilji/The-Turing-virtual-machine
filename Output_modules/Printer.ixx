@@ -80,8 +80,9 @@ export namespace printing_tools {
                         //dont move output_config_entry.output_config_data as well into a local variable as well, you can copy but that would be expensive.
             operations_dispatch_table[option_charactor](output_config_entry.output_config_data, &position, &string_to_output, &output_data_position);
              
+            
             }
-                
+            for()    
             }
 
 
