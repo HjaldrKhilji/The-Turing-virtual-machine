@@ -2,6 +2,8 @@ module;
 #include<vector>
 #include<string>
 #include <limits>
+#include <cstdint>  // For uintptr_t
+using std::uintptr_t;
 module estd_regex;
 import all_declarations;
 import Config_parser;
@@ -21,7 +23,7 @@ namespace estd {
 		char delimeter;
 		stream>>delimeter;
 		const config_parsing_tools::line_stream stream_used_to_parse_semantic_rules{std::getline(*extra_input, current_input.string_buffer, delimeter)};
-		uint64_t name;
+		uintptr_t name;
 		stream>>name;
 		semantical_analyzer_entry_reader<config>(name,all_non_term_entries, extra_input);
 		}
@@ -74,12 +76,12 @@ template<typename config>
       bool ignore;
       bool optional;
 	  bool not_pack_of_charactors_bool;
-      uint64_t minimum_number_of_time_to_match;
-      uint64_t maximum_number_of_times_to_match;
+      uintptr_t minimum_number_of_time_to_match;
+      uintptr_t maximum_number_of_times_to_match;
       processed_string string_to_match;
       std::pair<bool, std::string::size_type>match(const std::string &string_to_match_it_in, std::string::size_type starting_position){
       std::string::size_type position=starting_position;
-      uint64_t i=0;
+      uintptr_t i=0;
 		if(not_pack_of_charactors_bool){
       for(; i<maximum_number_of_times_to_match;i++){
       if(!string_to_match_it_in.find(string_to_match, position)){
