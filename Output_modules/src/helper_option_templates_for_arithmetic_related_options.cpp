@@ -348,7 +348,7 @@ namespace printing_tools {
 
                                 }
                             }
-                                catch (std::string error_from_converter) {
+                                catch (std::string& error_from_converter) {
                                     throw std::string{ "DYNAMIC ARETHIMETIC ENGINE: "+ error_from_converter+'.'};
                                 }
                             
@@ -522,6 +522,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
