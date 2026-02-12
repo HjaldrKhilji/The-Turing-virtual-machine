@@ -203,15 +203,15 @@ namespace printing_tools {
                     extra_info_for_extented_types= unordered_map_containing_types[info.index];
                     [[fallthrough]]
                     default:
-                    uint64_t array_size_in_bytes= (sizeof(std::pair<extented_type_info, Extented_types>*)*vector_containing_nested_type_info.length()); 
-                    uint64_t element_size_in_bytes=(sizeof(std::pair<extented_type_info, Extented_types>)*vector_containing_nested_type_info.length());
+                    uint64_t array_size_in_bytes= sizeof(Extented_types*)*vector_containing_nested_type_info.length(); 
+                    uint64_t element_size_in_bytes=sizeof(Extented_types)*vector_containing_nested_type_info.length();
                     char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(extented_type_info)];
                     new (reinterpret_cast<extented_type_info*>) extented_type_info{info};
-                    std::pair<extented_type_info, Extented_types>* array= reinterpret_cast< std::pair<extented_type_info, Extented_types>*>(raw_mem+sizeof(extented_type_info));
+                    Extented_types* array= reinterpret_cast<Extented_types*>(raw_mem+sizeof(extented_type_info));
                         
                     for(int i=0; i<vector_containing_nested_type_info.length(); i++){
                         array[i]=array+array_size_in_bytes+(i*element_size_in_bytes); 
-                        new (array[i]) Extented_types{vector_containing_nested_type_info[i].tag,source, location };
+                        new (array[i]) Extented_types{vector_containing_nested_type_info[i]->first,{vector_containing_nested_type_info[i].tag,source, location} };
                     }
                     ptr= reinterpret_cast<std::pair<extented_type_info,void*>*>(raw_mem);
                     ptr->second= reinterpret_cast<void*>(array);
@@ -227,35 +227,35 @@ namespace printing_tools {
             ~Extented_types(){
             switch(ptr->first){
                 case type_tag::uint64_tag:
-                    delete static_cast<std::pair<extented_type_info, uint64_t>*>(ptr);
+                    delete reinterpret_cast<std::pair<extented_type_info, uint64_t>*>(ptr);
                     break;
                 case type_tag::long_double_tag:
-                    delete static_cast<std::pair<extented_type_info, long double>*>(ptr);
+                    delete reinterpret_cast<std::pair<extented_type_info, long double>*>(ptr);
                     break;
                 case type_tag::uint64_tag:
-                    delete static_cast<std::pair<extented_type_info, std::string>*>(ptr);
+                    delete reinterpret_cast<std::pair<extented_type_info, std::string>*>(ptr);
                     break;
                 
             }
             vector<extented_type_info>* extra_info_for_extented_types;
             switch(ptr->first){
                 case type_tag::vector_containing_types:
-                    extra_info_for_extented_types= vector_containing_types[info.index];
                     [[fallthrough]]
                     case type_tag::type_in_map_tag:
-                    extra_info_for_extented_types= map_containing_types[info.index];
                     [[fallthrough]]
                     case type_tag::type_in_hash_map_tag:
-                    extra_info_for_extented_types= unordered_map_containing_types[info.index];
                     [[fallthrough]]
                 default:
                   uint64_t array_size_in_bytes= (sizeof(std::pair<extented_type_info, Extented_types>*)*vector_containing_nested_type_info.length()); 
                   uint64_t element_size_in_bytes=(sizeof(std::pair<extented_type_info, Extented_types>)*vector_containing_nested_type_info.length());
-                  std::pair<extented_type_info, Extented_types>* array= 
-                for(int i=0; i<vector_containing_nested_type_info.length(); i++){
-   
+                  std::pair<extented_type_info, Extented_types>* array=  
+                  reinterpret_cast<std::pair<extented_type_info, Extented_types>*>(ptr->second)
+                  
+                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+                   
                     
             }
+                 delete[] reinterpret_cast<char*>(ptr);
             }
             };
 
@@ -522,6 +522,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
