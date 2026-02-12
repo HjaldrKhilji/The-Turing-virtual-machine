@@ -886,6 +886,20 @@ void change_input_delimeter(const std::string& output_config, std::string::size_
         static_cast<uint64_t>(*output_data_position)++;
     }
 }
+template<bool change_config_or_data>
+void format_and_write_to_string(const std::string& output_config, std::string::size_type* position, std::string* output_data, std::string::size_type* output_data_position) {
+
+if(change_config_or_data){
+static_cast<std::string&>(output_config)=helper_templates_for_options::read_from_string<std::string>(output_data, output_data_position);
+position=0;
+}
+else{
+output_data=helper_templates_for_options::read_from_string<std::string>(output_config, position);
+output_data_position=0;
+}
+    
+}
+            
 template<bool source_is_output_config_or_output_data>
 void escape_charactor(const std::string& output_config, std::string::size_type* position, std::string* output_data, std::string::size_type* output_data_position) {
     std::string escape_charactor=helper_templates_for_options::read_from_string<std::string, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
