@@ -9,7 +9,9 @@ module;
 #include <deque>
 #include <map>
 #include <stack>
+#include <cstdint>  // For uintptr_t
 
+using std::uintptr_t
 // Functional and Utility
 #include <functional> // For std::function and std::reference_wrapper
 #include <utility>    // For std::move and std::pair
@@ -186,7 +188,7 @@ export module All_declarations;//for c++ noobs, including myself, the module nam
         template<typename config, typename config_for_semantic_entries=config>
         struct Non_terminal_name_entry {
             
-            uint64_t name;
+            uintptr_t name;
             union {
                 config pattern;
                 config output_config_data;//dont even think of making this one const! (it wont allow branching)
@@ -261,10 +263,10 @@ export module All_declarations;//for c++ noobs, including myself, the module nam
             //the traversal begin() returns the last element, and end() returns one before the
                         //first element, thats because the last entry will be the one that the user of this
                         //structure will PROBABLY traverse from.
-        public:  void add_non_term_symbol_name(uint64_t name)=0;//this adds the non term symbol only to fast traversal list
+        public:  void add_non_term_symbol_name(uintptr_t name)=0;//this adds the non term symbol only to fast traversal list
                void add_non_term_pattern_for_newest_entry(config pattern)=0;//this adds the newest element to the fast search map as well, after it has enter the pattern into the newest element traversal list
-               config& get_pattern_of_nested_non_term_symbol_pattern(uint64_t sub_symbol_name)=0;//this gets the pattern for a name, from the map, and the reason I say for nested non term symbol is because it is generally used for finding the symbols for nested non term symbols
-               void add_nested_non_term_symbol_to_the_newest_entry(uint64_t sub_symbol_name)=0;//this just takes a string, which it assumes to be the name of a non term symbol, and finds the non term symbol(from the map), and adds it's reference into the nested non term symbol list of the newest entry
+               config& get_pattern_of_nested_non_term_symbol_pattern(uintptr_t sub_symbol_name)=0;//this gets the pattern for a name, from the map, and the reason I say for nested non term symbol is because it is generally used for finding the symbols for nested non term symbols
+               void add_nested_non_term_symbol_to_the_newest_entry(uintptr_t sub_symbol_name)=0;//this just takes a string, which it assumes to be the name of a non term symbol, and finds the non term symbol(from the map), and adds it's reference into the nested non term symbol list of the newest entry
                void add_semantic_rule_for_newest_sub_entry(const Semantical_analyzer_config_entry<config>&& semantical_rule_entry)=0;//this is my favorite(I spend 4 days on making this), so all it does is that it finds the latest entry from the fast traversal list, then finds the latest sub entry in that, and adds this semantic rule entry for that sub entry 
                void print_all_content()=0;
                Non_terminal_name_entry<config>& get_current_non_term_entry(int index)=0;//simply gets the non term entry at the given index
@@ -302,7 +304,7 @@ export module All_declarations;//for c++ noobs, including myself, the module nam
 		
 		            //it should be obvious that the map is for fast lookups, and deque is for fast traversal:
 		            
-		            std::map < uint64_t,
+		            std::map < uintptr_t,
 		                Iterator_for_list_of_entries
 		                > map_for_fast_retrival_of_entries;
 		            std::deque < Non_terminal_name_entry<config> > list_of_all_non_term_entries_for_fast_traversal;
