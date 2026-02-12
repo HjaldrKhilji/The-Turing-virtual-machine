@@ -7,6 +7,7 @@ module;
 
 // Required for uintptr_t fixed-width integers
 #include <cstdint>
+using std::uintptr_t;
 
 // Required if your accumulator uses engine-level regex
 #include <regex>
