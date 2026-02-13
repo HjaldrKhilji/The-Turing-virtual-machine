@@ -73,13 +73,6 @@ export   namespace config_parsing_tools {
              
 			config semantic_pattern_to_check{};
 	        read_input(line_stream, semantic_pattern_to_check, all_non_term_entries, extra_input);
-			if constexpr(std::same_as<std::string, config>){      
-			//below is a shortcut, if config is string then semantic entry type is too
-             all_entries->add_semantic_rule_for_newest_sub_entry(
-			semantic_pattern_to_check
-			}
-			return;
-			}
             unsigned int minimum_amount_of_Matches = 0;
             unsigned int maximum_amount_of_matches = 0; //only used if settings_for_semantic_rules dosent have check_atleast on.
             
@@ -117,7 +110,7 @@ export   namespace config_parsing_tools {
             all_entries->add_non_term_pattern_for_newest_entry(non_terminal_pattern);
         }
         };
-        template<typename config, typename config_for_semantic_entries=absolute_base::Semantical_analyzer_config_entry<configs>>
+        template<typename config, typename config_for_semantic_entries=configs>
         class Config_reader  {
            
         private:
