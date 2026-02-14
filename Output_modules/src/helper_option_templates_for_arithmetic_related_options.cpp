@@ -165,7 +165,7 @@ namespace printing_tools {
             type_tag tag;
             union{
             uintptr_t index;//for Extented_types 
-            uintptr_t  size;//for Extented_types_lose_checking
+            uintptr_t  size;//for hetrogenous_array_type
             }
             };       
             
@@ -377,8 +377,8 @@ namespace printing_tools {
                 void pump_polymorphic_copy_semantics(std::string* string_to_pump_to, std::string::size_type* output_string_position) {
                     std::visit([&](auto&& arg) {
                         if constexpr (!std::is_same_v<polymorphic_strings, decltype(arg)>) {
-                            bool move_or_copy=read_from_string<bool>(string_to_pump_to, output_string_position);
-                            if(move_or_copy){
+                            bool copy_or_move=read_from_string<bool>(string_to_pump_to, output_string_position);
+                            if(copy_or_move){
                             const std::string& string_to_pump=  arg.get();
                             *string_to_pump_to += string_to_pump;
                             *output_string_position+=string_to_pump.length();
@@ -392,10 +392,11 @@ namespace printing_tools {
                             
                         }
                         else {
-                            std::string to_pump = std::to_string(arg);
+                            std::string stringified_num=std::to_string(arg);
+                           *string_to_pump_to += stringified_num;
+                           *output_string_position += stringified_num.length();  
+
                         }
-                        *string_to_pump_to += to_pump;
-                        *output_string_position += to_pump.length();
                         
                         }, internal_data);
                 }
@@ -405,11 +406,11 @@ namespace printing_tools {
                     Polymorphic_accumulator result = std::visit([&](auto&& a, auto&& b) -> Polymorphic_accumulator {
                     if constexpr (std::is_same_v<polymorphic_strings, decltype(a)>) {
                         if constexpr (std::is_same_v<polymorphic_strings, decltype(b)>) {
-                            return operator_name(a, b.get());
+                            return operator_name(a.get(), b.get());
 
                         }
                         else {
-                            return operator_name(a, std::to_string{ b });
+                            return operator_name(a.get(), std::to_string{ b });
 
                         }
                     }
@@ -599,6 +600,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
