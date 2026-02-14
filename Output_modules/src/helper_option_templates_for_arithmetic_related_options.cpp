@@ -246,6 +246,11 @@ namespace printing_tools {
                     case type_tag::type_in_hash_map_tag:
                     [[fallthrough]]
                 default:
+                    Extented_types* array= static_cast<Extented_types*>(ptr+sizeof(extented_type_info));
+                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+                    ~array[i];
+                    
+                    }
                  delete[] reinterpret_cast<char*>(ptr);
             }
             };
