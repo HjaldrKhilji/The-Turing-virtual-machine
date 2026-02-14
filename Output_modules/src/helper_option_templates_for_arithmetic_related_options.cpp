@@ -159,11 +159,14 @@ namespace printing_tools {
                     return false;
                 }
             }
-            enum class type_tag{uintptr_tag=1, long_double_tag=2, string_tag=3,
+            enum class type_tag: unsigned char{uintptr_tag=1, long_double_tag=2, string_tag=3,
             type_in_vector_tag=4, type_in_map_tag=5, type_in_hash_map_tag=6};
             struct extented_type_info{
             type_tag tag;
-            uintptr_t index;
+            union{
+            uintptr_t index;//for Extented_types 
+            uintptr_t  size;//for Extented_types_lose_checking
+            }
             };       
             
             std::vector<std::vector<extented_type_info>> vector_containing_types;
@@ -174,26 +177,27 @@ namespace printing_tools {
             struct Extented_types{
 //I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
             using nested_type= std::pair<extented_type_info, Extented_types*>;
-            using ordinary_type_int= std::pair<extented_type_info, uintptr_t>;
-            using ordinary_type_double= std::pair<extented_type_info, long double>;
-            using ordinary_type_string= std::pair<extented_type_info, std::string>;
+            using ordinary_type_int= std::pair<type_tag, uintptr_t>;
+            using ordinary_type_double= std::pair<type_tag, long double>;
+            using ordinary_type_string= std::pair<type_tag, std::string>;
 
              void* ptr;
-            Extented_types(extented_type_info info, const std::string& string_to_read_from, 
+            Extented_types(const extented_type_info& info, const std::string& string_to_read_from, 
                 std::string:size_type* pos )
             {
                 switch(info.tag){
                     case type_tag::uintptr_tag:
-                    std::pair<extented_type_info, uintptr_t>* temp= new std::pair<extented_type_info, uintptr_t>{info.tag,read_from_string<uintptr_t>(string_to_read_from, pos)};
-                    ptr= static_cast<void*>(temp);
+                    ptr= static_cast<void*>(new std::pair<type_tag, uintptr_t>
+                    {info.tag,read_from_string<uintptr_t>(string_to_read_from, pos)});
                     return;
                     case type_tag::long_double_tag:
-                    std::pair<extented_type_info, long double>* temp= new std::pair<extented_type_info, long double>{info.tag,read_from_string<long double>(string_to_read_from, pos)};
-                    ptr= static_cast<void*>(temp);
+                    ptr= static_cast<void*>(new std::pair<type_tag, long double>
+                    {info.tag,read_from_string<long double>(string_to_read_from, pos)});
+
                     return;
                     case type_tag::string_tag:
-                    std::pair<extented_type_info, std::string>* temp= new std::pair<extented_type_info, std::string>{info.tag,read_from_string<std::string>(string_to_read_from, pos)};  
-                    ptr= static_cast<void*>(temp);
+                    ptr= static_cast<void*>(new std::pair<type_tag, std::string>
+                    {info.tag,read_from_string<std::string>(string_to_read_from, pos)});
                     return;
                 }
                 vector<extented_type_info>* extra_info_for_extented_types;
@@ -208,15 +212,16 @@ namespace printing_tools {
                     extra_info_for_extented_types= unordered_map_containing_types[info.index];
                     [[fallthrough]]
                     default:
-                    uintptr_t array_size_in_bytes= sizeof(Extented_types*)*vector_containing_nested_type_info.length(); 
-                    uintptr_t element_size_in_bytes=sizeof(Extented_types)*vector_containing_nested_type_info.length();
+                    auto vec_size= vector_containing_nested_type_info.length();
+                    uintptr_t array_size_in_bytes= sizeof(Extented_types*)*vec_size; 
+                    uintptr_t element_size_in_bytes=sizeof(Extented_types)*vec_size;
                     char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(extented_type_info)];
                     new (reinterpret_cast<extented_type_info*>) extented_type_info{info};
                     Extented_types* array= reinterpret_cast<Extented_types*>(raw_mem+sizeof(extented_type_info));
                     Extented_types* end= array+array_size_in_bytes;
-                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+                    for(int i=0; i<vec_size; i++){
                         array[i]=end+(i*element_size_in_bytes); 
-                        new (array[i]) Extented_types{vector_containing_nested_type_info[i]->first,{vector_containing_nested_type_info[i].tag,source, location} };
+                        new (array[i]) Extented_types{vector_containing_nested_type_info[i], source, location} };
                     }
                     ptr= static_cast<void*>(raw_mem);
                     
@@ -225,7 +230,7 @@ namespace printing_tools {
             }
             
             ~Extented_types(){
-            switch(static_cast<std::pair<extented_type_info, void>*>(ptr)->first){
+            switch(static_cast<std::pair<type_tag, void>*>(ptr)->first){
                 case type_tag::uintptr_tag:
                     delete static_cast<std::pair<extented_type_info, uintptr_t>*>(ptr);
                     break;
@@ -238,7 +243,7 @@ namespace printing_tools {
                 
             }
             vector<extented_type_info>* extra_info_for_extented_types;
-            switch(static_cast<std::pair<extented_type_info, void>*>(ptr)->first){
+            switch(static_cast<extented_type_info*>(ptr)->tag){
                 case type_tag::vector_containing_types:
                     [[fallthrough]]
                     case type_tag::type_in_map_tag:
@@ -254,7 +259,69 @@ namespace printing_tools {
                  delete[] reinterpret_cast<char*>(ptr);
             }
             };
+            struct hetrogenous_array_type{
+//I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
+            using nested_type= std::pair<type_tag, hetrogenous_array_type*>;
+            using ordinary_type_int= std::pair<type_tag, uintptr_t>;
+            using ordinary_type_double= std::pair<type_tag, long double>;
+            using ordinary_type_string= std::pair<type_tag, std::string>;
 
+             void* ptr;
+            Extented_types(type_tag info, const std::string& string_to_read_from, 
+                std::string:size_type* pos )
+            {
+                switch(info){
+                    case type_tag::uintptr_tag:
+                    std::pair<type_tag, uintptr_t>* temp= new std::pair<type_tag, uintptr_t>{info.tag,read_from_string<uintptr_t>(string_to_read_from, pos)};
+                    ptr= static_cast<void*>(temp);
+                    return;
+                    case type_tag::long_double_tag:
+                    std::pair<type_tag, long double>* temp= new std::pair<type_tag, long double>{info.tag,read_from_string<long double>(string_to_read_from, pos)};
+                    ptr= static_cast<void*>(temp);
+                    return;
+                    case type_tag::string_tag:
+                    std::pair<type_tag, std::string>* temp= new std::pair<type_tag, std::string>{info.tag,read_from_string<std::string>(string_to_read_from, pos)};  
+                    ptr= static_cast<void*>(temp);
+                    return;
+                }
+                    uintptr_t size= read_from_string<uintptr_t>(string_to_read_from, pos);
+                    uintptr_t array_size_in_bytes= sizeof(hetrogenous_array_type*)*size; 
+                    uintptr_t element_size_in_bytes=sizeof(hetrogenous_array_type)*size;
+                    char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(extented_type_info)];
+                    new (reinterpret_cast<extented_type_info*>) extented_type_info{info, size};
+                    hetrogenous_array_type* array= reinterpret_cast<hetrogenous_array_type*>(raw_mem+sizeof(extented_type_info));
+                    hetrogenous_array_type* end= array+array_size_in_bytes;
+                    for(int i=0; i<size; i++){
+                        array[i]=end+(i*element_size_in_bytes); 
+                        new (array[i]) hetrogenous_array_type{static_cast<type_tag>(read_from_string<unsigned char>(string_to_read_from, pos)),source, location };
+                    }
+                    ptr= static_cast<void*>(raw_mem);
+                    
+                
+                  
+            }
+            
+            ~Extented_types(){
+            switch(static_cast<std::pair<type_tag, void>*>(ptr)->first){
+                case type_tag::uintptr_tag:
+                    delete static_cast<std::pair<type_tag, uintptr_t>*>(ptr);
+                    break;
+                case type_tag::long_double_tag:
+                    delete static_cast<std::pair<type_tag, long double>*>(ptr);
+                    break;
+                case type_tag::string_tag:
+                    delete static_cast<std::pair<type_tag, std::string>*>(ptr);
+                    break;
+                
+            }
+            
+                 Extented_types* array= static_cast<Extented_types*>(ptr+sizeof(extented_type_info));
+                for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+                ~array[i];
+                }
+                 delete[] reinterpret_cast<char*>(ptr);
+                    }
+            };
             struct polymorphic_strings{
             std::string* ptr;
             polymorphic_strings(std::string string_to_build_it_with): 
@@ -532,6 +599,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
