@@ -213,9 +213,9 @@ namespace printing_tools {
                     char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(extented_type_info)];
                     new (reinterpret_cast<extented_type_info*>) extented_type_info{info};
                     Extented_types* array= reinterpret_cast<Extented_types*>(raw_mem+sizeof(extented_type_info));
-                        
+                    Extented_types* end= array+array_size_in_bytes;
                     for(int i=0; i<vector_containing_nested_type_info.length(); i++){
-                        array[i]=array+array_size_in_bytes+(i*element_size_in_bytes); 
+                        array[i]=end+(i*element_size_in_bytes); 
                         new (array[i]) Extented_types{vector_containing_nested_type_info[i]->first,{vector_containing_nested_type_info[i].tag,source, location} };
                     }
                     ptr= static_cast<void*>(raw_mem);
@@ -225,20 +225,20 @@ namespace printing_tools {
             }
             
             ~Extented_types(){
-            switch(ptr->first){
+            switch(static_cast<std::pair<extented_type_info, void>*>(ptr)->first){
                 case type_tag::uintptr_tag:
-                    delete reinterpret_cast<std::pair<extented_type_info, uintptr_t>*>(ptr);
+                    delete static_cast<std::pair<extented_type_info, uintptr_t>*>(ptr);
                     break;
                 case type_tag::long_double_tag:
-                    delete reinterpret_cast<std::pair<extented_type_info, long double>*>(ptr);
+                    delete static_cast<std::pair<extented_type_info, long double>*>(ptr);
                     break;
-                case type_tag::uintptr_tag:
-                    delete reinterpret_cast<std::pair<extented_type_info, std::string>*>(ptr);
+                case type_tag::string_tag:
+                    delete static_cast<std::pair<extented_type_info, std::string>*>(ptr);
                     break;
                 
             }
             vector<extented_type_info>* extra_info_for_extented_types;
-            switch(ptr->first){
+            switch(static_cast<std::pair<extented_type_info, void>*>(ptr)->first){
                 case type_tag::vector_containing_types:
                     [[fallthrough]]
                     case type_tag::type_in_map_tag:
@@ -246,13 +246,6 @@ namespace printing_tools {
                     case type_tag::type_in_hash_map_tag:
                     [[fallthrough]]
                 default:
-                   static_cast<std::pair<extented_type_info, Extented_types*>> formated= static_cast<std::pair<extented_type_info, Extented_types*>>(ptr);
-                    Extented_types* array=  formated->second;
-                  
-                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
-                    delete array[i];
-                    
-            }
                  delete[] reinterpret_cast<char*>(ptr);
             }
             };
@@ -534,6 +527,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
