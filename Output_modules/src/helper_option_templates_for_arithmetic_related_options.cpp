@@ -261,26 +261,26 @@ namespace printing_tools {
             };
             struct hetrogenous_array_type{
 //I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
-            using nested_type= std::pair<type_tag, hetrogenous_array_type*>;
+            using nested_type= std::pair<extented_type_info, hetrogenous_array_type*>;
             using ordinary_type_int= std::pair<type_tag, uintptr_t>;
             using ordinary_type_double= std::pair<type_tag, long double>;
             using ordinary_type_string= std::pair<type_tag, std::string>;
 
              void* ptr;
-            Extented_types(type_tag info, const std::string& string_to_read_from, 
+            hetrogenous_array_type(type_tag info, const std::string& string_to_read_from, 
                 std::string:size_type* pos )
             {
                 switch(info){
                     case type_tag::uintptr_tag:
-                    std::pair<type_tag, uintptr_t>* temp= new std::pair<type_tag, uintptr_t>{info.tag,read_from_string<uintptr_t>(string_to_read_from, pos)};
+                    std::pair<type_tag, uintptr_t>* temp= new std::pair<type_tag, uintptr_t>{info,read_from_string<uintptr_t>(string_to_read_from, pos)};
                     ptr= static_cast<void*>(temp);
                     return;
                     case type_tag::long_double_tag:
-                    std::pair<type_tag, long double>* temp= new std::pair<type_tag, long double>{info.tag,read_from_string<long double>(string_to_read_from, pos)};
+                    std::pair<type_tag, long double>* temp= new std::pair<type_tag, long double>{info,read_from_string<long double>(string_to_read_from, pos)};
                     ptr= static_cast<void*>(temp);
                     return;
                     case type_tag::string_tag:
-                    std::pair<type_tag, std::string>* temp= new std::pair<type_tag, std::string>{info.tag,read_from_string<std::string>(string_to_read_from, pos)};  
+                    std::pair<type_tag, std::string>* temp= new std::pair<type_tag, std::string>{info,read_from_string<std::string>(string_to_read_from, pos)};  
                     ptr= static_cast<void*>(temp);
                     return;
                 }
@@ -301,7 +301,7 @@ namespace printing_tools {
                   
             }
             
-            ~Extented_types(){
+            ~hetrogenous_array_type(){
             switch(static_cast<std::pair<type_tag, void>*>(ptr)->first){
                 case type_tag::uintptr_tag:
                     delete static_cast<std::pair<type_tag, uintptr_t>*>(ptr);
@@ -314,9 +314,9 @@ namespace printing_tools {
                     break;
                 
             }
-            
-                 Extented_types* array= static_cast<Extented_types*>(ptr+sizeof(extented_type_info));
-                for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+                uintptr_t size= static_cast<std::pair<extented_type_info, void>*>(ptr)->size;
+                 hetrogenous_array_type* array= static_cast<hetrogenous_array_type*>(ptr+sizeof(extented_type_info));
+                for(int i=0; i<size; i++){
                 ~array[i];
                 }
                  delete[] reinterpret_cast<char*>(ptr);
@@ -599,6 +599,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
