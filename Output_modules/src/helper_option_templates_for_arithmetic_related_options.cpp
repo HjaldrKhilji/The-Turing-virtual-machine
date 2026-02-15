@@ -300,6 +300,42 @@ namespace printing_tools {
                 
                   
             }
+            enum class operation_type: unsigne char{
+            return_uintptr,
+            return_long_double,
+            return__long_double_but_swap,
+           return_str_convert_first_arg_to_str,
+          return_str_convert_second_arg_to_str,
+           nest_if_size_one,
+           nest_if_hetrogenous_array,
+           nest_if_extended_tpe
+            };
+            template <typename Op_two_type>
+            hetrogenous_array_type& operator+=(Op_two_type second_arg)          
+            {
+                 operation_type op_type;
+         switch(static_cast<std::pair<type_tag, void>*>(ptr)->first){
+            case type_tag::uintptr_tag:
+            if(!std::is_same_v<Op_two_type, uintptr>()) constexpr {
+             op_type= return_uintptr;
+             }
+            if(!std::is_same_v<Op_two_type, long double>()) constexpr {
+             op_type= return_long_double;
+             }    
+            if(!std::is_same_v<Op_two_type, >(std::string)) constexpr {
+             op_type= return_str_convert_first_arg_to_str;
+             }  
+            if(!std::is_same_v<Op_two_type, uintptr>()) constexpr {
+            break;
+            case type_tag::long_double_tag:
+
+            break;
+            case type_tag::string_tag:
+
+            break;
+            }
+
+            }
             
             ~hetrogenous_array_type(){
             switch(static_cast<std::pair<type_tag, void>*>(ptr)->first){
