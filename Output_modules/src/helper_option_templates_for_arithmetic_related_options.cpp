@@ -175,20 +175,30 @@ namespace printing_tools {
             return_str,
             return_str_convert_first_arg_to_str,
             return_str_convert_second_arg_to_str,
-            nest_if_size_one_of_hetrogenous_array,
-            nest_if_size_one_of_extended_type,
-            nest_for_fellow_hetrogenous_array,
-            nest_for_fimiliar_extended_type
+            nest_if_size_one_of_hetrogenous_array_of_arg_2_hetrogenous_array,
+            nest_if_size_one_of_extended_type_of_arg_2_hetrogenous_array,
+            nest_if_size_one_of_hetrogenous_array_of_arg_1_hetrogenous_array,
+            nest_if_size_one_of_hetrogenous_array_of_arg_1_hetrogenous_array,
+            nest_if_size_one_of_hetrogenous_array_of_arg_2_extended_type,
+            nest_if_size_one_of_extended_type_of_arg_2_extended_type,
+            nest_if_size_one_of_hetrogenous_array_of_arg_1_extended_type,
+            nest_if_size_one_of_hetrogenous_array_of_arg_1_extended_type,
+            nest_for_fellow_hetrogenous_array_arg_1,
+            nest_for_fimiliar_extended_type_arg_1,
+            nest_for_fellow_hetrogenous_array_arg_2,
+            nest_for_fimiliar_extended_type_arg_2
             };
             std::vector<std::vector<extented_type_info>> vector_containing_types;
             std::map<uintptr_t,std::vector<extented_type_info>> map_containing_types;
             std::unordered_map<uintptr_t,std::vector<extented_type_info>> 
             unordered_map_containing_types;
-            
+            struct Extented_types;
+            struct Hetrogenous_array;
             template<typename first_type, typename second_type>
             consteval void return_operation_type(){
                 return;
             }
+            using operation_type;
             template<typename second_type>
             consteval operation_type return_operation_type<uintptr_t>(){
                 if(std::is_same_v<second_type, uintptr_t>){
@@ -201,10 +211,10 @@ namespace printing_tools {
                     return return_str_convert_first_arg_to_str;
                 }
                 else if(std::is_same_v<second_type, Extented_types>){
-                    return nest_if_size_one_of_extended_type;
+                    return nest_if_size_one_of_extended_type_arg_2;
                 } 
                 else if(std::is_same_v<second_type, hetrogenous_array_type>){
-                    return nest_if_size_one_of_hetrogenous_array;
+                    return nest_if_size_one_of_hetrogenous_array_arg_2;
                 }
             }
              template<typename second_type>
@@ -219,30 +229,49 @@ namespace printing_tools {
                     return return_str_convert_first_arg_to_str;
                 }
                 else if(std::is_same_v<second_type, Extented_types>){
-                    return nest_if_size_one_of_extended_type;
+                    return nest_if_size_one_of_extended_type_arg_2;
                 } 
                 else if(std::is_same_v<second_type, hetrogenous_array_type>){
-                    return nest_if_size_one_of_hetrogenous_array;
+                    return nest_if_size_one_of_hetrogenous_array_arg_2;
                 }
             }
             template<typename second_type>
-            consteval operation_type return_operation_type<long double>(){
+            consteval operation_type return_operation_type<std::string>(){
                 if(std::is_same_v<second_type, uintptr_t>){
-                    return return_long_double_but_swap_first;
+                    return return_str_convert_second_arg_to_str;
                 }
                 else if(std::is_same_v<second_type, long double>){
-                    return return_long_double;
+                    return return_str_convert_second_arg_to_str;
                 }
                 else if(std::is_same_v<second_type, std::string>){
-                    return return_str_convert_first_arg_to_str;
+                    return return_str;
                 }
                 else if(std::is_same_v<second_type, Extented_types>){
-                    return nest_if_size_one_of_extended_type;
+                    return nest_if_size_one_of_extended_type_arg_2;
                 } 
                 else if(std::is_same_v<second_type, hetrogenous_array_type>){
-                    return nest_if_size_one_of_hetrogenous_array;
+                    return nest_if_size_one_of_hetrogenous_array_arg_2;
                 }
             }
+            template<typename second_type>
+            consteval operation_type return_operation_type<Extented_types>(){
+                if(std::is_same_v<second_type, uintptr_t>){
+                    return nest_for_fellow_hetrogenous_array_arg_1;
+                }
+                else if(std::is_same_v<second_type, long double>){
+                    return nest_for_fellow_hetrogenous_array_arg_1;
+                }
+                else if(std::is_same_v<second_type, std::string>){
+                    return nest_for_fellow_hetrogenous_array_arg_1;
+                }
+                else if(std::is_same_v<second_type, Extented_types>){
+                    return nest_if_size_one_of_extended_type_of_arg_2_extended_type;
+                } 
+                else if(std::is_same_v<second_type, hetrogenous_array_type>){
+                    return nest_if_size_one_of_hetrogenous_array_arg_2;
+                }
+            }
+
             template<typename Hetrogenous_array>
             struct Extented_types{
 //I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
@@ -421,6 +450,7 @@ namespace printing_tools {
                  delete[] reinterpret_cast<char*>(ptr);
                     }
             };
+            //the polymorphic types are polymorphic in the sense that the size is the same, so its not a technical name
             struct polymorphic_strings{
             std::string* ptr;
             polymorphic_strings(std::string string_to_build_it_with): 
@@ -436,9 +466,60 @@ namespace printing_tools {
             }
 
             };
-           
+            struct polymorphic_double{
+            long double *ptr;
+            polymorphic_double(long double double_to_build_it_with): 
+            ptr{   new long double   } {}
+            
+            inline auto operator+(uintptr_t a){
+                return *ptr+a;
+            }
+            inline auto operator+(long double a){
+                return *ptr+a;
+            }
+            inline  auto operator*(uintptr_t a){
+                return *ptr*a;
+            }
+            inline auto operator-(long double a){
+                return *ptr-a;
+            }inline auto operator/(uintptr_t a){
+                return *ptr/a;
+            }
+            inline auto operator^(long double a){
+                return *ptr^a;
+            }inline auto operator|(uintptr_t a){
+                return *ptr|a;
+            }
+            inline auto operator&(long double a){
+                return *ptr&a;
+            }
+        inline auto operator>=(uintptr_t a){
+                return *ptr>=a;
+            }
+            inline auto operator<=(long double a){
+                return *ptr<=a;
+            }inline auto operator<(uintptr_t a){
+                return *ptr<a;
+            }
+            inline auto operator>(long double a){
+                return *ptr>a;
+            }inline auto operator!=(uintptr_t a){
+                return *ptr!=a;
+            }
+            inline auto operator==(long double a){
+                return *ptr==a;
+            }
+            ~polymorphic_double(){
+                delete ptr;
+            }
+
+            };
+            template<typename Op_type>
+                bool all_comparision_imp_generator(Hetrogenous_array_type& lhs, const Polymorphic_accumulator& rhs, Op_type operator_name) {
+                }
             struct Polymorphic_accumulator {
-                std::variant<uintptr_t, long double, polymorphic_strings> internal_data;
+                using long_double= std::conditional<sizeof(long double)>8, polymorphic_double, long double>
+                std::variant<uintptr_t, long_double, polymorphic_strings,Hetrogenous_array_type,Extented_types<Hetrogenous_array_type>> internal_data;
                 bool value_type;
 
                 void pump(std::string* string_to_pump_to, std::string::size_type* output_string_position) {
@@ -501,7 +582,7 @@ namespace printing_tools {
                 }
 
                 template<typename Op_type>
-                bool all_comparision_imp_generator(const Polymorphic_accumulator& lhs, const Polymorphic_accumulator& rhs, Op_type operator_name) {
+                bool all_comparision_imp_generator( Polymorphic_accumulator& lhs,  Polymorphic_accumulator& rhs, Op_type operator_name) {
                     Polymorphic_accumulator result = std::visit([&](auto&& a, auto&& b) -> Polymorphic_accumulator {
                     if constexpr (std::is_same_v<polymorphic_strings, decltype(a)>) {
                         if constexpr (std::is_same_v<polymorphic_strings, decltype(b)>) {
@@ -520,11 +601,8 @@ namespace printing_tools {
                                     return operator_name(a, convert_to_number<uintptr_t>(b.get()));
                                 }
                                 else if constexpr (std::is_same_v<long double, decltype(a)>) {
-                                    return operator_name(b, convert_to_number<uintptr_t>(b.get()));
+                                    return operator_name(b, convert_to_number<long double>(b.get()));
 
-                                }
-                                else{
-                                return operator_name(b.get(), b.get());
                                 }
                             }
                                 catch (std::string& error_from_converter) {
@@ -533,7 +611,7 @@ namespace printing_tools {
                             
                         }
                         else {
-                            return operator_name(a , b);
+                            return operator_name(a, b);
 
                         }
                     }
@@ -699,6 +777,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
