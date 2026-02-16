@@ -236,7 +236,7 @@ namespace printing_tools {
             }
             
             ~Extented_types(){
-            switch(static_cast<std::pair<type_tag, void>*>(ptr)->first){
+            switch(static_cast<type_tag*>(ptr)){
                 case type_tag::uintptr_tag:
                     delete static_cast<std::pair<extented_type_info, uintptr_t>*>(ptr);
                     return;
@@ -312,14 +312,113 @@ namespace printing_tools {
             }
             
             template <typename Op_two_type>
-            requires std::is_arithmetic_v<Op_two_type> 
+            requires std::is_arithmetic_v<Op_two_type> || std::is_same_v<std:string, Op_two_type>
             Hetrogenous_array_type& operator+=(Op_two_type second_arg) {       
             {
-                 
+            switch(static_cast<type_tag*>(ptr)){
+                case type_tag::uintptr_tag:
+                    if(!std::is_same_v<uintptr_t, Op_two_type>) constexpr {
+                        static_cast<std::pair<type_tag, uintptr>*>(ptr)->second+= second_arg;
+                    }
+                    else if(!std::is_same_v<long double, Op_two_type>) constexpr {
+                        static_cast<std::pair<type_tag, uintptr>*>(ptr)->second+= uintptr{second_arg};
+                    }
+                    else if(!std::is_same_v<std::string, Op_two_type>) constexpr {
+                        static_cast<std::pair<type_tag, uintptr>*>(ptr)->second+= convert_to_number<uintptr_t>(second_arg);
+                    }
+                    break;
+                case type_tag::long_double_tag:
+                   if(!std::is_same_v<uintptr_t, Op_two_type>) constexpr {
+                        static_cast<std::pair<type_tag, long double>*>(ptr)->second+= long double{second_arg};
+                    }
+                    else if(!std::is_same_v<long double, Op_two_type>) constexpr {
+                        static_cast<std::pair<type_tag, long double>*>(ptr)->second+= second_arg;
+                    }
+                    else if(!std::is_same_v<std::string, Op_two_type>) constexpr {
+                        static_cast<std::pair<type_tag, long double>*>(ptr)->second+= convert_to_number<long double>(second_arg);
+                    }
+                    break;
+                case type_tag::string_tag:
+                    if(!std::is_same_v<uintptr_t, Op_two_type>) constexpr {
+                        static_cast<std::pair<type_tag, long double>*>(ptr)->second+= std::to_string(second_arg);
+                    }
+                    else if(!std::is_same_v<long double, Op_two_type>) constexpr {
+                        static_cast<std::pair<type_tag, long double>*>(ptr)->second+= std::to_string(second_arg);
+                    }
+                    else if(!std::is_same_v<std::string, Op_two_type>) constexpr {
+                        static_cast<std::pair<type_tag, long double>*>(ptr)->second+= second_arg;
+                    }
+                    break;
             }
-            
+            }
+            Hetrogenous_array_type& operator+=(Extended_types second_arg) {       
+            {
+            switch(static_cast<type_tag*>(ptr)){
+                case type_tag::uintptr_tag:
+                    auto* lhs = static_cast<std::pair<type_tag, uintptr>*>(ptr);
+                    switch(lhs->first){
+                        case type_tag::uintptr_tag:
+                        lhs->second+=static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second;
+                        break;
+                        case type_tag::long_double_tag:
+                        lhs->second+=uintptr{static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second};
+                        break;
+                        case type_tag::string_tag:
+                        lhs->second+=convert_to_number<uintptr>(std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second);
+                        break;
+                        case type_tag::extented_types:
+                            auto *rhs=static_cast<type_tag*, Extented_types>(second_arg.ptr);
+                            switch(rhs->first){
+                                case type_tag::uintptr_tag:
+                                lhs->second+=static_cast<std::pair<type_tag, uintptr>*>(rhs->second);
+                                break;
+                                case type_tag::long_double_tag:
+                                lhs->second+=uintptr{static_cast<std::pair<type_tag, long double>*>(rhs->second)};
+                                break;
+                                case type_tag::string_tag:
+                                lhs->second+=convert_to_number<uintptr>(std::static_cast<std::pair<type_tag, std::string>*>((rhs->second));
+                                break;
+                        }
+                        break;
+                        }
+                    break;
+                case type_tag::long_double_tag:
+                    auto* lhs = static_cast<std::pair<type_tag, long double>*>(ptr);
+                    switch(static_cast<type_tag*>(second_arg.ptr)){
+                    case type_tag::uintptr_tag:
+                    lhs->second+=long double{static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second};
+                    break;
+                    case type_tag::long_double_tag:
+                    lhs->second+=static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second;
+                    break;
+                    case type_tag::string_tag:
+                    lhs->second+=convert_to_number<long double>(std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second);
+                    break;
+                    }
+                    break;
+                case type_tag::string_tag:
+                    auto* lhs = static_cast<std::pair<type_tag, std::string>*>(ptr);
+                    switch(static_cast<type_tag*>(second_arg.ptr)){
+                    case type_tag::uintptr_tag:
+                    lhs->second+=std::to_string(static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second);
+                    break;
+                    case type_tag::long_double_tag:
+                    lhs->second+=std::to_string(static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second);
+                    break;
+                    case type_tag::string_tag:
+                    lhs->second+=std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second;
+                    break;
+                    case type_tag::extented_types:
+                                       
+                    break;
+                    }
+                    break;
+                case type_tag::extented_types:
+                
+            }
+            }
             ~Hetrogenous_array_type(){
-            switch(static_cast<std::pair<type_tag, void>*>(ptr)->first){
+            switch(static_cast<type_tag*>(ptr)){
                 case type_tag::uintptr_tag:
                     delete static_cast<std::pair<type_tag, uintptr_t>*>(ptr);
                     break;
@@ -668,6 +767,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
