@@ -168,110 +168,12 @@ namespace printing_tools {
             uintptr_t  size;//for hetrogenous_array_type
             }
             };       
-            enum class operation_type: unsigned char{
-            return_uintptr,
-            return_long_double,
-            return_long_double_but_swap_first,
-            return_str,
-            return_str_convert_first_arg_to_str,
-            return_str_convert_second_arg_to_str,
-            nest_if_size_one_of_hetrogenous_array_of_arg_2_hetrogenous_array,
-            nest_if_size_one_of_extended_type_of_arg_2_hetrogenous_array,
-            nest_if_size_one_of_hetrogenous_array_of_arg_1_hetrogenous_array,
-            nest_if_size_one_of_hetrogenous_array_of_arg_1_hetrogenous_array,
-            nest_if_size_one_of_hetrogenous_array_of_arg_2_extended_type,
-            nest_if_size_one_of_extended_type_of_arg_2_extended_type,
-            nest_if_size_one_of_hetrogenous_array_of_arg_1_extended_type,
-            nest_if_size_one_of_hetrogenous_array_of_arg_1_extended_type,
-            nest_for_fellow_hetrogenous_array_arg_1,
-            nest_for_fimiliar_extended_type_arg_1,
-            nest_for_fellow_hetrogenous_array_arg_2,
-            nest_for_fimiliar_extended_type_arg_2
-            };
+            
             std::vector<std::vector<extented_type_info>> vector_containing_types;
             std::map<uintptr_t,std::vector<extented_type_info>> map_containing_types;
             std::unordered_map<uintptr_t,std::vector<extented_type_info>> 
             unordered_map_containing_types;
-            struct Extented_types;
-            struct Hetrogenous_array;
-            template<typename first_type, typename second_type>
-            consteval void return_operation_type(){
-                return;
-            }
-            using operation_type;
-            template<typename second_type>
-            consteval operation_type return_operation_type<uintptr_t>(){
-                if(std::is_same_v<second_type, uintptr_t>){
-                    return return_uintptr;
-                }
-                else if(std::is_same_v<second_type, long double>){
-                    return return_long_double_but_swap_first;
-                }
-                else if(std::is_same_v<second_type, std::string>){
-                    return return_str_convert_first_arg_to_str;
-                }
-                else if(std::is_same_v<second_type, Extented_types>){
-                    return nest_if_size_one_of_extended_type_arg_2;
-                } 
-                else if(std::is_same_v<second_type, hetrogenous_array_type>){
-                    return nest_if_size_one_of_hetrogenous_array_arg_2;
-                }
-            }
-             template<typename second_type>
-            consteval operation_type return_operation_type<long double>(){
-                if(std::is_same_v<second_type, uintptr_t>){
-                    return return_long_double_but_swap_first;
-                }
-                else if(std::is_same_v<second_type, long double>){
-                    return return_long_double;
-                }
-                else if(std::is_same_v<second_type, std::string>){
-                    return return_str_convert_first_arg_to_str;
-                }
-                else if(std::is_same_v<second_type, Extented_types>){
-                    return nest_if_size_one_of_extended_type_arg_2;
-                } 
-                else if(std::is_same_v<second_type, hetrogenous_array_type>){
-                    return nest_if_size_one_of_hetrogenous_array_arg_2;
-                }
-            }
-            template<typename second_type>
-            consteval operation_type return_operation_type<std::string>(){
-                if(std::is_same_v<second_type, uintptr_t>){
-                    return return_str_convert_second_arg_to_str;
-                }
-                else if(std::is_same_v<second_type, long double>){
-                    return return_str_convert_second_arg_to_str;
-                }
-                else if(std::is_same_v<second_type, std::string>){
-                    return return_str;
-                }
-                else if(std::is_same_v<second_type, Extented_types>){
-                    return nest_if_size_one_of_extended_type_arg_2;
-                } 
-                else if(std::is_same_v<second_type, hetrogenous_array_type>){
-                    return nest_if_size_one_of_hetrogenous_array_arg_2;
-                }
-            }
-            template<typename second_type>
-            consteval operation_type return_operation_type<Extented_types>(){
-                if(std::is_same_v<second_type, uintptr_t>){
-                    return nest_for_fellow_hetrogenous_array_arg_1;
-                }
-                else if(std::is_same_v<second_type, long double>){
-                    return nest_for_fellow_hetrogenous_array_arg_1;
-                }
-                else if(std::is_same_v<second_type, std::string>){
-                    return nest_for_fellow_hetrogenous_array_arg_1;
-                }
-                else if(std::is_same_v<second_type, Extented_types>){
-                    return nest_if_size_one_of_extended_type_of_arg_2_extended_type;
-                } 
-                else if(std::is_same_v<second_type, hetrogenous_array_type>){
-                    return nest_if_size_one_of_hetrogenous_array_arg_2;
-                }
-            }
-
+            
             template<typename Hetrogenous_array>
             struct Extented_types{
 //I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
@@ -410,21 +312,10 @@ namespace printing_tools {
             }
             
             template <typename Op_two_type>
-            Hetrogenous_array_type& operator+=(Op_two_type second_arg)          
+            requires std::is_arithmetic_v<Op_two_type> 
+            Hetrogenous_array_type& operator+=(Op_two_type second_arg) {       
             {
-                 operation_type op_type;
-         switch(static_cast<std::pair<type_tag, void>*>(ptr)->first){
-            case type_tag::uintptr_tag:
-            
-            break;
-            case type_tag::long_double_tag:
-
-            break;
-            case type_tag::string_tag:
-
-            break;
-            }
-
+                 
             }
             
             ~Hetrogenous_array_type(){
@@ -777,6 +668,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
