@@ -89,7 +89,7 @@ namespace helper_templates_for_options {
                 }
 
             );
-            if (entry_found != entry.sub_entries.end()) {
+            if (entry_found != entry.sub_entries.end()-1) {
                 throw std::string{ "sub_entry not found" };
             }
             return counter;
