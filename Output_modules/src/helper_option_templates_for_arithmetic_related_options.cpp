@@ -160,7 +160,7 @@ namespace printing_tools {
                 }
             }
             enum class type_tag: unsigned char{uintptr_tag=1, long_double_tag=2, string_tag=3,
-            type_in_vector_tag=4, type_in_map_tag=5, type_in_hash_map_tag=6, extented_types=7, heterogeneous_array};
+            type_in_vector_tag=4, type_in_map_tag=5, type_in_hash_map_tag=6, extented_types=7, heterogeneous_array=8};
             struct extented_type_info{
             type_tag tag;
             union{
@@ -355,28 +355,36 @@ namespace printing_tools {
             {
             switch(static_cast<type_tag*>(ptr)){
                 case type_tag::uintptr_tag:
-                    auto* lhs = static_cast<std::pair<type_tag, uintptr>*>(ptr);
-                    switch(lhs->first){
+                    auto& lhs = *(static_cast<std::pair<type_tag, uintptr>*>(ptr));
+                    switch(lhs.first){
                         case type_tag::uintptr_tag:
-                        lhs->second+=static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second;
+                        lhs.second+=static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second;
                         break;
                         case type_tag::long_double_tag:
-                        lhs->second+=uintptr{static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second};
+                        lhs.second+=uintptr{static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second};
                         break;
                         case type_tag::string_tag:
-                        lhs->second+=convert_to_number<uintptr>(std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second);
+                        lhs.second+=convert_to_number<uintptr>(std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second);
                         break;
                         case type_tag::extented_types:
-                            auto *rhs=static_cast<type_tag*, Extented_types>(second_arg.ptr);
-                            switch(rhs->first){
+                            auto& rhs=*(static_cast<type_tag*, Extented_types>(second_arg.ptr));
+                            switch(rhs.first){
                                 case type_tag::uintptr_tag:
-                                lhs->second+=static_cast<std::pair<type_tag, uintptr>*>(rhs->second);
+                                lhs.second+=static_cast<std::pair<type_tag, uintptr>*>(rhs->second);
                                 break;
                                 case type_tag::long_double_tag:
-                                lhs->second+=uintptr{static_cast<std::pair<type_tag, long double>*>(rhs->second)};
+                                lhs.second+=uintptr{static_cast<std::pair<type_tag, long double>*>(rhs->second)};
                                 break;
                                 case type_tag::string_tag:
-                                lhs->second+=convert_to_number<uintptr>(std::static_cast<std::pair<type_tag, std::string>*>((rhs->second));
+                                lhs.second+=convert_to_number<uintptr>(std::static_cast<std::pair<type_tag, std::string>*>((rhs->second));
+                                break;
+                                case type_tag::heterogeneous_array:
+                                auto& raw_data_pair= *(std::static_cast<std::pair<type_tag, Heterogeneous_array>*);
+                                char *raw_mem = (raw_data_pair.second).ptr;
+                                Hetrogenous_array_type* array= reinterpret_cast<Hetrogenous_array_type*>(raw_mem+sizeof(extented_type_info));
+                                for(uintptr_t i=0; i<reinterpret_cast<extented_type_info*>(raw_mem)->size; i++){
+                                    lhs.second+=array[i];
+                                }
                                 break;
                         }
                         break;
@@ -386,13 +394,13 @@ namespace printing_tools {
                     auto* lhs = static_cast<std::pair<type_tag, long double>*>(ptr);
                     switch(static_cast<type_tag*>(second_arg.ptr)){
                     case type_tag::uintptr_tag:
-                    lhs->second+=long double{static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second};
+                    lhs.second+=long double{static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second};
                     break;
                     case type_tag::long_double_tag:
-                    lhs->second+=static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second;
+                    lhs.second+=static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second;
                     break;
                     case type_tag::string_tag:
-                    lhs->second+=convert_to_number<long double>(std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second);
+                    lhs.second+=convert_to_number<long double>(std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second);
                     break;
                     }
                     break;
@@ -400,13 +408,13 @@ namespace printing_tools {
                     auto* lhs = static_cast<std::pair<type_tag, std::string>*>(ptr);
                     switch(static_cast<type_tag*>(second_arg.ptr)){
                     case type_tag::uintptr_tag:
-                    lhs->second+=std::to_string(static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second);
+                    lhs.second+=std::to_string(static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second);
                     break;
                     case type_tag::long_double_tag:
-                    lhs->second+=std::to_string(static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second);
+                    lhs.second+=std::to_string(static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second);
                     break;
                     case type_tag::string_tag:
-                    lhs->second+=std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second;
+                    lhs.second+=std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second;
                     break;
                     case type_tag::extented_types:
                                        
@@ -767,6 +775,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
