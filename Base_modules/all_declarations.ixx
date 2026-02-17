@@ -282,9 +282,6 @@ export module All_declarations;//for c++ noobs, including myself, the module nam
               ReverseIt begin() final{
                   return list_of_all_non_term_entries_for_fast_traversal.rend();
 
-              }ReverseIt physical_end() final{
-                  return list_of_all_non_term_entries_for_fast_traversal.rbegin();
-
               }
               using Iterator_for_list_of_entries = std::deque<Non_terminal_name_entry<config>>::iterator;
              Non_terminal_name_entry<config>* find_entry(std::string) = 0;
