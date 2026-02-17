@@ -95,7 +95,7 @@ export   namespace config_parsing_tools {
          void push_latest_entry_as_sub_entry_of_an_entry(absolute_base::All_non_terminal_entries<config>* all_entries,  absolute_base::Non_terminal_name_entry<config>* entry_to_push_it_into) {
             
          
-            all_entries->add_a_child_to_entry(entry_to_push_it_into, *(all_entries->physical_end()));
+            all_entries->add_a_child_to_entry(entry_to_push_it_into, *(all_entries->physical_end()-1));
 
         }
         template<typename config>
