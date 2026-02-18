@@ -381,54 +381,60 @@ namespace printing_tools {
                 
                   
             }
+            //ALL_ActiO0n0OnOps_for_simple0OPS is ALL action on ops for simple ops, the name is bad on purpose (to avoid name conflcts and to stick out as something wierd so the mantainer(still probably me in the future), knows it can have bugs
+            //by simple ops, i mean, you cant branch, unless lhs(or rhs) does it for you
+            #define ALL_ActiO0n0OnOps_for_simple0OPS(lhs, rhs)\
+                        if constexpr(op_action_type==_true) {\
+                            op(lhs,second_arg);\
+                        }\
+                        else{\
+                            if constexpr (op_action_type==_nuteral) {\
+                                return op(lhs,second_arg);\
+                            }\
+                            else{\
+                                return Hetrogenous_array_type{lhs, second_arg)};\
+                            }\
+                        }
             // _true means assigment operators, _nuteral means compairision/ordering operators, _false/other means binary operators (eg + - * /,etc) that return a by value result 
             template <typename Op_two_type, typename op, ternary_state op_action_type>
             requires std::is_arithmetic_v<Op_two_type> || std::is_same_v<std:string, Op_two_type>
             std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>>
-            operator+=(Op_two_type second_arg) {       
+            operator_generator(Op_two_type second_arg) {  //the manliest op gen ever, made by a real man (THE 6'3 KING (me, ofcourse))     
             {
             switch(static_cast<type_tag*>(ptr)){
                 case type_tag::uintptr_tag:
-                    if(!std::is_same_v<uintptr_t, Op_two_type>) constexpr {
-                        if(op_action_type==_true){
-                            op(*static_cast<std::pair<type_tag, uintptr>*>(ptr)->second,second_arg);
-                        }
-                        if(op_action_type==_nuteral){
-                            return op(static_cast<std::pair<type_tag, uintptr>*>(ptr)->second,second_arg);
-                        }
-                        else{
-                            return Hetrogenous_array_type{op(static_cast<std::pair<type_tag, uintptr>*>(ptr)->second, second_arg)};
-                        }
-                    }
-                    else if(!std::is_same_v<long double, Op_two_type>) constexpr {
-                        static_cast<std::pair<type_tag, uintptr>*>(ptr)->second+= uintptr{second_arg};
-                    }
-                    else if(!std::is_same_v<std::string, Op_two_type>) constexpr {
-                        static_cast<std::pair<type_tag, uintptr>*>(ptr)->second+= convert_to_number<uintptr_t>(second_arg);
-                    }
+                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, uintptr_t>*>(ptr)->second), second_arg)
+                }
+                else if(!std::is_same_v<long double, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, uintptr_t>*>(ptr)->second), uintptr_t{second_arg})
+                }
+                else if(!std::is_same_v<std::string, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, uintptr_t>*>(ptr)->second),  convert_to_number<uintptr_t>(second_arg))
+                }
                     break;
                 case type_tag::long_double_tag:
-                   if(!std::is_same_v<uintptr_t, Op_two_type>) constexpr {
-                        static_cast<std::pair<type_tag, long double>*>(ptr)->second+= long double{second_arg};
-                    }
-                    else if(!std::is_same_v<long double, Op_two_type>) constexpr {
-                        static_cast<std::pair<type_tag, long double>*>(ptr)->second+= second_arg;
-                    }
-                    else if(!std::is_same_v<std::string, Op_two_type>) constexpr {
-                        static_cast<std::pair<type_tag, long double>*>(ptr)->second+= convert_to_number<long double>(second_arg);
-                    }
+                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, long double>*>(ptr)->second),  long double{second_arg})
+                }
+                else if(!std::is_same_v<long double, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, long double>*>(ptr)->second), second_arg)
+                }
+                else if(!std::is_same_v<std::string, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, long double>*>(ptr)->second),  convert_to_number<long double>(second_arg))
+                }
                     break;
                 case type_tag::string_tag:
-                    if(!std::is_same_v<uintptr_t, Op_two_type>) constexpr {
-                        static_cast<std::pair<type_tag, long double>*>(ptr)->second+= std::to_string(second_arg);
-                    }
-                    else if(!std::is_same_v<long double, Op_two_type>) constexpr {
-                        static_cast<std::pair<type_tag, long double>*>(ptr)->second+= std::to_string(second_arg);
-                    }
-                    else if(!std::is_same_v<std::string, Op_two_type>) constexpr {
-                        static_cast<std::pair<type_tag, long double>*>(ptr)->second+= second_arg;
-                    }
-                    break;
+                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, std::string>*>(ptr)->second),  std::to_string(second_arg))
+                }
+                else if(!std::is_same_v<long double, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, std::string>*>(ptr)->second), std::to_string(second_arg))
+                }
+                else if(!std::is_same_v<std::string, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, std::string>*>(ptr)->second),  second_arg)
+                }
+                break;
             }
             }
             template<typename op, ternary_state op_action_type>
