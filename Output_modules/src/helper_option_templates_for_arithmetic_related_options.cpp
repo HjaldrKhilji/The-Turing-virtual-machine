@@ -188,12 +188,14 @@ namespace printing_tools {
                             }\
                         }
             // _true means assigment operators, _nuteral means compairision/ordering operators, _false/other means binary operators (eg + - * /,etc) that return a by value result 
-             #define REPETETIVE_CASE_STATEMENT_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs,rhs, op, raw_data_pair)\
+             #define REPETETIVE_CASE_STATEMENT_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs,rhs, op, type_tag, name_of_the_class_used_in)\
                             case type_tag::heterogeneous_array:\
-                                char *raw_mem = (raw_data_pair->second).ptr;\
-                                Hetrogenous_array_type& array= *(reinterpret_cast<Hetrogenous_array_type*>(raw_mem+sizeof(Extented_type_info)));\
-                                auto size= reinterpret_cast<Extented_type_info*>(raw_mem)->rhs.size;\
+                                auto& raw_pair= *(static_cast<std::pair<Extented_type_info, Heterogeneous_array>*>(rhs.ptr));\
+                                auto size= (raw_pair->first).size;\
+                                char *raw_mem = static_cast<char*>((raw_pair.second).ptr);\
+                                Hetrogenous_array_type* array= reinterpret_cast<Hetrogenous_array_type*>(raw_mem+sizeof(Extented_type_info));\
                                 if constexpr(op_action_type==_true) {\
+                                *(static_cast<Extented_type_info, type_of_lhs>*(lhs.second))\
                                     for(uintptr_t i=0; i<size; i++){\
                                         op(lhs.second, array[i]);\
                                     }\
@@ -208,51 +210,56 @@ namespace printing_tools {
                                     return true;\
                                     }\
                                     else{\
-                                    auto lhs_temp= lhs;\
+                                    auto lhs_temp= lhs.second;\
                                     for(uintptr_t i=0; i<size; i++){\
-                                    op(lhs_temp.second, array[i])\
+                                    op(lhs_temp, array[i]);\
                                     }\
-                                    return lhs_temp;\
+                                    return name_of_the_class_used_in{type_tag, lhs_temp};\
                                     }\
                                     }\
                                 break;\
                             case type_tag::extended_types:\
                                 vector<Extented_type_info>* extra_info_for_extented_types;\
-                                switch(info.tag){\
+                                switch(static_cast<type_tag*>(rhs.ptr)){\
                                     case type_tag::vector_containing_types:\
-                                        extra_info_for_extented_types= vector_containing_types[info.index];\
+                                        extra_info_for_extented_types= vector_containing_types[raw_pair.first.info.index];\
+                                        break;\
                                     case type_tag::type_in_map_tag:\
-                                        extra_info_for_extented_types= map_containing_types[info.index];\
+                                        extra_info_for_extented_types= map_containing_types[raw_pair.first.info.index];\
+                                        break;\
                                     case type_tag::type_in_hash_map_tag:\
-                                        extra_info_for_extented_types= unordered_map_containing_types[info.index];\
-                                    default:\
-                                    auto size= extra_info_for_extented_types->size();\
-                                    char *raw_mem = (raw_data_pair->second).ptr;\
-                                    Extended_types& array= *(reinterpret_cast<Hetrogenous_array_type*>(raw_mem+sizeof(Extented_type_info)));\
-                                    if constexpr(op_action_type==_true) {\
+                                        extra_info_for_extented_types= unordered_map_containing_types[raw_pair.first.info.index];\
+                                        break;\
+                                    }\  
+                                     auto& raw_pair= *(static_cast<std::pair<Extented_type_info, Extented_types>*>(rhs.ptr));\
+                                    auto size= (raw_pair->first).size;\
+                                    char *raw_mem = static_cast<char*>((raw_pair.second).ptr);\
+                                    Extended_types* array= reinterpret_cast<Extended_types*>(raw_mem+sizeof(Extented_type_info));\
+                                 if constexpr(op_action_type==_true) {\
+                                *(static_cast<Extented_type_info, type_of_lhs>*(lhs.second))\
                                     for(uintptr_t i=0; i<size; i++){\
                                         op(lhs.second, array[i]);\
                                     }\
+                                }\
+                                else{\
+                                    if constexpr (op_action_type==_nuteral) {\
+                                    for(uintptr_t i=0; i<size; i++){\
+                                        if(!op(lhs.second, array[i])){\
+                                            return false;\
+                                        }\
+                                    }\
+                                    return true;\
                                     }\
                                     else{\
-                                        if constexpr (op_action_type==_nuteral) {\
-                                        for(uintptr_t i=0; i<size; i++){\
-                                            if(!op(lhs.second, array[i])){\
-                                                return false;\
-                                            }\
-                                        }\
-                                        return true;\
-                                        }\
-                                        else{\
-                                        auto lhs_temp= lhs;\
-                                        for(uintptr_t i=0; i<size; i++){\
-                                        op(lhs_temp.second, array[i])\
-                                        }\
-                                        return lhs_temp;\
-                                        }\
-                                        }\
+                                    auto lhs_temp= lhs.second;\
+                                    for(uintptr_t i=0; i<size; i++){\
+                                    op(lhs_temp, array[i]);\
+                                    }\
+                                    return name_of_the_class_used_in{type_tag, lhs_temp};\
+                                    }\
+                                    }\
                                         }
-                        
+                             
             template<typename Hetrogenous_array>
             struct Extented_types{
 //I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
@@ -486,13 +493,13 @@ namespace printing_tools {
                     auto& lhs = *(static_cast<std::pair<type_tag, uintptr>*>(ptr));
                     switch((static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->first){
                         case type_tag::uintptr_tag:
-                        ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, uintptr_t>*>(ptr)->second), static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second,op);
+                        ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second,op);
                         break;
                         case type_tag::long_double_tag:
-                        ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, uintptr_t>*>(ptr)->second), uintptr{static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second},op);
+                        ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), uintptr{static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second},op);
                         break;
                         case type_tag::string_tag:
-                        ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, uintptr_t>*>(ptr)->second), convert_to_number<uintptr>(std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second,op);
+                        ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), convert_to_number<uintptr>(std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second,op);
                         break;
                         REPETETIVE_CASE_STATEMENT_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs,rhs, op, static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr))
                     }
@@ -878,6 +885,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
