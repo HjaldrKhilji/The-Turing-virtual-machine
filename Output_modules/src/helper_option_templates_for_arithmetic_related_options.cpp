@@ -184,7 +184,7 @@ namespace printing_tools {
                                 return op(lhs,second_arg);\
                             }\
                             else{\
-                                return Hetrogenous_array_type{lhs, second_arg)};\
+                                return Hetrogenous_array_type{lhs, second_arg};\
                             }\
                         }
             // _true means assigment operators, _nuteral means compairision/ordering operators, _false/other means binary operators (eg + - * /,etc) that return a by value result 
@@ -212,6 +212,7 @@ namespace printing_tools {
                                     for(uintptr_t i=0; i<size; i++){\
                                     op(lhs_temp.second, array[i])\
                                     }\
+                                    return lhs_temp;\
                                     }\
                                     }\
                                 break;\
@@ -247,6 +248,7 @@ namespace printing_tools {
                                         for(uintptr_t i=0; i<size; i++){\
                                         op(lhs_temp.second, array[i])\
                                         }\
+                                        return lhs_temp;\
                                         }\
                                         }\
                                         }
@@ -501,10 +503,10 @@ namespace printing_tools {
                                 ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, long double>*>(ptr)->second),   long double{static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second},op)
                                 break;
                             case type_tag::long_double_tag:
-                            ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, long double>*>(ptr)->second),   static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second,op)
+                            ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, long double>*>(ptr)->second),   static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second,op)
                             break;
                             case type_tag::string_tag:
-                            op(lhs.second,convert_to_number<long double>(std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second));
+                            ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, long double>*>(ptr)->second),   convert_to_number<long double>(std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second),op)
                             break;
                              REPETETIVE_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs,rhs, op, static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr));
                             }
@@ -513,13 +515,13 @@ namespace printing_tools {
                     auto* lhs = static_cast<std::pair<type_tag, std::string>*>(ptr);
                     switch((static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->first){
                     case type_tag::uintptr_tag:
-                    op(lhs.second, std::to_string(static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second));
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, std::string>*>(ptr)->second), std::to_string(static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second),op)
                     break;
                     case type_tag::long_double_tag:
-                    op(lhs.second, std::to_string(static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second));
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, std::string>*>(ptr)->second), std::to_string(static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second),op)
                     break;
                     case type_tag::string_tag:
-                    op(lhs.second,std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second);
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, std::string>*>(ptr)->second), static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second,op)
                     break;
                     REPETETIVE_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs,rhs, op, static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr));
              REPETETIVE_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE
@@ -876,6 +878,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
