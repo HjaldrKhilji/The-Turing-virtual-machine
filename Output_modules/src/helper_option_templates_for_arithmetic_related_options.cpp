@@ -188,9 +188,9 @@ namespace printing_tools {
                             }\
                         }
             // _true means assigment operators, _nuteral means compairision/ordering operators, _false/other means binary operators (eg + - * /,etc) that return a by value result 
-             #define REPETETIVE_CASE_STATEMENT_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs,rhs, op, type_tag, name_of_the_class_used_in)\
+             #define REPETETIVE_CASE_STATEMENT_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs,rhs_raw, op, type_tag, name_of_the_class_used_in)\
                             case type_tag::heterogeneous_array:\
-                                auto& raw_pair= *(static_cast<std::pair<Extented_type_info, Heterogeneous_array>*>(rhs.ptr));\
+                                auto& raw_pair= *(static_cast<std::pair<Extented_type_info, Heterogeneous_array>*>(rhs_raw.ptr));\
                                 auto size= (raw_pair->first).size;\
                                 char *raw_mem = static_cast<char*>((raw_pair.second).ptr);\
                                 Hetrogenous_array_type* array= reinterpret_cast<Hetrogenous_array_type*>(raw_mem+sizeof(Extented_type_info));\
@@ -220,7 +220,7 @@ namespace printing_tools {
                                 break;\
                             case type_tag::extended_types:\
                                 vector<Extented_type_info>* extra_info_for_extented_types;\
-                                switch(static_cast<type_tag*>(rhs.ptr)){\
+                                switch(static_cast<type_tag*>(rhs_raw.ptr)){\
                                     case type_tag::vector_containing_types:\
                                         extra_info_for_extented_types= vector_containing_types[raw_pair.first.info.index];\
                                         break;\
@@ -231,7 +231,7 @@ namespace printing_tools {
                                         extra_info_for_extented_types= unordered_map_containing_types[raw_pair.first.info.index];\
                                         break;\
                                     }\  
-                                     auto& raw_pair= *(static_cast<std::pair<Extented_type_info, Extented_types>*>(rhs.ptr));\
+                                     auto& raw_pair= *(static_cast<std::pair<Extented_type_info, Extented_types>*>(rhs_raw.ptr));\
                                     auto size= (raw_pair->first).size;\
                                     char *raw_mem = static_cast<char*>((raw_pair.second).ptr);\
                                     Extended_types* array= reinterpret_cast<Extended_types*>(raw_mem+sizeof(Extented_type_info));\
@@ -499,39 +499,38 @@ namespace printing_tools {
                         ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), uintptr{static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second},op);
                         break;
                         case type_tag::string_tag:
-                        ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), convert_to_number<uintptr>(std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second,op);
+                        ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), convert_to_number<uintptr>(std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second,op, type_tag::uintptr_tag);
                         break;
-                        REPETETIVE_CASE_STATEMENT_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs,rhs, op, static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr))
+                        REPETETIVE_CASE_STATEMENT_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs, second_arg,  op, )
                     }
                     case type_tag::long_double_tag:
                         auto* lhs = static_cast<std::pair<type_tag, long double>*>(ptr);
                         switch((static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->first){
                             case type_tag::uintptr_tag:
-                                ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, long double>*>(ptr)->second),   long double{static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second},op)
+                                ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second),long double{static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second},op)
                                 break;
                             case type_tag::long_double_tag:
-                            ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, long double>*>(ptr)->second),   static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second,op)
+                            ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second),static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second,op)
                             break;
                             case type_tag::string_tag:
-                            ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, long double>*>(ptr)->second),   convert_to_number<long double>(std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second),op)
+                            ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second),convert_to_number<long double>(std::static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second),op)
                             break;
-                             REPETETIVE_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs,rhs, op, static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr));
+                             REPETETIVE_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs, second_arg, op, type_tag::long_double_tag);
                             }
                         break;
                 case type_tag::string_tag:
                     auto* lhs = static_cast<std::pair<type_tag, std::string>*>(ptr);
                     switch((static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->first){
                     case type_tag::uintptr_tag:
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, std::string>*>(ptr)->second), std::to_string(static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second),op)
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), std::to_string(static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr)->second),op)
                     break;
                     case type_tag::long_double_tag:
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, std::string>*>(ptr)->second), std::to_string(static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second),op)
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), std::to_string(static_cast<std::pair<type_tag, long double>*>(second_arg.ptr)->second),op)
                     break;
                     case type_tag::string_tag:
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<type_tag, std::string>*>(ptr)->second), static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second,op)
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), static_cast<std::pair<type_tag, std::string>*>(second_arg.ptr)->second,op)
                     break;
-                    REPETETIVE_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs,rhs, op, static_cast<std::pair<type_tag, uintptr>*>(second_arg.ptr));
-             REPETETIVE_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE
+                    REPETETIVE_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs, second_arg, op, type_tag::string_tag);
                 
             }
             }
@@ -885,6 +884,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
