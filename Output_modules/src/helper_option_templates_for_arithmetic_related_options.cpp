@@ -318,7 +318,52 @@ namespace printing_tools {
                     ptr= static_cast<void*>(raw_mem);
                   
             }
-            
+            template <typename Op_two_type, typename op, ternary_state op_action_type>
+            requires std::is_arithmetic_v<Op_two_type> || std::is_same_v<std:string, Op_two_type>
+            std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>>
+            inline operator_generator(Op_two_type second_arg) {  //the manliest op gen ever, made by a real man (THE 6'3 KING (me, ofcourse))     
+            {
+            switch(static_cast<Type_tag*>(ptr)){
+                case Type_tag::uintptr_tag:
+                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)   {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, uintptr_t>*>(ptr)->second), second_arg, op, Type_tag::uintptr_tag, uintptr_t)
+                }
+                else if(!std::is_same_v<long double, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, uintptr_t>*>(ptr)->second), uintptr_t{second_arg},op, Type_tag::uintptr_tag, uintptr_t)
+                }
+                else if(!std::is_same_v<std::string, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, uintptr_t>*>(ptr)->second),  convert_to_number<uintptr_t>(second_arg),op, Type_tag::uintptr_tag, uintptr_t)
+                }
+                    break;
+                case Type_tag::long_double_tag:
+                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, long double>*>(ptr)->second),  long double{second_arg}, op, Type_tag::long_double_tag, long double)
+                }
+                else if(!std::is_same_v<long double, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, long double>*>(ptr)->second), second_arg,op, Type_tag::long_double_tag, long double)
+                }
+                else if(!std::is_same_v<std::string, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, long double>*>(ptr)->second),  convert_to_number<long double>(second_arg),op, Type_tag::long_double_tag, long double)
+                }
+                    break;
+                case Type_tag::string_tag:
+                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, std::string>*>(ptr)->second),  std::to_string(second_arg),op, Type_tag::string_tag, std::string)
+                }
+                else if(!std::is_same_v<long double, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, std::string>*>(ptr)->second), std::to_string(second_arg),op, Type_tag::string_tag, std::string)
+                }
+                else if(!std::is_same_v<std::string, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, std::string>*>(ptr)->second),  second_arg,op, Type_tag::string_tag, std::string)
+                }
+                break;
+            }
+            }
+            template<typename op, ternary_state op_action_type>
+            std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
+            inline op_generator(Hetrogenous_array_type second_arg) {      
+            static_cast<*Extended_types>(this)->op_generator<op, op_action_type>(second_arg);
+            }
             ~Extented_types(){
             switch(static_cast<Type_tag*>(ptr).tag){
                 case Type_tag::uintptr_tag:
@@ -399,9 +444,9 @@ namespace printing_tools {
                   
             }
             template <Type_tag tag_of_type_to_construct_from>
-            Hetrogenous_array_type(T obj )
+            inline Hetrogenous_array_type(T obj )
             {
-                if(std::is_same_v(tag_of_type_to_construct_from, uintptr_t){
+                if constexpr(std::is_same_v(tag_of_type_to_construct_from, uintptr_t) {
                         ptr= static_cast<void*>(new std::pair<Type_tag, uintptr>{Type_tag::uintptr_tag,obj});  
                 }
                 else if(std::is_same_v(tag_of_type_to_construct_from, long double){
@@ -411,7 +456,20 @@ namespace printing_tools {
                         ptr= static_cast<void*>(new std::pair<Type_tag,  std::string>{ Type_tag::string_tag,obj});  
                 }
                 else if(std::is_same_v(tag_of_type_to_construct_from, Extended_types){
-                ptr= obj.ptr;
+                    Extented_type_info& temp =*(static_cast<Extented_type_info*>(obj.ptr));
+                    const Extended_types& source_array= *(static_cast<Extended_types*>(static_cast<char*>(obj.ptr)+sizeof(Extented_type_info)));
+                    uintptr_t size= temp.size;
+                    uintptr_t array_size_in_bytes= sizeof(Extended_types*)*size; 
+                    uintptr_t element_size_in_bytes=sizeof(Extended_types)*size;
+                    char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
+                    new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::heterogeneous_array, size};
+                    Extended_types* array= reinterpret_cast<Extended_types*>(raw_mem+sizeof(Extented_type_info));
+                    Extended_types* end= array+array_size_in_bytes;
+                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+                        array[i]=end+(i*element_size_in_bytes); 
+                            new (array[i]) Extended_types{source_array[i]};
+                        }
+                    ptr= static_cast<void*>(raw_mem);  
                 }
                 else if(std::is_same_v(tag_of_type_to_construct_from, Hetrogenous_array_type){
                            
@@ -939,6 +997,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
