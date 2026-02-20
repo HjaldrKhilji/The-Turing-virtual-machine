@@ -175,8 +175,7 @@ namespace printing_tools {
             unordered_map_containing_types;
             //ALL_ActiO0n0OnOps_for_simple0OPS is ALL action on ops for simple ops, the name is bad on purpose (to avoid name conflcts and to stick out as something wierd so the mantainer(still probably me in the future), knows it can have bugs
             //by simple ops, i mean, you cant branch, unless lhs(or rhs) does it for you
-            #define ALL_ActiO0nsO0ps_for_extended_and_hetrogenous_types(source_array, array, op, op_action_type )
-            #define ALL_ActiO0n0OnOps_for_simple0OPS(lhs, rhs, op, name_of_the_class_used, type_name)\
+            #define ALL_ActiO0n0OnOps_for_simple0OPS(lhs, rhs, op, name_of_the_class_used)\
                         if constexpr(op_action_type==_true) {\
                             op(lhs,second_arg);\
                         }\
@@ -189,9 +188,9 @@ namespace printing_tools {
                             }\
                         }
             // _true means assigment operators, _nuteral means compairision/ordering operators, _false/other means binary operators (eg + - * /,etc) that return a by value result 
-             #define REPETETIVE_CASE_STATEMENT_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs,rhs_raw, op, Type_tag, name_of_the_class_used_in)\
+             #define REPETETIVE_CASE_STATEMENT_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs,rhs, op, Type_tag, name_of_the_class_used_in)\
                             case Type_tag::heterogeneous_array:\
-                                auto& raw_pair= *(static_cast<std::pair<Extented_type_info, name_of_the_class_used_in>*>(rhs_raw.ptr));\
+                                auto& raw_pair= *(static_cast<std::pair<Extented_type_info, name_of_the_class_used_in>*>(rhs));\
                                 auto size= (raw_pair->first).size;\
                                 char *raw_mem = static_cast<char*>((raw_pair.second).ptr);\
                                 Hetrogenous_array_type* array= reinterpret_cast<Hetrogenous_array_type*>(raw_mem+sizeof(Extented_type_info));\
@@ -220,7 +219,7 @@ namespace printing_tools {
                                 break;\
                             case Type_tag::extended_types:\
                                 vector<Extented_type_info>* extra_info_for_extented_types;\
-                                switch(static_cast<Type_tag*>(rhs_raw.ptr)){\
+                                switch(static_cast<Type_tag*>(rhs)){\
                                     case Type_tag::vector_containing_types:\
                                         extra_info_for_extented_types= vector_containing_types[raw_pair.first.info.index];\
                                         break;\
@@ -231,7 +230,7 @@ namespace printing_tools {
                                         extra_info_for_extented_types= unordered_map_containing_types[raw_pair.first.info.index];\
                                         break;\
                                     }\  
-                                     auto& raw_pair= *(static_cast<std::pair<Extented_type_info, Extented_types>*>(rhs_raw.ptr));\
+                                     auto& raw_pair= *(static_cast<std::pair<Extented_type_info, Extented_types>*>(rhs));\
                                     auto size= (raw_pair->first).size;\
                                     char *raw_mem = static_cast<char*>((raw_pair.second).ptr);\
                                     Extended_types* array= reinterpret_cast<Extended_types*>(raw_mem+sizeof(Extented_type_info));\
@@ -259,7 +258,220 @@ namespace printing_tools {
                                     }\
                                     }\
                                         }
-                             
+   
+
+
+
+            template <typename tag_of_type_to_construct_from, typename class_used_in>
+            inline construct_void_pointer(void **ptr, tag_of_type_to_construct_from obj ){
+                if constexpr(std::is_same_v(tag_of_type_to_construct_from, uintptr_t) {
+                        *ptr= static_cast<void*>(new std::pair<Type_tag, uintptr>{Type_tag::uintptr_tag,obj});  
+                }
+                else if(std::is_same_v(tag_of_type_to_construct_from, long double){
+                        *ptr= static_cast<void*>(new std::pair<Type_tag, long double>{Type_tag::long_double_tag,obj});  
+                }
+                else if(std::is_same_v(tag_of_type_to_construct_from, std::string){
+                        *ptr= static_cast<void*>(new std::pair<Type_tag,  std::string>{ Type_tag::string_tag,obj});  
+                }
+                else if(std::is_same_v(tag_of_type_to_construct_from, Extended_types){
+                    Extented_type_info& temp =*(static_cast<Extented_type_info*>(obj.ptr));
+                    const Extended_types& source_array= *(static_cast<Extended_types*>(static_cast<char*>(obj.ptr)+sizeof(Extented_type_info)));
+                    uintptr_t size= temp.size;
+                    uintptr_t array_size_in_bytes= sizeof(Extended_types*)*size; 
+                    uintptr_t element_size_in_bytes=sizeof(Extended_types)*size;
+                    char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
+                    new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::heterogeneous_array, size};
+                    class_used_in* array= reinterpret_cast<class_used_in*>(raw_mem+sizeof(Extented_type_info));
+                    class_used_in* end= array+array_size_in_bytes;
+                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+                        array[i]=end+(i*element_size_in_bytes); 
+                            new (array[i]) class_used_in{source_array[i]};
+                        }
+                    *ptr= static_cast<void*>(raw_mem);  
+                }
+                else if(std::is_same_v(tag_of_type_to_construct_from, Hetrogenous_array_type){  
+                            Extented_type_info& temp =*(static_cast<Extented_type_info*>(obj.ptr));
+                            const Hetrogenous_array_type& source_array= *(static_cast<Hetrogenous_array_type*>(static_cast<char*>(obj.ptr)+sizeof(Extented_type_info)));
+                            uintptr_t size= temp.size;
+                            uintptr_t array_size_in_bytes= sizeof(Hetrogenous_array_type*)*size; 
+                            uintptr_t element_size_in_bytes=sizeof(Hetrogenous_array_type)*size;
+                            char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
+                            new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::heterogeneous_array, size};
+                            class_used_in* array= reinterpret_cast<class_used_in*>(raw_mem+sizeof(Extented_type_info));
+                            class_used_in* end= array+array_size_in_bytes;
+                            for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+                            array[i]=end+(i*element_size_in_bytes); 
+                            new (array[i]) class_used_in{source_array[i]};
+                            }
+                            *ptr= static_cast<void*>(raw_mem);  
+                }
+            }
+
+
+
+
+            template <typename Op_two_type, typename op, ternary_state op_action_type, typename name_of_the_class_used_in>
+            requires std::is_arithmetic_v<Op_two_type> || std::is_same_v<std:string, Op_two_type>
+            inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>>
+            void_operator_generator(void **ptr, Op_two_type second_arg) {  //the manliest op gen ever, made by a real man (THE 6'3 KING (me, ofcourse))     
+            switch(static_cast<Type_tag*>(*ptr)){
+                case Type_tag::uintptr_tag:
+                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)   {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, uintptr_t>*>(*ptr)->second), second_arg, op, name_of_the_class_used_in)
+                }
+                else if(!std::is_same_v<long double, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, uintptr_t>*>(*ptr)->second), uintptr_t{second_arg},op, name_of_the_class_used_in)
+                }
+                else if(!std::is_same_v<std::string, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, uintptr_t>*>(*ptr)->second),  convert_to_number<uintptr_t>(second_arg),op, name_of_the_class_used_in)
+                }
+                    break;
+                case Type_tag::long_double_tag:
+                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, long double>*>(*ptr)->second),  long double{second_arg}, op, name_of_the_class_used_in)
+                }
+                else if(!std::is_same_v<long double, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, long double>*>(*ptr)->second), second_arg,op, name_of_the_class_used_in)
+                }
+                else if(!std::is_same_v<std::string, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, long double>*>(*ptr)->second),  convert_to_number<long double>(second_arg),op, name_of_the_class_used_in)
+                }
+                    break;
+                case Type_tag::string_tag:
+                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, std::string>*>(*ptr)->second),  std::to_string(second_arg),op, name_of_the_class_used_in)
+                }
+                else if(!std::is_same_v<long double, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, std::string>*>(*ptr)->second), std::to_string(second_arg),op, name_of_the_class_used_in)
+                }
+                else if(!std::is_same_v<std::string, Op_two_type>)  {
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, std::string>*>(*ptr)->second),  second_arg,op, name_of_the_class_used_in)
+                }
+                break;
+            }
+            }
+
+
+
+
+            template<typename op, ternary_state op_action_type, typename name_of_the_class_used_in>
+            std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
+            void_op_generator(void **ptr, void* second_arg) {       
+            
+            switch(static_cast<Type_tag*>(*ptr)){
+                case Type_tag::uintptr_tag:
+                    auto& lhs = *(static_cast<std::pair<Type_tag, uintptr>*>(*ptr));
+                    switch((static_cast<std::pair<Type_tag, uintptr>*>(second_arg)->first){
+                        case Type_tag::uintptr_tag:
+                            ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), static_cast<std::pair<Type_tag, uintptr>*>(second_arg)->second,op,name_of_the_class_used_in);
+                            break;
+                        case Type_tag::long_double_tag:
+                            ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), uintptr{static_cast<std::pair<Type_tag, long double>*>(second_arg)->second},op, name_of_the_class_used_in);
+                            break;
+                        case Type_tag::string_tag:
+                            ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), convert_to_number<uintptr>(std::static_cast<std::pair<Type_tag, std::string>*>(second_arg)->second,op,name_of_the_class_used_in);
+                            break;
+                        REPETETIVE_CASE_STATEMENT_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs, second_arg,  op, name_of_the_class_used_in)
+                    }
+                case Type_tag::long_double_tag:
+                    auto* lhs = static_cast<std::pair<Type_tag, long double>*>(*ptr);
+                    switch((static_cast<std::pair<Type_tag, uintptr>*>(second_arg)->first){
+                        case Type_tag::uintptr_tag:
+                            ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second),long double{static_cast<std::pair<Type_tag, uintptr>*>(second_arg)->second},op, name_of_the_class_used_in)
+                            break;
+                        case Type_tag::long_double_tag:
+                        ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second),static_cast<std::pair<Type_tag, long double>*>(second_arg)->second,op, name_of_the_class_used_in)
+                        break;
+                        case Type_tag::string_tag:
+                        ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second),convert_to_number<long double>(std::static_cast<std::pair<Type_tag, std::string>*>(second_arg.ptr)->second),op, name_of_the_class_used_in)
+                        break;
+                        REPETETIVE_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs, second_arg, op, Type_tag::long_double_tag, name_of_the_class_used_in);
+                        }
+                    break;
+                case Type_tag::string_tag:
+                    auto* lhs = static_cast<std::pair<Type_tag, std::string>*>(*ptr);
+                    switch((static_cast<std::pair<Type_tag, uintptr>*>(second_arg)->first){
+                    case Type_tag::uintptr_tag:
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), std::to_string(static_cast<std::pair<Type_tag, uintptr>*>(second_arg)->second),op, name_of_the_class_used_in)
+                    break;
+                    case Type_tag::long_double_tag:
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), std::to_string(static_cast<std::pair<Type_tag, long double>*>(second_arg)->second),op, name_of_the_class_used_in)
+                    break;
+                    case Type_tag::string_tag:
+                    ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), static_cast<std::pair<Type_tag, std::string>*>(second_arg)->second,op,name_of_the_class_used_in)
+                    break;
+                    REPETETIVE_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs, second_arg, op,Type_tag::string_tag, name_of_the_class_used_in);
+                case Type_tag::hetrogenous_array_type:
+                        Extented_type_info& temp_info =*(static_cast<Extented_type_info*>(*ptr));
+                        Extented_type_info& temp_info_source =*(static_cast<Extented_type_info*>(second_arg));
+                        if(temp_info.size == temp_info_source.size){
+                        throw std::string{"size mismatch for two hetrogenous arrays operands"};
+                        } 
+                        uintptr_t size= temp_info.size;
+                        uintptr_t array_size_in_bytes= sizeof(Hetrogenous_array_type*)*size; 
+                        uintptr_t element_size_in_bytes=sizeof(Hetrogenous_array_type)*size;
+                        Hetrogenous_array_type* array= reinterpret_cast<Hetrogenous_array_type*>(static_cast<char*>(ptr)+sizeof(Extented_type_info));
+                        Hetrogenous_array_type* source_array= reinterpret_cast<Hetrogenous_array_type*>(static_cast<char*>(second_arg)+sizeof(Extented_type_info));
+                        if constexpr(op_action_type==_true) {
+                            for(uintptr_t i=0; i<size; i++){
+                                op(source_array[i], array[i]);
+                                }
+                            }
+                            else{
+                                if constexpr (op_action_type==_nuteral) {
+                                    for(uintptr_t i=0; i<size; i++){
+                                        if(!op(source_array[i], array[i])){
+                                            return false;
+                                        }
+                                    }
+                                    return true;
+                                    }
+                                else{
+                                    auto lhs_temp= lhs.second;
+                                    for(uintptr_t i=0; i<size; i++){
+                                    op(source_array[i], array[i]);
+                                    }
+                                    return name_of_the_class_used_in{Type_tag, lhs_temp};
+                                    }
+                    }
+                case Type_tag::extended_types:
+                        Extented_type_info& temp_info =*(static_cast<Extented_type_info*>(*ptr));
+                        Extented_type_info& temp_info_source =*(static_cast<Extented_type_info*>(second_arg));
+                        if(temp_info.size == temp_info_source.size){
+                        throw std::string{"size mismatch for two hetrogenous arrays operands"};
+                        } 
+                        uintptr_t size= temp_info.size;
+                        uintptr_t array_size_in_bytes= sizeof(Hetrogenous_array_type*)*size; 
+                        uintptr_t element_size_in_bytes=sizeof(Hetrogenous_array_type)*size;
+                        Extended_types* array= reinterpret_cast<Extended_types*>(static_cast<char*>(ptr)+sizeof(Extented_type_info));
+                        Hetrogenous_array_type* source_array= reinterpret_cast<Hetrogenous_array_type*>(static_cast<char*>(second_arg)+sizeof(Extented_type_info));
+                        if constexpr(op_action_type==_true) {
+                            for(uintptr_t i=0; i<size; i++){
+                                op(source_array[i], array[i]);
+                                }
+                            }
+                            else{
+                                if constexpr (op_action_type==_nuteral) {
+                                    for(uintptr_t i=0; i<size; i++){
+                                        if(!op(source_array[i], array[i])){
+                                            return false;
+                                        }
+                                    }
+                                    return true;
+                                    }
+                                else{
+                                    auto lhs_temp= lhs.second;
+                                    for(uintptr_t i=0; i<size; i++){
+                                    op(source_array[i], array[i]);
+                                    }
+                                    return name_of_the_class_used_in{Type_tag, lhs_temp};
+                                    }
+                    }
+                
+                default:
+
+            }
+            }
             template<typename Hetrogenous_array>
             struct Extented_types{
 //I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
@@ -318,51 +530,28 @@ namespace printing_tools {
                     ptr= static_cast<void*>(raw_mem);
                   
             }
-            template <typename Op_two_type, typename op, ternary_state op_action_type>
-            requires std::is_arithmetic_v<Op_two_type> || std::is_same_v<std:string, Op_two_type>
-            std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>>
-            inline operator_generator(Op_two_type second_arg) {  //the manliest op gen ever, made by a real man (THE 6'3 KING (me, ofcourse))     
+            template <Type_tag tag_of_type_to_construct_from>
+            inline Hetrogenous_array_type(tag_of_type_to_construct_from obj)
             {
-            switch(static_cast<Type_tag*>(ptr)){
-                case Type_tag::uintptr_tag:
-                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)   {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, uintptr_t>*>(ptr)->second), second_arg, op, Type_tag::uintptr_tag, uintptr_t)
-                }
-                else if(!std::is_same_v<long double, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, uintptr_t>*>(ptr)->second), uintptr_t{second_arg},op, Type_tag::uintptr_tag, uintptr_t)
-                }
-                else if(!std::is_same_v<std::string, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, uintptr_t>*>(ptr)->second),  convert_to_number<uintptr_t>(second_arg),op, Type_tag::uintptr_tag, uintptr_t)
-                }
-                    break;
-                case Type_tag::long_double_tag:
-                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, long double>*>(ptr)->second),  long double{second_arg}, op, Type_tag::long_double_tag, long double)
-                }
-                else if(!std::is_same_v<long double, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, long double>*>(ptr)->second), second_arg,op, Type_tag::long_double_tag, long double)
-                }
-                else if(!std::is_same_v<std::string, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, long double>*>(ptr)->second),  convert_to_number<long double>(second_arg),op, Type_tag::long_double_tag, long double)
-                }
-                    break;
-                case Type_tag::string_tag:
-                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, std::string>*>(ptr)->second),  std::to_string(second_arg),op, Type_tag::string_tag, std::string)
-                }
-                else if(!std::is_same_v<long double, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, std::string>*>(ptr)->second), std::to_string(second_arg),op, Type_tag::string_tag, std::string)
-                }
-                else if(!std::is_same_v<std::string, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, std::string>*>(ptr)->second),  second_arg,op, Type_tag::string_tag, std::string)
-                }
-                break;
+              construct_void_pointer<Extended_types>(&ptr, obj);
             }
+            template <typename , typename op, ternary_state op_action_type>
+            requires std::is_arithmetic_v<Op_two_type> || std::is_same_v<std:string, Op_two_type>
+            inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>>
+            void_operator_generator(Op_two_type second_arg) {
+                void_operator_generator<Op_two_type, op, op_action_type>, op_action_type(&ptr,second_arg);
             }
+                    
             template<typename op, ternary_state op_action_type>
-            std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
-            inline op_generator(Hetrogenous_array_type second_arg) {      
-            static_cast<*Extended_types>(this)->op_generator<op, op_action_type>(second_arg);
+            inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
+            void_op_generator(Hetrogenous_array_type second_arg){
+                void_op_generator<op, op_action_type>(&ptr, second_arg.ptr);
+            }
+
+            template<typename op, ternary_state op_action_type>
+            inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
+            void_op_generator(Extended_types second_arg){
+                void_op_generator<op, op_action_type>(&ptr, second_arg.ptr);
             }
             ~Extented_types(){
             switch(static_cast<Type_tag*>(ptr).tag){
@@ -444,231 +633,27 @@ namespace printing_tools {
                   
             }
             template <Type_tag tag_of_type_to_construct_from>
-            inline Hetrogenous_array_type(T obj )
+            inline Hetrogenous_array_type(tag_of_type_to_construct_from obj)
             {
-                if constexpr(std::is_same_v(tag_of_type_to_construct_from, uintptr_t) {
-                        ptr= static_cast<void*>(new std::pair<Type_tag, uintptr>{Type_tag::uintptr_tag,obj});  
-                }
-                else if(std::is_same_v(tag_of_type_to_construct_from, long double){
-                        ptr= static_cast<void*>(new std::pair<Type_tag, long double>{Type_tag::long_double_tag,obj});  
-                }
-                else if(std::is_same_v(tag_of_type_to_construct_from, std::string){
-                        ptr= static_cast<void*>(new std::pair<Type_tag,  std::string>{ Type_tag::string_tag,obj});  
-                }
-                else if(std::is_same_v(tag_of_type_to_construct_from, Extended_types){
-                    Extented_type_info& temp =*(static_cast<Extented_type_info*>(obj.ptr));
-                    const Extended_types& source_array= *(static_cast<Extended_types*>(static_cast<char*>(obj.ptr)+sizeof(Extented_type_info)));
-                    uintptr_t size= temp.size;
-                    uintptr_t array_size_in_bytes= sizeof(Extended_types*)*size; 
-                    uintptr_t element_size_in_bytes=sizeof(Extended_types)*size;
-                    char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
-                    new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::heterogeneous_array, size};
-                    Extended_types* array= reinterpret_cast<Extended_types*>(raw_mem+sizeof(Extented_type_info));
-                    Extended_types* end= array+array_size_in_bytes;
-                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
-                        array[i]=end+(i*element_size_in_bytes); 
-                            new (array[i]) Extended_types{source_array[i]};
-                        }
-                    ptr= static_cast<void*>(raw_mem);  
-                }
-                else if(std::is_same_v(tag_of_type_to_construct_from, Hetrogenous_array_type){
-                           
-                        switch(static_cast<Type_tag*>(obj.ptr)){
-                            case Type_tag::uintptr_tag:
-                            using type_being_deep_copied=std::pair<type_tag, uintptr_t>;
-                            ptr= static_cast<void*>(new type_being_deep_copied{ *(static_cast<type_being_deep_copied*>(obj.ptr)) });
-                            case Type_tag::long_double_tag:
-                            using type_being_deep_copied=std::pair<type_tag, long double>;
-                            ptr= static_cast<void*>(new type_being_deep_copied{ *(static_cast<type_being_deep_copied*>(obj.ptr)) });
-                            case Type_tag::string_tag:
-                            using type_being_deep_copied=std::pair<type_tag, std::string>;
-                            ptr= static_cast<void*>(new type_being_deep_copied{ *(static_cast<type_being_deep_copied*>(obj.ptr)) });
-                            case Type_tag::extended_types:
-                            using type_being_deep_copied=std::pair<type_tag, Extended_types>;
-                            ptr= static_cast<void*>(new type_being_deep_copied{ *(static_cast<type_being_deep_copied*>(obj.ptr)) });
-                            case Type_tag::heterogeneous_array:
-                            Extented_type_info& temp =*(static_cast<Extented_type_info*>(obj.ptr));
-                            const Hetrogenous_array_type& source_array= *(static_cast<Hetrogenous_array_type*>(static_cast<char*>(obj.ptr)+sizeof(Extented_type_info)));
-                            uintptr_t size= temp.size;
-                            uintptr_t array_size_in_bytes= sizeof(Hetrogenous_array_type*)*size; 
-                            uintptr_t element_size_in_bytes=sizeof(Hetrogenous_array_type)*size;
-                            char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
-                            new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::heterogeneous_array, size};
-                            Hetrogenous_array_type* array= reinterpret_cast<Hetrogenous_array_type*>(raw_mem+sizeof(Extented_type_info));
-                            Hetrogenous_array_type* end= array+array_size_in_bytes;
-                            for(int i=0; i<vector_containing_nested_type_info.length(); i++){
-                            array[i]=end+(i*element_size_in_bytes); 
-                            new (array[i]) Hetrogenous_array_type{source_array[i]};
-                            }
-                            ptr= static_cast<void*>(raw_mem);  
-                        }
-                        
-                }    
+              construct_void_pointer<Hetrogenous_array_type>(&ptr, obj);
             }
-           
-            template <typename Op_two_type, typename op, ternary_state op_action_type>
+            template <typename , typename op, ternary_state op_action_type>
             requires std::is_arithmetic_v<Op_two_type> || std::is_same_v<std:string, Op_two_type>
-            std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>>
-            operator_generator(Op_two_type second_arg) {  //the manliest op gen ever, made by a real man (THE 6'3 KING (me, ofcourse))     
-            {
-            switch(static_cast<Type_tag*>(ptr)){
-                case Type_tag::uintptr_tag:
-                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, uintptr_t>*>(ptr)->second), second_arg, op, Type_tag::uintptr_tag, uintptr_t)
-                }
-                else if(!std::is_same_v<long double, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, uintptr_t>*>(ptr)->second), uintptr_t{second_arg},op, Type_tag::uintptr_tag, uintptr_t)
-                }
-                else if(!std::is_same_v<std::string, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, uintptr_t>*>(ptr)->second),  convert_to_number<uintptr_t>(second_arg),op, Type_tag::uintptr_tag, uintptr_t)
-                }
-                    break;
-                case Type_tag::long_double_tag:
-                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, long double>*>(ptr)->second),  long double{second_arg}, op, Type_tag::long_double_tag, long double)
-                }
-                else if(!std::is_same_v<long double, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, long double>*>(ptr)->second), second_arg,op, Type_tag::long_double_tag, long double)
-                }
-                else if(!std::is_same_v<std::string, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, long double>*>(ptr)->second),  convert_to_number<long double>(second_arg),op, Type_tag::long_double_tag, long double)
-                }
-                    break;
-                case Type_tag::string_tag:
-                if constexpr (!std::is_same_v<uintptr_t, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, std::string>*>(ptr)->second),  std::to_string(second_arg),op, Type_tag::string_tag, std::string)
-                }
-                else if(!std::is_same_v<long double, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, std::string>*>(ptr)->second), std::to_string(second_arg),op, Type_tag::string_tag, std::string)
-                }
-                else if(!std::is_same_v<std::string, Op_two_type>)  {
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(static_cast<std::pair<Type_tag, std::string>*>(ptr)->second),  second_arg,op, Type_tag::string_tag, std::string)
-                }
-                break;
+            inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>>
+            void_operator_generator(Op_two_type second_arg) {
+            void_operator_generator<Op_two_type, op, op_action_type>, op_action_type(&ptr,second_arg);
             }
-            }
+                    
             template<typename op, ternary_state op_action_type>
-            std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
-            op_generator(Hetrogenous_array_type second_arg) {       
-            
-            switch(static_cast<Type_tag*>(ptr)){
-                case Type_tag::uintptr_tag:
-                    auto& lhs = *(static_cast<std::pair<Type_tag, uintptr>*>(ptr));
-                    switch((static_cast<std::pair<Type_tag, uintptr>*>(second_arg.ptr)->first){
-                        case Type_tag::uintptr_tag:
-                            ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), static_cast<std::pair<Type_tag, uintptr>*>(second_arg.ptr)->second,op, Type_tag::uintptr_tag, uintptr_t);
-                            break;
-                        case Type_tag::long_double_tag:
-                            ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), uintptr{static_cast<std::pair<Type_tag, long double>*>(second_arg.ptr)->second},op, Type_tag::uintptr_tag, uintptr_t);
-                            break;
-                        case Type_tag::string_tag:
-                            ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), convert_to_number<uintptr>(std::static_cast<std::pair<Type_tag, std::string>*>(second_arg.ptr)->second,op, Type_tag::uintptr_tag, uintptr_t);
-                            break;
-                        REPETETIVE_CASE_STATEMENT_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs, second_arg,  op, Type_tag::uintptr_tag, hetrogenous_array_type)
-                    }
-                case Type_tag::long_double_tag:
-                    auto* lhs = static_cast<std::pair<Type_tag, long double>*>(ptr);
-                    switch((static_cast<std::pair<Type_tag, uintptr>*>(second_arg.ptr)->first){
-                        case Type_tag::uintptr_tag:
-                            ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second),long double{static_cast<std::pair<Type_tag, uintptr>*>(second_arg.ptr)->second},op, Type_tag::long_double_tag, long double)
-                            break;
-                        case Type_tag::long_double_tag:
-                        ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second),static_cast<std::pair<Type_tag, long double>*>(second_arg.ptr)->second,op, Type_tag::long_double_tag, long double)
-                        break;
-                        case Type_tag::string_tag:
-                        ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second),convert_to_number<long double>(std::static_cast<std::pair<Type_tag, std::string>*>(second_arg.ptr)->second),op, Type_tag::long_double_tag, long double)
-                        break;
-                        REPETETIVE_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs, second_arg, op, Type_tag::long_double_tag, hetrogenous_array_type);
-                        }
-                    break;
-                case Type_tag::string_tag:
-                    auto* lhs = static_cast<std::pair<Type_tag, std::string>*>(ptr);
-                    switch((static_cast<std::pair<Type_tag, uintptr>*>(second_arg.ptr)->first){
-                    case Type_tag::uintptr_tag:
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), std::to_string(static_cast<std::pair<Type_tag, uintptr>*>(second_arg.ptr)->second),op, Type_tag::string_tag, std::string)
-                    break;
-                    case Type_tag::long_double_tag:
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), std::to_string(static_cast<std::pair<Type_tag, long double>*>(second_arg.ptr)->second),op, Type_tag::string_tag, std::string)
-                    break;
-                    case Type_tag::string_tag:
-                    ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), static_cast<std::pair<Type_tag, std::string>*>(second_arg.ptr)->second,op, Type_tag::string_tag, std::string)
-                    break;
-                    REPETETIVE_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs, second_arg, op, Type_tag::string_tag, hetrogenous_array_type);
-                case Type_tag::hetrogenous_array_type:
-                        Extented_type_info& temp_info =*(static_cast<Extented_type_info*>(ptr));
-                        Extented_type_info& temp_info_source =*(static_cast<Extented_type_info*>(second_arg.ptr));
-                        if(temp_info.size == temp_info_source.size){
-                        throw std::string{"size mismatch for two hetrogenous arrays operands"};
-                        } 
-                        uintptr_t size= temp_info.size;
-                        uintptr_t array_size_in_bytes= sizeof(Hetrogenous_array_type*)*size; 
-                        uintptr_t element_size_in_bytes=sizeof(Hetrogenous_array_type)*size;
-                        Hetrogenous_array_type* array= reinterpret_cast<Hetrogenous_array_type*>(static_cast<char*>(ptr)+sizeof(Extented_type_info));
-                        Hetrogenous_array_type* source_array= reinterpret_cast<Hetrogenous_array_type*>(static_cast<char*>(second_arg.ptr)+sizeof(Extented_type_info));
-                        if constexpr(op_action_type==_true) {
-                            for(uintptr_t i=0; i<size; i++){
-                                op(source_array[i], array[i]);
-                                }
-                            }
-                            else{
-                                if constexpr (op_action_type==_nuteral) {
-                                    for(uintptr_t i=0; i<size; i++){
-                                        if(!op(source_array[i], array[i])){
-                                            return false;
-                                        }
-                                    }
-                                    return true;
-                                    }
-                                else{
-                                    auto lhs_temp= lhs.second;
-                                    for(uintptr_t i=0; i<size; i++){
-                                    op(source_array[i], array[i]);
-                                    }
-                                    return name_of_the_class_used_in{Type_tag, lhs_temp};
-                                    }
-                    }
-                case Type_tag::extended_types:
-                        Extented_type_info& temp_info =*(static_cast<Extented_type_info*>(ptr));
-                        Extented_type_info& temp_info_source =*(static_cast<Extented_type_info*>(second_arg.ptr));
-                        if(temp_info.size == temp_info_source.size){
-                        throw std::string{"size mismatch for two hetrogenous arrays operands"};
-                        } 
-                        uintptr_t size= temp_info.size;
-                        uintptr_t array_size_in_bytes= sizeof(Hetrogenous_array_type*)*size; 
-                        uintptr_t element_size_in_bytes=sizeof(Hetrogenous_array_type)*size;
-                        Extended_types* array= reinterpret_cast<Extended_types*>(static_cast<char*>(ptr)+sizeof(Extented_type_info));
-                        Hetrogenous_array_type* source_array= reinterpret_cast<Hetrogenous_array_type*>(static_cast<char*>(second_arg.ptr)+sizeof(Extented_type_info));
-                        if constexpr(op_action_type==_true) {
-                            for(uintptr_t i=0; i<size; i++){
-                                op(source_array[i], array[i]);
-                                }
-                            }
-                            else{
-                                if constexpr (op_action_type==_nuteral) {
-                                    for(uintptr_t i=0; i<size; i++){
-                                        if(!op(source_array[i], array[i])){
-                                            return false;
-                                        }
-                                    }
-                                    return true;
-                                    }
-                                else{
-                                    auto lhs_temp= lhs.second;
-                                    for(uintptr_t i=0; i<size; i++){
-                                    op(source_array[i], array[i]);
-                                    }
-                                    return name_of_the_class_used_in{Type_tag, lhs_temp};
-                                    }
-                    }
-                
-                default:
+            inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
+            void_op_generator(Hetrogenous_array_type second_arg){
+                void_op_generator<op, op_action_type>(&ptr, second_arg.ptr);
+            }
 
-            }
-            }
             template<typename op, ternary_state op_action_type>
-            std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
-            inline op_generator(Extended_types second_arg) {       
-            *this.op_generator<op, op_action_type>(Hetrogenous_array_type{second_arg});
+            inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
+            void_op_generator(Extended_types second_arg){
+                void_op_generator<op, op_action_type>(&ptr, second_arg.ptr);
             }
             ~Hetrogenous_array_type(){
             switch(static_cast<Type_tag*>(ptr)){
@@ -997,6 +982,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
