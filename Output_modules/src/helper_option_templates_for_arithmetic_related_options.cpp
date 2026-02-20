@@ -371,7 +371,7 @@ namespace printing_tools {
                         case Type_tag::string_tag:
                             ALL_ActiO0n0OnOps_for_simple0OPS(*(lhs->second), convert_to_number<uintptr>(std::static_cast<std::pair<Type_tag, std::string>*>(second_arg)->second,op,name_of_the_class_used_in);
                             break;
-                        REPETETIVE_CASE_STATEMENT_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs, second_arg,  op, name_of_the_class_used_in)
+                        REPETETIVE_CASE_STATEMENT_OPS_ON_EXTENDED_AND_HETROGENOUS0Types_f0r_Hetrogenous_ARRAYS_FUNNY_NAME_ON_PURPOSE(lhs, second_arg,  op,Type_tag::uintptr_tag, name_of_the_class_used_in)
                     }
                 case Type_tag::long_double_tag:
                     auto* lhs = static_cast<std::pair<Type_tag, long double>*>(*ptr);
@@ -535,23 +535,23 @@ namespace printing_tools {
             {
               construct_void_pointer<Extended_types>(&ptr, obj);
             }
-            template <typename , typename op, ternary_state op_action_type>
+            template <typename op, typename op, ternary_state op_action_type>
             requires std::is_arithmetic_v<Op_two_type> || std::is_same_v<std:string, Op_two_type>
             inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>>
             void_operator_generator(Op_two_type second_arg) {
-                void_operator_generator<Op_two_type, op, op_action_type>, op_action_type(&ptr,second_arg);
+                void_operator_generator<Op_two_type, op, op_action_type, Extented_types>, op_action_type(&ptr,second_arg);
             }
                     
             template<typename op, ternary_state op_action_type>
             inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
             void_op_generator(Hetrogenous_array_type second_arg){
-                void_op_generator<op, op_action_type>(&ptr, second_arg.ptr);
+                void_op_generator<op, op_action_type, Extented_types>(&ptr, second_arg.ptr);
             }
 
             template<typename op, ternary_state op_action_type>
             inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
             void_op_generator(Extended_types second_arg){
-                void_op_generator<op, op_action_type>(&ptr, second_arg.ptr);
+                void_op_generator<op, op_action_type, Extented_types>(&ptr, second_arg.ptr);
             }
             ~Extented_types(){
             switch(static_cast<Type_tag*>(ptr).tag){
@@ -641,19 +641,19 @@ namespace printing_tools {
             requires std::is_arithmetic_v<Op_two_type> || std::is_same_v<std:string, Op_two_type>
             inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>>
             void_operator_generator(Op_two_type second_arg) {
-            void_operator_generator<Op_two_type, op, op_action_type>, op_action_type(&ptr,second_arg);
+            void_operator_generator<Op_two_type, op, op_action_type,Hetrogenous_array_type> op_action_type(&ptr,second_arg);
             }
                     
             template<typename op, ternary_state op_action_type>
             inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
             void_op_generator(Hetrogenous_array_type second_arg){
-                void_op_generator<op, op_action_type>(&ptr, second_arg.ptr);
+                void_op_generator<op, op_action_type, Hetrogenous_array_type>(&ptr, second_arg.ptr);
             }
 
             template<typename op, ternary_state op_action_type>
             inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
             void_op_generator(Extended_types second_arg){
-                void_op_generator<op, op_action_type>(&ptr, second_arg.ptr);
+                void_op_generator<op, op_action_type, Hetrogenous_array_type>(&ptr, second_arg.ptr);
             }
             ~Hetrogenous_array_type(){
             switch(static_cast<Type_tag*>(ptr)){
@@ -683,17 +683,25 @@ namespace printing_tools {
             std::string* ptr;
             fixed_size_strings(std::string string_to_build_it_with): 
             ptr{    new std::string{  std::move( string_to_build_it_with )  }    } {}
-            inline const std::string& get(){
-                return *ptr;
-            }
-            inline std::string get_moved(){
-                return std::move(*ptr);
-            }
+            
             ~fixed_size_strings(){
                 delete ptr;
             }
 
             };
+            inline std::string&& get(std::string&& a){
+                return std::move(a);
+            }            
+            inline std::string& get(std::string& a){
+                return a;
+            }
+            inline std::string&& get(fixed_size_strings&& a){
+                return std::move(*(a.ptr));
+            }            
+            inline std::string& get(fixed_size_strings& a){
+                return *(a.ptr);
+            }
+            
             struct fixed_size_floats{
             long double *ptr;
             fixed_size_floats(long double double_to_build_it_with): 
@@ -708,20 +716,21 @@ namespace printing_tools {
                 bool all_comparision_imp_generator(Hetrogenous_array_type& lhs, const Polymorphic_accumulator& rhs, Op_type operator_name) {
                 }
             struct Polymorphic_accumulator {
-                using long_double= std::conditional<sizeof(long double)<8, long double,
-                    std::conditional<sizeof(double)<8, double, 
-                    std::conditional<sizeof(float)>8, float, 
+                constexpr common_size= sizeof(uintptr_t);
+                using long_double= std::conditional<sizeof(long double)<common_size, long double,
+                    std::conditional<sizeof(double)<common_size, double, 
+                    std::conditional<sizeof(float)>common_size, float, 
                     fixed_size_floats>
                     >
                     >
-                using fixed_size_strings=fixed_size_strings;
+                using fixed_size_strings_t== std::conditional<sizeof(std::string)<common_size, std::string>;
                 using Hetrogenous_array_type=Hetrogenous_array_type;
                 using Extented_types= Extented_types<Hetrogenous_array_type>;
                 union{
                     uintptr_t unsigned_num;
                     intptr_t signed_num;
                     long_double floating_point;
-                    fixed_size_strings strings;
+                    fixed_size_strings_t strings;
                     Hetrogenous_array_type diverse_array;
                     Extented_types Extended_types;   
                 }
@@ -982,6 +991,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
