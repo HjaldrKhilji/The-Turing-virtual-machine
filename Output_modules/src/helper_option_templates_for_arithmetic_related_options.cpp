@@ -408,22 +408,25 @@ namespace printing_tools {
             switch(static_cast<Type_tag*>(ptr).tag){
                 case Type_tag::uintptr_tag:
                     delete static_cast<std::pair<Extented_type_info, uintptr_t>*>(ptr);
-                    return;
+                    break;
                 case Type_tag::long_double_tag:
                     delete static_cast<std::pair<Extented_type_info, long double>*>(ptr);
-                    return;
+                    break;
                 case Type_tag::string_tag:
                     delete static_cast<std::pair<Extented_type_info, std::string>*>(ptr);
-                    return;
+                    break;
                 default:
+                //assumes that the destructors of the derieved classes (hetrogenous array and extended types are empty)
+                 Polymoprhic_extensible_engine* array= static_cast<Polymoprhic_extensible_engine*>(ptr+sizeof(Extented_type_info));
+                for(int i=0; i<vector_containing_nested_type_info.length(); i++){
+                ~array[i];
+                }
+                delete[] reinterpret_cast<char*>(ptr);
+                break;
+            }
             }
 
-            Extented_types* array= static_cast<Extented_types*>(ptr+sizeof(Extented_type_info));
-            for(int i=0; i<vector_containing_nested_type_info.length(); i++){
-                ~array[i];
-            }
-            delete[] reinterpret_cast<char*>(ptr);
-            }
+           
             };
             struct Extented_types:public Polymoprhic_extensible_engine{
 //I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
@@ -442,139 +445,97 @@ namespace printing_tools {
                     case Type_tag::uintptr_tag:
                     ptr= static_cast<void*>(new std::pair<Type_tag, uintptr_t>
                     {Type_tag::uintptr_tag,read_from_string<uintptr_t>(string_to_read_from, pos)});
-                    return;
+                    break;
                     case Type_tag::long_double_tag:
                     ptr= static_cast<void*>(new std::pair<Type_tag, long double>
                     {Type_tag::long_double_tag,read_from_string<long double>(string_to_read_from, pos)});
-                    return;
+                    break;
                     case Type_tag::string_tag:
                     ptr= static_cast<void*>(new std::pair<Type_tag, std::string>
                     {Type_tag::string_tag,read_from_string<std::string>(string_to_read_from, pos)});
-                    return;
+                    break;
                     case Type_tag::heterogeneous_array:
                     Type_tag nested_tag= static_cast<Type_tag>(read_from_string<unsigned char>(string_to_read_from, pos));
                     ptr= static_cast<void*>(new std::pair<Type_tag, Hetrogenous_array>
                     {Type_tag::heterogeneous_array,{nested_tag, source, pos});
-                    return;
+                    break;
+                    case Type_tag::Extended_types:
+                        vector<Extented_type_info>* extra_info_for_extented_types;
+                        switch(info.tag){
+                        case Type_tag::vector_containing_types:
+                            extra_info_for_extented_types= vector_containing_types[info.index];
+                            break;
+                        case Type_tag::type_in_map_tag:
+                            extra_info_for_extented_types= map_containing_types[info.index];
+                            break;
+                        case Type_tag::type_in_hash_map_tag:
+                            extra_info_for_extented_types= unordered_map_containing_types[info.index];
+                            break;
+                        default:
+                            break;
+                        }    
+                        auto vec_size= vector_containing_nested_type_info.length();
+                        uintptr_t array_size_in_bytes= sizeof(Polymoprhic_extensible_engine*)*vec_size; 
+                        uintptr_t element_size_in_bytes=sizeof(Extented_types)*vec_size;
+                        char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
+                        new (reinterpret_cast<Extented_type_info*>) Extented_type_info{info};
+                        Polymoprhic_extensible_engine* array= reinterpret_cast<Polymoprhic_extensible_engine*>(raw_mem+sizeof(Extented_type_info));
+                        Polymoprhic_extensible_engine* end= array+array_size_in_bytes;
+                        for(int i=0; i<vec_size; i++){
+                            array[i]=end+(i*element_size_in_bytes); 
+                            new (array[i]) Extented_types{vector_containing_nested_type_info[i], source, location} };
+                        }
+                        ptr= static_cast<void*>(raw_mem);
+                        break;
                     default:
+                
                 }
-                vector<Extented_type_info>* extra_info_for_extented_types;
-                switch(info.tag){
-                    case Type_tag::vector_containing_types:
-                    extra_info_for_extented_types= vector_containing_types[info.index];
-                    case Type_tag::type_in_map_tag:
-                    extra_info_for_extented_types= map_containing_types[info.index];
-                    case Type_tag::type_in_hash_map_tag:
-                    extra_info_for_extented_types= unordered_map_containing_types[info.index];
-                    default:
-                    
-                }
-                    auto vec_size= vector_containing_nested_type_info.length();
-                    uintptr_t array_size_in_bytes= sizeof(Extented_types*)*vec_size; 
-                    uintptr_t element_size_in_bytes=sizeof(Extented_types)*vec_size;
-                    char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
-                    new (reinterpret_cast<Extented_type_info*>) Extented_type_info{info};
-                    Polymoprhic_extensible_engine* array= reinterpret_cast<Polymoprhic_extensible_engine*>(raw_mem+sizeof(Extented_type_info));
-                    Polymoprhic_extensible_engine* end= array+array_size_in_bytes;
-                    for(int i=0; i<vec_size; i++){
-                        array[i]=end+(i*element_size_in_bytes); 
-                        new (array[i]) Extented_types{vector_containing_nested_type_info[i], source, location} };
-                    }
-                    ptr= static_cast<void*>(raw_mem);
-                  
+                
             }
 
     
             };
-            struct Hetrogenous_array_type{
-//I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
-            using Nested_type= std::pair<Extented_type_info, hetrogenous_array_type*>;
+            struct Hetrogenous_array_type:public Polymoprhic_extensible_engine{
+        //I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
+            using Nested_type= std::pair<Extented_type_info, Polymoprhic_extensible_engine*>;
             using Ordinary_type_int= std::pair<Type_tag, uintptr_t>;
             using Ordinary_type_double= std::pair<Type_tag, long double>;
             using Ordinary_type_string= std::pair<Type_tag, std::string>;
-            using Element_of_extended_types= std::pair<Type_tag, Extented_types<Hetrogenous_array_type>>;
-            using Extented_types= Extented_types<Hetrogenous_array_type>;//for avoiding wierd template specialization syntax
-
-             void* ptr;
+            using Ordinary_type_hetrogenous_array= std::pair<Type_tag, Hetrogenous_array>;
+            using Hetrogenous_array= std::pair<Type_tag, Hetrogenous_array>;
             Hetrogenous_array_type(Type_tag info, const std::string& string_to_read_from, 
                 std::string:size_type* pos )
             {
                 switch(info){
                     case Type_tag::uintptr_tag:
-                    ptr= static_cast<void*>(new std::pair<Type_tag, uintptr>{Type_tag::uintptr_tag,read_from_string<uintptr>(string_to_read_from, pos)});  
-                    return;
+                        ptr= static_cast<void*>(new std::pair<Type_tag, uintptr>{Type_tag::uintptr_tag,read_from_string<uintptr>(string_to_read_from, pos)});  
+                        break;
                     case Type_tag::long_double_tag:
-                    ptr= static_cast<void*>(new std::pair<Type_tag, long double>{Type_tag::long_double_tag,read_from_string<long double>(string_to_read_from, pos)});  
-                    return;
+                        ptr= static_cast<void*>(new std::pair<Type_tag, long double>{Type_tag::long_double_tag,read_from_string<long double>(string_to_read_from, pos)});  
+                        break;
                     case Type_tag::string_tag:
-                    ptr= static_cast<void*>(new std::pair<Type_tag, std::string>{Type_tag::string_tag,read_from_string<std::string>(string_to_read_from, pos)});  
-                    return;
-                    case Type_tag::extented_types:
-                    ptr= static_cast<void*>(new std::pair<Type_tag, Extented_types>{Type_tag::extented_types,read_from_string<Extented_types>(string_to_read_from, pos)});  
-                    return;
+                        ptr= static_cast<void*>(new std::pair<Type_tag, std::string>{Type_tag::string_tag,read_from_string<std::string>(string_to_read_from, pos)});  
+                        break;
+                    case Type_tag::Extended_types:
+                        ptr= static_cast<void*>(new std::pair<Type_tag, Extented_types>{Type_tag::extented_types,read_from_string<Extented_types>(string_to_read_from, pos)});  
+                        break;
+                    case Type_tag::hetrogenous_types:
+                        uintptr_t size= read_from_string<uintptr_t>(string_to_read_from, pos);
+                        uintptr_t array_size_in_bytes= sizeof(Polymoprhic_extensible_engine*)*size; 
+                        uintptr_t element_size_in_bytes=sizeof(Hetrogenous_array_type)*size;
+                        char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
+                        new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::heterogeneous_array, size};
+                        Polymoprhic_extensible_engine* array= reinterpret_cast<Polymoprhic_extensible_engine*>(raw_mem+sizeof(Extented_type_info));
+                        Polymoprhic_extensible_engine* end= array+array_size_in_bytes;
+                        for(int i=0; i<size; i++){
+                            array[i]=end+(i*element_size_in_bytes); 
+                            new (array[i]) Hetrogenous_array_type{static_cast<Type_tag>(read_from_string<unsigned char>(string_to_read_from, pos)),source, location };
+                        }
+                        ptr= static_cast<void*>(raw_mem);
+                        break;
                     default:
-                }
-                    uintptr_t size= read_from_string<uintptr_t>(string_to_read_from, pos);
-                    uintptr_t array_size_in_bytes= sizeof(Hetrogenous_array_type*)*size; 
-                    uintptr_t element_size_in_bytes=sizeof(Hetrogenous_array_type)*size;
-                    char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
-                    new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::heterogeneous_array, size};
-                    Hetrogenous_array_type* array= reinterpret_cast<Hetrogenous_array_type*>(raw_mem+sizeof(Extented_type_info));
-                    Hetrogenous_array_type* end= array+array_size_in_bytes;
-                    for(int i=0; i<size; i++){
-                        array[i]=end+(i*element_size_in_bytes); 
-                        new (array[i]) Hetrogenous_array_type{static_cast<Type_tag>(read_from_string<unsigned char>(string_to_read_from, pos)),source, location };
-                    }
-                    ptr= static_cast<void*>(raw_mem);
-                    
-                
-                  
+                        break;
             }
-            template <Type_tag tag_of_type_to_construct_from>
-            inline Hetrogenous_array_type(tag_of_type_to_construct_from obj)
-            {
-              construct_void_pointer<Hetrogenous_array_type>(&ptr, obj);
-            }
-            template <typename , typename op, ternary_state op_action_type>
-            requires std::is_arithmetic_v<Op_two_type> || std::is_same_v<std:string, Op_two_type>
-            inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>>
-            void_operator_generator(Op_two_type second_arg) {
-            void_operator_generator<Op_two_type, op, op_action_type,Hetrogenous_array_type> op_action_type(&ptr,second_arg);
-            }
-                    
-            template<typename op, ternary_state op_action_type>
-            inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
-            void_op_generator(Hetrogenous_array_type second_arg){
-                void_op_generator<op, op_action_type, Hetrogenous_array_type>(&ptr, second_arg.ptr);
-            }
-
-            template<typename op, ternary_state op_action_type>
-            inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
-            void_op_generator(Extended_types second_arg){
-                void_op_generator<op, op_action_type, Hetrogenous_array_type>(&ptr, second_arg.ptr);
-            }
-            ~Hetrogenous_array_type(){
-            switch(static_cast<Type_tag*>(ptr)){
-                case Type_tag::uintptr_tag:
-                    delete static_cast<std::pair<Type_tag, uintptr_t>*>(ptr);
-                    break;
-                case Type_tag::long_double_tag:
-                    delete static_cast<std::pair<Type_tag, long double>*>(ptr);
-                    break;
-                case Type_tag::string_tag:
-                    delete static_cast<std::pair<Type_tag, std::string>*>(ptr);
-                    break;
-                case Type_tag::extented_types:
-                    delete static_cast<std::pair<Type_tag, Extented_types>*>(ptr);
-                    break;
-            }
-                uintptr_t size= static_cast<std::pair<Extented_type_info, void>*>(ptr)->size;
-                 Hetrogenous_array_type* array= static_cast<Hetrogenous_array_type*>(static_cast<char*>(obj.ptr)+sizeof(Extented_type_info));
-                for(int i=0; i<size; i++){
-                ~array[i];
-                }
-                 delete[] reinterpret_cast<char*>(ptr);
-                    }
             };
             //the polymorphic types are polymorphic in the sense that the size is the same, so its not a technical name
             struct fixed_size_strings{
@@ -889,6 +850,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
