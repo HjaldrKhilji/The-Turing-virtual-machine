@@ -492,7 +492,7 @@ namespace printing_tools {
             template<typename op, ternary_state op_action_type>
             std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
             op_generator(Hetrogenous_array_type second_arg) {       
-            {
+            
             switch(static_cast<Type_tag*>(ptr)){
                 case Type_tag::uintptr_tag:
                     auto& lhs = *(static_cast<std::pair<Type_tag, uintptr>*>(ptr));
@@ -569,10 +569,48 @@ namespace printing_tools {
                                     return name_of_the_class_used_in{Type_tag, lhs_temp};
                                     }
                     }
+                case Type_tag::extended_types:
+                        Extented_type_info& temp_info =*(static_cast<Extented_type_info*>(ptr));
+                        Extented_type_info& temp_info_source =*(static_cast<Extented_type_info*>(second_arg.ptr));
+                        if(temp_info.size == temp_info_source.size){
+                        throw std::string{"size mismatch for two hetrogenous arrays operands"};
+                        } 
+                        uintptr_t size= temp_info.size;
+                        uintptr_t array_size_in_bytes= sizeof(Hetrogenous_array_type*)*size; 
+                        uintptr_t element_size_in_bytes=sizeof(Hetrogenous_array_type)*size;
+                        Extended_types* array= reinterpret_cast<Extended_types*>(static_cast<char*>(ptr)+sizeof(Extented_type_info));
+                        Hetrogenous_array_type* source_array= reinterpret_cast<Hetrogenous_array_type*>(static_cast<char*>(second_arg.ptr)+sizeof(Extented_type_info));
+                        if constexpr(op_action_type==_true) {
+                            for(uintptr_t i=0; i<size; i++){
+                                op(source_array[i], array[i]);
+                                }
+                            }
+                            else{
+                                if constexpr (op_action_type==_nuteral) {
+                                    for(uintptr_t i=0; i<size; i++){
+                                        if(!op(source_array[i], array[i])){
+                                            return false;
+                                        }
+                                    }
+                                    return true;
+                                    }
+                                else{
+                                    auto lhs_temp= lhs.second;
+                                    for(uintptr_t i=0; i<size; i++){
+                                    op(source_array[i], array[i]);
+                                    }
+                                    return name_of_the_class_used_in{Type_tag, lhs_temp};
+                                    }
+                    }
                 
                 default:
 
             }
+            }
+            template<typename op, ternary_state op_action_type>
+            std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
+            inline op_generator(Extended_types second_arg) {       
+            *this.op_generator<op, op_action_type>(Hetrogenous_array_type{second_arg});
             }
             ~Hetrogenous_array_type(){
             switch(static_cast<Type_tag*>(ptr)){
@@ -598,9 +636,9 @@ namespace printing_tools {
                     }
             };
             //the polymorphic types are polymorphic in the sense that the size is the same, so its not a technical name
-            struct polymorphic_strings{
+            struct fixed_size_strings{
             std::string* ptr;
-            polymorphic_strings(std::string string_to_build_it_with): 
+            fixed_size_strings(std::string string_to_build_it_with): 
             ptr{    new std::string{  std::move( string_to_build_it_with )  }    } {}
             inline const std::string& get(){
                 return *ptr;
@@ -608,55 +646,17 @@ namespace printing_tools {
             inline std::string get_moved(){
                 return std::move(*ptr);
             }
-            ~polymorphic_strings(){
+            ~fixed_size_strings(){
                 delete ptr;
             }
 
             };
-            struct polymorphic_double{
+            struct fixed_size_floats{
             long double *ptr;
-            polymorphic_double(long double double_to_build_it_with): 
+            fixed_size_floats(long double double_to_build_it_with): 
             ptr{   new long double   } {}
-            
-            inline auto operator+(uintptr_t a){
-                return *ptr+a;
-            }
-            inline auto operator+(long double a){
-                return *ptr+a;
-            }
-            inline  auto operator*(uintptr_t a){
-                return *ptr*a;
-            }
-            inline auto operator-(long double a){
-                return *ptr-a;
-            }inline auto operator/(uintptr_t a){
-                return *ptr/a;
-            }
-            inline auto operator^(long double a){
-                return *ptr^a;
-            }inline auto operator|(uintptr_t a){
-                return *ptr|a;
-            }
-            inline auto operator&(long double a){
-                return *ptr&a;
-            }
-        inline auto operator>=(uintptr_t a){
-                return *ptr>=a;
-            }
-            inline auto operator<=(long double a){
-                return *ptr<=a;
-            }inline auto operator<(uintptr_t a){
-                return *ptr<a;
-            }
-            inline auto operator>(long double a){
-                return *ptr>a;
-            }inline auto operator!=(uintptr_t a){
-                return *ptr!=a;
-            }
-            inline auto operator==(long double a){
-                return *ptr==a;
-            }
-            ~polymorphic_double(){
+
+            ~fixed_size_floats(){
                 delete ptr;
             }
 
@@ -665,13 +665,28 @@ namespace printing_tools {
                 bool all_comparision_imp_generator(Hetrogenous_array_type& lhs, const Polymorphic_accumulator& rhs, Op_type operator_name) {
                 }
             struct Polymorphic_accumulator {
-                using long_double= std::conditional<sizeof(long double)>8, polymorphic_double, long double>
-                std::variant<uintptr_t, long_double, polymorphic_strings,Hetrogenous_array_type,Extented_types<Hetrogenous_array_type>> internal_data;
-                bool value_type;
+                using long_double= std::conditional<sizeof(long double)<8, long double,
+                    std::conditional<sizeof(double)<8, double, 
+                    std::conditional<sizeof(float)>8, float, 
+                    fixed_size_floats>
+                    >
+                    >
+                using fixed_size_strings=fixed_size_strings;
+                using Hetrogenous_array_type=Hetrogenous_array_type;
+                using Extented_types= Extented_types<Hetrogenous_array_type>;
+                union{
+                    uintptr_t unsigned_num;
+                    intptr_t signed_num;
+                    long_double floating_point;
+                    fixed_size_strings strings;
+                    Hetrogenous_array_type diverse_array;
+                    Extented_types Extended_types;   
+                }
+                Type_tag True_type;
 
                 void pump(std::string* string_to_pump_to, std::string::size_type* output_string_position) {
                     std::visit([&](auto&& arg) {
-                        if constexpr (!std::is_same_v<polymorphic_strings, decltype(arg)>) {
+                        if constexpr (!std::is_same_v<fixed_size_strings, decltype(arg)>) {
                             const std::string& string_to_pump=  arg.get();
                             *string_to_pump_to += string_to_pump;
                             *output_string_position+=string_to_pump.length();
@@ -688,7 +703,7 @@ namespace printing_tools {
                 void pump_move(std::string* string_to_pump_to, std::string::size_type* output_string_position) {
                     std::visit([&](auto&& arg) {
                         
-                      if constexpr (!std::is_same_v<polymorphic_strings, decltype(arg)>) {
+                      if constexpr (!std::is_same_v<fixed_size_strings, decltype(arg)>) {
                             const std::string string_to_pump=  arg.get_moved();
                             *string_to_pump_to += string_to_pump;
                             *output_string_position+=string_to_pump.length();
@@ -703,7 +718,7 @@ namespace printing_tools {
                 }
                 void pump_polymorphic_copy_semantics(std::string* string_to_pump_to, std::string::size_type* output_string_position) {
                     std::visit([&](auto&& arg) {
-                        if constexpr (!std::is_same_v<polymorphic_strings, decltype(arg)>) {
+                        if constexpr (!std::is_same_v<fixed_size_strings, decltype(arg)>) {
                             bool copy_or_move=read_from_string<bool>(string_to_pump_to, output_string_position);
                             if(copy_or_move){
                             const std::string& string_to_pump=  arg.get();
@@ -731,8 +746,8 @@ namespace printing_tools {
                 template<typename Op_type>
                 bool all_comparision_imp_generator( Polymorphic_accumulator& lhs,  Polymorphic_accumulator& rhs, Op_type operator_name) {
                     Polymorphic_accumulator result = std::visit([&](auto&& a, auto&& b) -> Polymorphic_accumulator {
-                    if constexpr (std::is_same_v<polymorphic_strings, decltype(a)>) {
-                        if constexpr (std::is_same_v<polymorphic_strings, decltype(b)>) {
+                    if constexpr (std::is_same_v<fixed_size_strings, decltype(a)>) {
+                        if constexpr (std::is_same_v<fixed_size_strings, decltype(b)>) {
                             return operator_name(a.get(), b.get());
 
                         }
@@ -742,7 +757,7 @@ namespace printing_tools {
                         }
                     }
                     else {
-                        if constexpr (std::is_same_v<polymorphic_strings, decltype(b)>) {
+                        if constexpr (std::is_same_v<fixed_size_strings, decltype(b)>) {
                             try {
                                 if constexpr (std::is_same_v<uintptr_t, decltype(a)>) {
                                     return operator_name(a, convert_to_number<uintptr_t>(b.get()));
@@ -792,8 +807,8 @@ namespace printing_tools {
                 inline Polymorphic_accumulator operator+(Polymorphic_accumulator polymorphic_accumulator) {
                     Polymorphic_accumulator result = std::visit([&](auto&& a, auto&& b) -> Polymorphic_accumulator {
 
-                        if constexpr (std::is_same_v<polymorphic_strings, decltype(a)>) {
-                            if constexpr (!std::is_same_v<polymorphic_strings, decltype(b)>) {
+                        if constexpr (std::is_same_v<fixed_size_strings, decltype(a)>) {
+                            if constexpr (!std::is_same_v<fixed_size_strings, decltype(b)>) {
                                 return Polymorphic_accumulator{ a.get() + b.get() };//used std::move() because of strings
 
                             }
@@ -803,7 +818,7 @@ namespace printing_tools {
                             }
                         }
                         else {
-                        if constexpr (std::is_same_v<polymorphic_strings, decltype(b)>) {
+                        if constexpr (std::is_same_v<fixed_size_strings, decltype(b)>) {
                         return Polymorphic_accumulator{ std::to_string(a) + b.get() };//used std::move() because of strings
                         }
                         else {
@@ -924,6 +939,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
