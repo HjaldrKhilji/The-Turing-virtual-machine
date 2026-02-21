@@ -237,10 +237,10 @@ namespace printing_tools {
                     Extented_type_info& temp =*(static_cast<Extented_type_info*>(obj.ptr));
                     const class_used_in& source_array= *(static_cast<class_used_in*>(static_cast<char*>(obj.ptr)+sizeof(Extented_type_info)));
                     uintptr_t size= temp.size;
-                    uintptr_t array_size_in_bytes= sizeof(Extended_types*)*size; 
-                    uintptr_t element_size_in_bytes=sizeof(Extended_types)*size;
+                    uintptr_t array_size_in_bytes= sizeof(class_used_in*)*size; 
+                    uintptr_t element_size_in_bytes=sizeof(class_used_in)*size;
                     char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
-                    new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::heterogeneous_array, size};
+                    new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::nested_type, size};
                     class_used_in* array= reinterpret_cast<class_used_in*>(raw_mem+sizeof(Extented_type_info));
                     class_used_in* end= array+array_size_in_bytes;
                     for(int i=0; i<vector_containing_nested_type_info.length(); i++){
@@ -457,9 +457,9 @@ namespace printing_tools {
                     case Type_tag::heterogeneous_array:
                     Type_tag nested_tag= static_cast<Type_tag>(read_from_string<unsigned char>(string_to_read_from, pos));
                     ptr= static_cast<void*>(new std::pair<Type_tag, Hetrogenous_array>
-                    {Type_tag::heterogeneous_array,{nested_tag, source, pos});
+                    {Type_tag::nested_type,{nested_tag, source, pos});
                     break;
-                    case Type_tag::Extended_types:
+                    case Type_tag::extended_types:
                         vector<Extented_type_info>* extra_info_for_extented_types;
                         switch(info.tag){
                         case Type_tag::vector_containing_types:
@@ -476,9 +476,9 @@ namespace printing_tools {
                         }    
                         auto vec_size= vector_containing_nested_type_info.length();
                         uintptr_t array_size_in_bytes= sizeof(Polymoprhic_extensible_engine*)*vec_size; 
-                        uintptr_t element_size_in_bytes=sizeof(Extented_types)*vec_size;
+                        uintptr_t element_size_in_bytes=sizeof(Extended_types)*vec_size;
                         char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
-                        new (reinterpret_cast<Extented_type_info*>) Extented_type_info{info};
+                        new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::nested_type, vec_size};
                         Polymoprhic_extensible_engine* array= reinterpret_cast<Polymoprhic_extensible_engine*>(raw_mem+sizeof(Extented_type_info));
                         Polymoprhic_extensible_engine* end= array+array_size_in_bytes;
                         for(int i=0; i<vec_size; i++){
@@ -524,7 +524,7 @@ namespace printing_tools {
                         uintptr_t array_size_in_bytes= sizeof(Polymoprhic_extensible_engine*)*size; 
                         uintptr_t element_size_in_bytes=sizeof(Hetrogenous_array_type)*size;
                         char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
-                        new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::heterogeneous_array, size};
+                        new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::nested_type, size};
                         Polymoprhic_extensible_engine* array= reinterpret_cast<Polymoprhic_extensible_engine*>(raw_mem+sizeof(Extented_type_info));
                         Polymoprhic_extensible_engine* end= array+array_size_in_bytes;
                         for(int i=0; i<size; i++){
@@ -850,6 +850,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
