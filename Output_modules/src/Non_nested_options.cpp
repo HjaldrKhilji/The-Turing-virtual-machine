@@ -297,7 +297,7 @@ namespace printing_tools {
         template<char operator_name>
         void polymorphic_calculator(const std::string& output_config, std::string::size_type* position, std::string* output_data, std::string::size_type* output_data_position) {
             using helper_templates_for_options::helpers_for_arithmetic_options::read_polymorphically_from_string;
-            using T_result_type = helper_templates_for_options::helpers_for_arithmetic_options::Accumulator<Polymorphic_accumulator>;
+            using T_result_type = helper_templates_for_options::helpers_for_arithmetic_options::Accumulator<Polymoprhic_extensible_engine>;
             try {
                 constexpr if (operator_name == '+') {
                     T_result_type result =
@@ -711,9 +711,9 @@ namespace printing_tools {
         constexpr ternary_state operator"" _false() {
             return 0;
         }
-        std::map<uintptr_t, printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator> all_variable_ordered_storage{};
-        std::unordered_map<uintptr_t, printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator> all_variable_hashed_storage{};
-        std::vector< printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator> all_variable_linear_storage;
+        std::map<uintptr_t, printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymoprhic_extensible_engine> all_variable_ordered_storage{};
+        std::unordered_map<uintptr_t, printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymoprhic_extensible_engine> all_variable_hashed_storage{};
+        std::vector< printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymoprhic_extensible_engine> all_variable_linear_storage;
         
         template<bool source_is_output_config_or_output_data, ternary_state store_in_hashed_or_non_hashed_or_linear>
         void store_variable(const std::string& output_config, std::string::size_type* position, std::string* output_data, std::string::size_type* output_data_position) {
@@ -751,8 +751,8 @@ namespace printing_tools {
         void get_polymorphic(const std::string& output_config, std::string::size_type* position, std::string* output_data, std::string::size_type* output_data_position) {
             try {
                 using helper_templates_for_options::helpers_for_arithmetic_options::read_from_string;
-                using helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator;
-                Polymorphic_accumulator value;
+                using helper_templates_for_options::helpers_for_arithmetic_options::Polymoprhic_extensible_engine;
+                Polymoprhic_extensible_engine value;
                 uintptr_t variable_name = helper_templates_for_options::read_from_string<uintptr_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
                 if constexpr(store_in_hashed_or_non_hashed_or_linear==_true) {
                     value = all_variable_ordered_storage.at(variable_name);
