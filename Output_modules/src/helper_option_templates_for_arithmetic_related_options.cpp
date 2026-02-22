@@ -358,13 +358,14 @@ namespace printing_tools {
                 break;
             }
             }
-using intptr_tag = intptr_t;
-using uintptr_tag = uintptr_t;
-using long_double_tag = long_double;
-using string_tag = fixed_size_strings_t;
-using vector_intptr = std::vector<intptr_t>;
-using vector_uintptr = std::vector<uintptr_t>;
-using vector_double = std::vector<long_double>;
+#define ALiaSES_f0R_JuMPEnTeRYGeNAraT0r()\
+using intptr_tag = intptr_t;\
+using uintptr_tag = uintptr_t;\
+using long_double_tag = long_double;\
+using string_tag = fixed_size_strings_t;\
+using vector_intptr = std::vector<intptr_t>;\
+using vector_uintptr = std::vector<uintptr_t>;\
+using vector_double = std::vector<long_double>;\
 using vector_string = std::vector<fixed_size_strings_t>;
 #define JuMPEnTeRYGeNAraT0r(op,
 op_action_type,
@@ -380,7 +381,6 @@ _7_seventh_type_arg_for_second_parameter,
 _8_eighth_type_arg_for_second_paremeter,
 ptr_of_first_arg,
 ptr_of_second_type)\
-{\
         case produce_jump_index(Type_tag::uintptr_tag, Type_tag::uintptr_tag):
             return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, uintptr_t, uintptr_t>(ptr, second_arg);
         
@@ -390,8 +390,8 @@ ptr_of_second_type)\
         case produce_jump_index(Type_tag::uintptr_tag, Type_tag::string_tag):
             return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, uintptr_t, fixed_size_strings_t>(ptr, second_arg);
 
-\
-}
+
+
 
 template<typename op, ternary_state op_action_type, typename name_of_the_class_used_in>
 auto void_op_generator(void **ptr, void* second_arg) -> 
@@ -403,6 +403,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
 
  switch(produce_jump_index(*static_cast<Type_tag*>(*ptr), *static_cast<Type_tag*>(second_arg))) 
 {        using Type_tag;
+         ALiaSES_f0R_JuMPEnTeRYGeNAraT0r;
         // --- UINT_PTR LHS GROUP ---
         case produce_jump_index(Type_tag::uintptr_tag, Type_tag::uintptr_tag):
             return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, uintptr_t, uintptr_t>(ptr, second_arg);
@@ -638,6 +639,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
         }
     }
 }
+
 
 
 
