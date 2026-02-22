@@ -26,11 +26,11 @@ namespace printing_tools {
 namespace loop_and_branch_helpers {
 
 
-     using printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator;
+     using printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymoprhic_extensible_engine;
 
 
      
-     bool do_polymorphic_comparisions(char comparision_operator, Polymorphic_accumulator x, Polymorphic_accumulator y) {
+     bool do_polymorphic_comparisions(char comparision_operator, Polymoprhic_extensible_engine x, Polymoprhic_extensible_engine y) {
          switch (comparision_operator) {
          case 'A':
              return a == b;
@@ -62,7 +62,7 @@ namespace loop_and_branch_helpers {
          static bool loop_cache_empty = true;
          static std::tuple<uintptr_t, char operator_name, uintptr_t> loop_cache{ {},{},{} };
          using helper_templates_for_options::helpers_for_arithmetic_options::read_from_string;
-         using printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator;
+         using printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymoprhic_extensible_engine;
          std::string x{};
          char comparision_operator_name;
          std::string y{};
@@ -83,8 +83,8 @@ namespace loop_and_branch_helpers {
 
          }
 
-         Polymorphic_accumulator x_value;
-         Polymorphic_accumulator y_value;
+         Polymoprhic_extensible_engine x_value;
+         Polymoprhic_extensible_engine y_value;
             if constexpr(store_in_hashed_or_non_hashed_or_linear==_true) {
               x_value = all_variable_ordered_storage.at(x);
               y_value = all_variable_ordered_storage.at(y);
@@ -148,14 +148,14 @@ namespace loop_and_branch_helpers {
  void branch(const std::string& output_config, std::string::size_type* position, std::string* output_data, std::string::size_type* output_data_position) {
      try {
          using helper_templates_for_options::helpers_for_arithmetic_options::read_from_string;
-         using printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymorphic_accumulator;
+         using printing_tools::helper_templates_for_options::helpers_for_arithmetic_options::Polymoprhic_extensible_engine;
          std::string x = read_from_string<uintptr_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
          std::string& output_config_mutable = const_cast<std::string&>(output_config);
          char comparision_operator_name = output_config_mutable.back();
          output_config_mutable.pop_back();
          std::string y = read_from_string<uintptr_t, source_is_output_config_or_output_data>(output_config, output_data, position, output_data_position);
-         Polymorphic_accumulator x_value;
-         Polymorphic_accumulator y_value;
+         Polymoprhic_extensible_engine x_value;
+         Polymoprhic_extensible_engine y_value;
          if constexpr(store_in_hashed_or_non_hashed_or_linear==_true) {
               x_value = all_variable_ordered_storage.at(x);
               y_value = all_variable_ordered_storage.at(y);
