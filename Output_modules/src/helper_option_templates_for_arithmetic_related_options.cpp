@@ -8,6 +8,7 @@ module;
 #include <variant>
 #include <functional>
 #include <cstdint>  // For uintptr_t
+#include<atomic>
 using std::uintptr_t;
 //i used AI to track the header files needed
 #include<utility>
@@ -159,8 +160,53 @@ namespace printing_tools {
                     return false;
                 }
             }
-            enum class Type_tag: unsigned char{uintptr_tag=1, long_double_tag=2, string_tag=3,
-            type_in_vector_tag=4, type_in_map_tag=5, type_in_hash_map_tag=6, nested_type=7, heterogeneous_array=8, extended_types=9};
+            //the polymorphic types are polymorphic in the sense that the size is the same, so its not a technical name
+            struct fixed_size_strings{
+            std::string* ptr;
+            fixed_size_strings(std::string string_to_build_it_with): 
+            ptr{    new std::string{  std::move( string_to_build_it_with )  }    } {}
+            
+            ~fixed_size_strings(){
+                delete ptr;
+            }
+
+            };
+            inline std::string&& get(std::string&& a){
+                return std::move(a);
+            }            
+            inline std::string& get(std::string& a){
+                return a;
+            }
+            inline std::string&& get(fixed_size_strings&& a){
+                return std::move(*(a.ptr));
+            }            
+            inline std::string& get(fixed_size_strings& a){
+                return *(a.ptr);
+            }
+            
+            struct fixed_size_floats{
+            long double *ptr;
+            fixed_size_floats(long double double_to_build_it_with): 
+            ptr{   new long double   } {}
+
+            ~fixed_size_floats(){
+                delete ptr;
+            }
+
+            };
+            constexpr common_size= sizeof(uintptr_t);
+                using long_double= std::conditional<sizeof(long double)<common_size, long double,
+                    std::conditional<sizeof(double)<common_size, double, 
+                    std::conditional<sizeof(float)>common_size, float, 
+                    fixed_size_floats>
+                    >
+                    >
+                using fixed_size_strings_t== std::conditional<sizeof(std::string)<common_size, std::string>;
+                using Hetrogenous_array_type=Hetrogenous_array_type;
+            enum class Type_tag: unsigned char{boolean =0, uintptr_tag=1, long_double_tag=2, string_tag=3,
+            type_in_vector_tag=4, type_in_map_tag=5, type_in_hash_map_tag=6, nested_type=7, heterogeneous_array=8, 
+            extended_types=9, atomic_nested_owning_type=10, semaphore=11, command_line_executioner=12, 
+            socket_executioner=13, vector_int=14, vector_double=15, vector_string=16};
             struct Extented_type_info{
             Type_tag tag;
             union{
@@ -537,300 +583,12 @@ namespace printing_tools {
                         break;
             }
             };
-            //the polymorphic types are polymorphic in the sense that the size is the same, so its not a technical name
-            struct fixed_size_strings{
-            std::string* ptr;
-            fixed_size_strings(std::string string_to_build_it_with): 
-            ptr{    new std::string{  std::move( string_to_build_it_with )  }    } {}
-            
-            ~fixed_size_strings(){
-                delete ptr;
-            }
 
-            };
-            inline std::string&& get(std::string&& a){
-                return std::move(a);
-            }            
-            inline std::string& get(std::string& a){
-                return a;
-            }
-            inline std::string&& get(fixed_size_strings&& a){
-                return std::move(*(a.ptr));
-            }            
-            inline std::string& get(fixed_size_strings& a){
-                return *(a.ptr);
-            }
-            
-            struct fixed_size_floats{
-            long double *ptr;
-            fixed_size_floats(long double double_to_build_it_with): 
-            ptr{   new long double   } {}
 
-            ~fixed_size_floats(){
-                delete ptr;
-            }
 
-            };
-            template<typename Op_type>
-                bool all_comparision_imp_generator(Hetrogenous_array_type& lhs, const Polymorphic_accumulator& rhs, Op_type operator_name) {
-                }
-            struct Polymorphic_accumulator {
-                constexpr common_size= sizeof(uintptr_t);
-                using long_double= std::conditional<sizeof(long double)<common_size, long double,
-                    std::conditional<sizeof(double)<common_size, double, 
-                    std::conditional<sizeof(float)>common_size, float, 
-                    fixed_size_floats>
-                    >
-                    >
-                using fixed_size_strings_t== std::conditional<sizeof(std::string)<common_size, std::string>;
-                using Hetrogenous_array_type=Hetrogenous_array_type;
-                using Extented_types= Extented_types<Hetrogenous_array_type>;
-                union{
-                    uintptr_t unsigned_num;
-                    intptr_t signed_num;
-                    long_double floating_point;
-                    fixed_size_strings_t strings;
-                    Hetrogenous_array_type diverse_array;
-                    Extented_types Extended_types;   
-                }
-                Type_tag True_type;
-
-                void pump(std::string* string_to_pump_to, std::string::size_type* output_string_position) {
-                    std::visit([&](auto&& arg) {
-                        if constexpr (!std::is_same_v<fixed_size_strings, decltype(arg)>) {
-                            const std::string& string_to_pump=  arg.get();
-                            *string_to_pump_to += string_to_pump;
-                            *output_string_position+=string_to_pump.length();
-                            }
-                        else {
-                            std::string stringified_num=std::to_string(arg);
-                           *string_to_pump_to += stringified_num;
-                           *output_string_position += stringified_num.length();
-
-                        }
-                        
-                        }, internal_data);
-                }
-                void pump_move(std::string* string_to_pump_to, std::string::size_type* output_string_position) {
-                    std::visit([&](auto&& arg) {
-                        
-                      if constexpr (!std::is_same_v<fixed_size_strings, decltype(arg)>) {
-                            const std::string string_to_pump=  arg.get_moved();
-                            *string_to_pump_to += string_to_pump;
-                            *output_string_position+=string_to_pump.length();
-                            }
-                        else {
-                            std::string stringified_num=std::to_string(arg);
-                           *string_to_pump_to += stringified_num;
-                           *output_string_position += stringified_num.length();
-
-                        }
-                        }, internal_data);
-                }
-                void pump_polymorphic_copy_semantics(std::string* string_to_pump_to, std::string::size_type* output_string_position) {
-                    std::visit([&](auto&& arg) {
-                        if constexpr (!std::is_same_v<fixed_size_strings, decltype(arg)>) {
-                            bool copy_or_move=read_from_string<bool>(string_to_pump_to, output_string_position);
-                            if(copy_or_move){
-                            const std::string& string_to_pump=  arg.get();
-                            *string_to_pump_to += string_to_pump;
-                            *output_string_position+=string_to_pump.length();
-                            }
-                            else{
-                            const std::string string_to_pump=  arg.get_moved();
-                            *string_to_pump_to += string_to_pump;
-                            *output_string_position+=string_to_pump.length();   
-                            }
-                            
-                            
-                        }
-                        else {
-                            std::string stringified_num=std::to_string(arg);
-                           *string_to_pump_to += stringified_num;
-                           *output_string_position += stringified_num.length();  
-
-                        }
-                        
-                        }, internal_data);
-                }
-
-                template<typename Op_type>
-                bool all_comparision_imp_generator( Polymorphic_accumulator& lhs,  Polymorphic_accumulator& rhs, Op_type operator_name) {
-                    Polymorphic_accumulator result = std::visit([&](auto&& a, auto&& b) -> Polymorphic_accumulator {
-                    if constexpr (std::is_same_v<fixed_size_strings, decltype(a)>) {
-                        if constexpr (std::is_same_v<fixed_size_strings, decltype(b)>) {
-                            return operator_name(a.get(), b.get());
-
-                        }
-                        else {
-                            return operator_name(a.get(), std::to_string{ b });
-
-                        }
-                    }
-                    else {
-                        if constexpr (std::is_same_v<fixed_size_strings, decltype(b)>) {
-                            try {
-                                if constexpr (std::is_same_v<uintptr_t, decltype(a)>) {
-                                    return operator_name(a, convert_to_number<uintptr_t>(b.get()));
-                                }
-                                else if constexpr (std::is_same_v<long double, decltype(a)>) {
-                                    return operator_name(b, convert_to_number<long double>(b.get()));
-
-                                }
-                            }
-                                catch (std::string& error_from_converter) {
-                                    throw std::string{ "DYNAMIC ARETHIMETIC ENGINE: "+ error_from_converter+'.'};
-                                }
-                            
-                        }
-                        else {
-                            return operator_name(a, b);
-
-                        }
-                    }
-                }, lhs, rhs);
-                return result;
-                }
-                inline bool operator==(Polymorphic_accumulator polymorphic_accumulator) {
-                    return all_comparision_imp_generator(*this, polymorphic_accumulator, std::equal_to <>{});
-
-                }
-                inline bool operator!=(Polymorphic_accumulator polymorphic_accumulator) {
-                    return all_comparision_imp_generator(*this, polymorphic_accumulator, std::not_equal_to <>{});
-
-                }
-                inline bool operator<(Polymorphic_accumulator polymorphic_accumulator) {
-                    return all_comparision_imp_generator(*this, polymorphic_accumulator, std::less <>{});
-
-                }
-                inline bool operator>(Polymorphic_accumulator polymorphic_accumulator) {
-                    return all_comparision_imp_generator(*this, polymorphic_accumulator, std::greater <>{});
-
-                }
-                inline bool operator<=(Polymorphic_accumulator polymorphic_accumulator) {
-                    return all_comparision_imp_generator(*this, polymorphic_accumulator, std::less_equal <>{});
-
-                }
-                inline bool operator>=(Polymorphic_accumulator polymorphic_accumulator) {
-                    return all_comparision_imp_generator(*this, polymorphic_accumulator, std::greater_equal <>{});
-
-                }
-                inline Polymorphic_accumulator operator+(Polymorphic_accumulator polymorphic_accumulator) {
-                    Polymorphic_accumulator result = std::visit([&](auto&& a, auto&& b) -> Polymorphic_accumulator {
-
-                        if constexpr (std::is_same_v<fixed_size_strings, decltype(a)>) {
-                            if constexpr (!std::is_same_v<fixed_size_strings, decltype(b)>) {
-                                return Polymorphic_accumulator{ a.get() + b.get() };//used std::move() because of strings
-
-                            }
-                            else {
-                                return Polymorphic_accumulator{ a.get() + std::to_string(b) };//used std::move() because of strings
-
-                            }
-                        }
-                        else {
-                        if constexpr (std::is_same_v<fixed_size_strings, decltype(b)>) {
-                        return Polymorphic_accumulator{ std::to_string(a) + b.get() };//used std::move() because of strings
-                        }
-                        else {
-                        return Polymorphic_accumulator{ a.get()+b.get() };
-                        }
-                        }
-                        }, *this, polymorphic_accumulator);
-                    return result;
-
-                }
-                inline Polymorphic_accumulator plus_with_move(Polymorphic_accumulator polymorphic_accumulator) {
-                    Polymorphic_accumulator result = std::visit([&](auto&& a, auto&& b) -> Polymorphic_accumulator {
-
-                        if constexpr (std::is_same_v<std::string, decltype(a)>) {
-                            if constexpr (!std::is_same_v<std::string, decltype(b)>) {
-                                return Polymorphic_accumulator{ std::move(a) + std::move(b) };//used std::move() because of strings
-
-                            }
-                            else {
-                                return Polymorphic_accumulator{ std::move(a) + std::to_string(b) };//used std::move() because of strings
-
-                            }
-                        }
-                        else {
-                        if constexpr (std::is_same_v<std::string, decltype(b)>) {
-                        return Polymorphic_accumulator{ std::to_string(a) + std::move(b) };//used std::move() because of strings
-
-                            }
-                            else {
-                                return Polymorphic_accumulator{ a+b };
-
-                            }
-                        }
-                        }, *this, polymorphic_accumulator);
-                    return result;
-
-                }
-
-                template<typename Op_type>
-                inline Polymorphic_accumulator all_operator_impl_generator(const Polymorphic_accumulator& lhs, const Polymorphic_accumulator& rhs, Op_type operator_name) {
-                    
-                    Polymorphic_accumulator result = std::visit([&](auto&& a, auto&& b) -> Polymorphic_accumulator {
-                        //I used && to enable the good old reference forwading
-                        if constexpr (requires { operator_name(a, b); }) {
-                           
-                           return Polymorphic_accumulator{ operator_name(a, b) };
-                            
-                        }
-                        
-
-                            else {
-                            throw std::string{ "DYNAMIC ARETHIMETIC ENGINE std::visit all_opoerator_impl compile time error, first paremeter is std::string, type mismatch. ") };
-                        }}
-                            , lhs.internal_data, rhs.internal_data);
-                        return result;
-                    
-                    
-                   }
-                
-                inline Polymorphic_accumulator operator-(Polymorphic_accumulator polymorphic_accumulator) {
-                    return all_operator_impl_generator(*this, polymorphic_accumulator, std::minus<>{});
-
-                }
-                inline Polymorphic_accumulator operator*(Polymorphic_accumulator polymorphic_accumulator) {
-                    return all_operator_impl_generator(*this, polymorphic_accumulator, std::multiplies<>{});
-
-                }
-                inline Polymorphic_accumulator operator*(Polymorphic_accumulator polymorphic_accumulator) {
-                    return all_operator_impl_generator(*this, polymorphic_accumulator, std::divides<>{});
-
-                }
-                inline Polymorphic_accumulator operator|(Polymorphic_accumulator polymorphic_accumulator) {
-                    return all_operator_impl_generator(*this, polymorphic_accumulator, std::bit_or<>{});
-
-                }
-                inline Polymorphic_accumulator operator&(Polymorphic_accumulator polymorphic_accumulator) {
-                    return all_operator_impl_generator(*this, polymorphic_accumulator, std::bit_and<>{});
-
-                }
-                inline Polymorphic_accumulator operator^(Polymorphic_accumulator polymorphic_accumulator) {
-                    return all_operator_impl_generator(*this, polymorphic_accumulator, std::bit_xor<>{});
-
-                }
-
-            };
-            Polymorphic_accumulator read_polymorphically_from_string(const std::string& string_to_read_from, std::string::size_type* pos) {
+            Polymoprhic_extensible_engine read_polymorphically_from_string(const std::string& string_to_read_from, std::string::size_type* pos) {
               
-                    if (is_char_digit(string_to_read_from[*pos])) 
-                        {
-                            return Polymorphic_accumulator{ read_from_string<uintptr_t>(string_to_read_from, pos) };
-
-                         }
-                    else if (string_to_read_from[*pos] == '.') {
-                        return Polymorphic_accumulator{ read_from_string<long double>(string_to_read_from, pos) };
-                    }
-                    
-
-
-                    else {
-                        return  Polymorphic_accumulator{ string_index{read_from_string<std::string>(string_to_read_from, pos)} };
-                    }
+                   
                     
                 
 
@@ -838,7 +596,7 @@ namespace printing_tools {
 
             }
             template <bool read_from_x_or_y>
-            inline Polymorphic_accumulator read_polymorphically_from_string(const std::string& x, const std::string& y, std::string::size_type* x_pos, std::string::size_type* y_pos) {
+            inline Polymoprhic_extensible_engine read_polymorphically_from_string(const std::string& x, const std::string& y, std::string::size_type* x_pos, std::string::size_type* y_pos) {
                 constexpr if (read_from_x_or_y) {
                     read_polymorphically_from_string(x, x_pos);
                 }
@@ -850,6 +608,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
