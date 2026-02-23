@@ -219,7 +219,6 @@ namespace printing_tools {
                     command_line_executioner = 11,
                     socket_executioner = 12,
                     jthread_nested_machine = 13
-                    
                 };
                enum class Type_tag_for_input : unsigned char {//has extra type tags that translate into nested_type, the type tags are:
                     //heterogeneous_array,extended_types, type_in_vector_tag, type_in_map_tag, type_in_hash_map_tag
@@ -639,6 +638,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
         }
     }
 }
+
 
 
 
