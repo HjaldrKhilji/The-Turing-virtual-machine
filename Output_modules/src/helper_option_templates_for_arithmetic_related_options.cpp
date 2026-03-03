@@ -205,43 +205,88 @@ namespace printing_tools {
                 using Hetrogenous_array_type=Hetrogenous_array_type;
  
             enum class Type_tag : unsigned char {
-                    intptr_tag = 0,
-                    uintptr_tag = 1,
-                    long_double_tag = 2,
-                    string_tag = 3,
-                    vector_intptr = 4,
-                    vector_uintptr = 5,
-                    vector_double = 6,
+                    string_tag_for_15_plus_operands_ops=0;
+                    uintptr_tag_for_15_plus_operands_ops = 1,
+                    long_double_tag=2,
+                    uintptr_tag=3,
+                    string_tag = 4,
+                    intptr_tag = 5,
+                    long_double_tag = 6,
                     vector_string = 7,
-                    nested_type = 8,
-                    atomic_nested_owning_type = 9,
-                    semaphore = 10,
-                    command_line_executioner = 11,
-                    socket_executioner = 12,
-                    jthread_nested_machine = 13
+                    vector_uintptr = 8,
+                    vector_intptr = 9,
+                    vector_double = 10,
+                    nested_type_with_dynamic_container = 11,
+                    object_info=12,
+                    atomic_nested_owning_type = 13,
+                    semaphore = 14,
+                    lock=15,
+                    process_executioner = 16,
+                    socket_executioner = 17,
+                    jthread_nested_machine = 18,
+                    reference_to_vecotr_of_nested_for_gpu_ops=19,
+                    encryption=20,
+                    decryption=21,
+                    predict= 22,
+                    linked=23,
+                    gui=24,
+                    capture_event=25,
+                    confirm_event=26,
+                    user_defined_binary_code_ops=27,
+                    other=28
+                    //not all of them would be implemented right now, like it would be a step by step process, but all 
+                    //of them will have a respective entry until they are implemented
                 };
                enum class Type_tag_for_input : unsigned char {//has extra type tags that translate into nested_type, the type tags are:
-                    //heterogeneous_array,extended_types, type_in_vector_tag, type_in_map_tag, type_in_hash_map_tag
-                    intptr_tag = 0,
-                    uintptr_tag = 1,
-                    long_double_tag = 2,
-                    string_tag = 3,
-                    vector_intptr = 4,
-                    vector_uintptr = 5,
-                    vector_double = 6,
+                    //heterogeneous_array,type_in_vector_tag, type_in_map_tag, type_in_hash_map_tag, alongside with ( array_nested_type_* )
+                    //types that in the nested_type enum translate to nested_type_with_dynamic_container
+                    string_tag_for_15_plus_operands_ops=0;
+                    uintptr_tag_for_15_plus_operands_ops = 1,
+                    long_double_tag=2,
+                    uintptr_tag=3,
+                    string_tag = 4,
+                    intptr_tag = 5,
+                    long_double_tag = 6,
                     vector_string = 7,
-                    nested_type = 8,
-                    atomic_nested_owning_type = 9,
-                    semaphore = 10,
-                    command_line_executioner = 11,
-                    socket_executioner = 12,
-                    jthread_nested_machine = 13,
-                    heterogeneous_array = 14,
-                    extended_types = 15,
-                    type_in_vector_tag = 16,
-                    type_in_map_tag = 17,
-                    type_in_hash_map_tag = 18,
-                    
+                    vector_uintptr = 8,
+                    vector_intptr = 9,
+                    vector_double = 10,
+                    array_nested_type_vector = 11,
+                    array_nested_type_deque = 12,
+                    array_nested_type_list = 13,
+                    array_nested_type_forward_list = 14,
+                    array_nested_type_set = 15,
+                    array_nested_type_unordered_set = 16,
+                    array_nested_type_multi_set = 17,
+                    array_nested_type_unordered_multi_unordered_set = 18,
+                    array_nested_type_redis_map=19,
+                    object_info=20,
+                    atomic_nested_owning_type = 21,
+                    semaphore = 22,
+                    lock=23,
+                    process_executioner = 24,
+                    socket_executioner = 25,
+                    jthread_nested_machine = 26,
+                    reference_to_vecotr_of_nested_for_gpu_ops=27,
+                    encryption=28,
+                    decryption=29,
+                    predict= 30,
+                    linked=31,
+                    gui=32,
+                    capture_event=33,
+                    confirm_event=34,
+                    user_defined_binary_code_ops=35,
+                    other=36,
+                    //tpyes that will then prompt you to ask for the the actual enum type (these enums are used as a "gateway"
+                    //for intialization):
+                    heterogeneous_array=37,
+                    type_in_vector_tag=38,
+                    type_in_deque_tag=39,
+                    type_in_map_tag=40,
+                    type_in_multi_map_tag=41,
+                    type_in_hash_map_tag=42,
+                    type_in_multi_hash_map_tag=43,
+                        
                 };
             constexpr inline unsigned char produce_jump_index(Type_tag type_x, Type_tag type_y){
                 (static_cast<unsigned char>(type)>>4)+type_y;
@@ -638,6 +683,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
         }
     }
 }
+
 
 
 
