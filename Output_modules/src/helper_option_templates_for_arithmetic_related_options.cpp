@@ -160,16 +160,15 @@ namespace printing_tools {
                     return false;
                 }
             }
-            //the polymorphic types are polymorphic in the sense that the size is the same, so its not a technical name
             struct fixed_size_strings{
             std::string* ptr;
-            fixed_size_strings(std::string string_to_build_it_with): 
+            inline fixed_size_strings(std::string string_to_build_it_with): 
             ptr{    new std::string{  std::move( string_to_build_it_with )  }    } {}
             
-            ~fixed_size_strings(){
+            inline ~fixed_size_strings(){
                 delete ptr;
             }
-
+            
             };
             inline std::string&& get(std::string&& a){
                 return std::move(a);
@@ -183,20 +182,29 @@ namespace printing_tools {
             inline std::string& get(fixed_size_strings& a){
                 return *(a.ptr);
             }
-            
+            constexpr common_size= sizeof(uintptr_t);
             struct fixed_size_floats{
-            long double *ptr;
-            fixed_size_floats(long double double_to_build_it_with): 
-            ptr{   new long double   } {}
-
-            ~fixed_size_floats(){
+            using Underlying_t= std::conditional<sizeof(long double)>common_size, long double,
+                    std::conditional<sizeof(double)>common_size, double, float>
+            Underlying_t *ptr;
+            static Underlying_t double_null= NAN;
+            inline fixed_size_floats(Underlying_t raw_double_to_build_it_with): 
+            ptr{   new Underlying_t{raw_double_to_build_it_with}   } {}
+            inline fixed_size_floats(fixed_size_floats&& double_to_build_it_with): 
+            ptr{   double_to_build_it_with.ptr   } {double_to_build_it_with.ptr=&double_null; }
+            inline fixed_size_floats(fixed_size_floats& double_to_build_it_with): 
+            ptr{   new Underlying_t{*double_to_build_it_with.ptr}   } { }
+            inline  std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>>
+            fixed_size_floats(){
+                
+            }
+            inline ~fixed_size_floats(){
                 delete ptr;
             }
 
             };
-            constexpr common_size= sizeof(uintptr_t);
-                using long_double= std::conditional<sizeof(long double)<common_size, long double,
-                    std::conditional<sizeof(double)<common_size, double, 
+                using long_double= std::conditional<sizeof(long double)>common_size, long double,
+                    std::conditional<sizeof(double)>common_size, double, 
                     std::conditional<sizeof(float)>common_size, float, 
                     fixed_size_floats>
                     >
@@ -205,9 +213,10 @@ namespace printing_tools {
                 using Hetrogenous_array_type=Hetrogenous_array_type;
  
             enum class Type_tag : unsigned char {
-                    string_tag_for_15_plus_operands_ops=0;
-                    uintptr_tag_for_15_plus_operands_ops = 1,
-                    long_double_tag=2,
+                    string_tag_for_15_plus_operand_ops=0;
+                    uintptr_tag_for_15_plus_operand_ops = 1,
+                    long_double_tag_implementation_defined_size=2,
+                    eight_byte_double_tag=2,
                     uintptr_tag=3,
                     string_tag = 4,
                     intptr_tag = 5,
@@ -683,6 +692,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
         }
     }
 }
+
 
 
 
