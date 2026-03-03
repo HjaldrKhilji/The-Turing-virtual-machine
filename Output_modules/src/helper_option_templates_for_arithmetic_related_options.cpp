@@ -211,55 +211,76 @@ namespace printing_tools {
                     >
                 using fixed_size_strings_t== std::conditional<sizeof(std::string)<common_size, std::string>;
                 using Hetrogenous_array_type=Hetrogenous_array_type;
- 
-            enum class Type_tag : unsigned char {
-                    string_tag_for_15_plus_operand_ops=0;
-                    uintptr_tag_for_15_plus_operand_ops = 1,
-                    long_double_tag_implementation_defined_size=2,
-                    eight_byte_double_tag=2,
-                    uintptr_tag=3,
-                    string_tag = 4,
-                    intptr_tag = 5,
-                    long_double_tag = 6,
-                    vector_string = 7,
-                    vector_uintptr = 8,
-                    vector_intptr = 9,
-                    vector_double = 10,
-                    nested_type_with_dynamic_container = 11,
-                    object_info=12,
-                    atomic_nested_owning_type = 13,
-                    semaphore = 14,
-                    lock=15,
-                    process_executioner = 16,
-                    socket_executioner = 17,
-                    jthread_nested_machine = 18,
-                    reference_to_vecotr_of_nested_for_gpu_ops=19,
-                    encryption=20,
-                    decryption=21,
-                    predict= 22,
-                    linked=23,
-                    gui=24,
-                    capture_event=25,
-                    confirm_event=26,
-                    user_defined_binary_code_ops=27,
-                    other=28
-                    //not all of them would be implemented right now, like it would be a step by step process, but all 
-                    //of them will have a respective entry until they are implemented
+                enum class Type_tag : unsigned char {
+                    /* --- [ 00 - 01 ] High-Operand Specialized Tags --- */
+                    string_tag_for_15_plus_operand_ops          = 0,
+                    uintptr_tag_for_15_plus_operand_ops         = 1,
+                
+                    /* --- [ 02 - 07 ] Scalar Primitive Types --- */
+                    long_double_tag_implementation_defined_size = 2,
+                    eight_byte_double_tag                       = 3,
+                    uintptr_tag                                 = 4,
+                    string_tag                                  = 5,
+                    intptr_tag                                  = 6,
+                    long_double_tag                             = 7,
+                
+                    /* --- [ 08 - 13 ] Contiguous & Dynamic Containers --- */
+                    vector_string                               = 8,
+                    vector_uintptr                              = 9,
+                    vector_intptr                               = 10,
+                    vector_double                               = 11,
+                    vector_long_double_tag_implementation_defined_size = 12,
+                    nested_type_with_dynamic_container          = 13,
+                
+                    /* --- [ 14 - 20 ] System & Concurrency Handles --- */
+                    object_info                                 = 14,
+                    atomic_nested_owning_type                   = 15,
+                    semaphore                                   = 16,
+                    lock                                        = 17,
+                    process_executioner                         = 18,
+                    socket_executioner                          = 19,
+                    jthread_nested_machine                      = 20,
+                
+                    /* --- [ 21 - 25 ] Computational & Linking Ops --- */
+                    reference_to_vecotr_of_nested_for_gpu_ops   = 21,
+                    encryption                                  = 22,
+                    decryption                                  = 23,
+                    predict                                     = 24,
+                    linked                                      = 25,
+                
+                    /* --- [ 26 - 30 ] Interface, Events & Extensibility --- */
+                    gui                                         = 26,
+                    capture_event                               = 27,
+                    confirm_event                               = 28,
+                    user_defined_binary_code_ops                = 29,
+                    other                                       = 30
+                
+                    // not all of them would be implemented right now, like it would be a step by step process, 
+                    // but all of them will have a respective entry until they are implemented
                 };
-               enum class Type_tag_for_input : unsigned char {//has extra type tags that translate into nested_type, the type tags are:
+                      
+                enum class Type_tag_for_input : unsigned char {
+                    //has extra type tags that translate into nested_type, the type tags are:
                     //heterogeneous_array,type_in_vector_tag, type_in_map_tag, type_in_hash_map_tag, alongside with ( array_nested_type_* )
                     //types that in the nested_type enum translate to nested_type_with_dynamic_container
-                    string_tag_for_15_plus_operands_ops=0;
+                    // 0-1: Large operand optimizations
+                    string_tag_for_15_plus_operands_ops = 0,
                     uintptr_tag_for_15_plus_operands_ops = 1,
-                    long_double_tag=2,
-                    uintptr_tag=3,
+                
+                    // 2-6: Basic Scalars
+                    long_double_tag_init = 2, // Renamed slightly to avoid collision with 6
+                    uintptr_tag = 3,
                     string_tag = 4,
                     intptr_tag = 5,
                     long_double_tag = 6,
+                
+                    // 7-10: Standard Vectors
                     vector_string = 7,
                     vector_uintptr = 8,
                     vector_intptr = 9,
                     vector_double = 10,
+                
+                    // 11-19: Container Nesting (Translates to nested_type_with_dynamic_container)
                     array_nested_type_vector = 11,
                     array_nested_type_deque = 12,
                     array_nested_type_list = 13,
@@ -268,34 +289,39 @@ namespace printing_tools {
                     array_nested_type_unordered_set = 16,
                     array_nested_type_multi_set = 17,
                     array_nested_type_unordered_multi_unordered_set = 18,
-                    array_nested_type_redis_map=19,
-                    object_info=20,
+                    array_nested_type_redis_map = 19,
+                
+                    // 20-26: Execution & System
+                    object_info = 20,
                     atomic_nested_owning_type = 21,
                     semaphore = 22,
-                    lock=23,
+                    lock = 23,
                     process_executioner = 24,
                     socket_executioner = 25,
                     jthread_nested_machine = 26,
-                    reference_to_vecotr_of_nested_for_gpu_ops=27,
-                    encryption=28,
-                    decryption=29,
-                    predict= 30,
-                    linked=31,
-                    gui=32,
-                    capture_event=33,
-                    confirm_event=34,
-                    user_defined_binary_code_ops=35,
-                    other=36,
-                    //tpyes that will then prompt you to ask for the the actual enum type (these enums are used as a "gateway"
-                    //for intialization):
-                    heterogeneous_array=37,
-                    type_in_vector_tag=38,
-                    type_in_deque_tag=39,
-                    type_in_map_tag=40,
-                    type_in_multi_map_tag=41,
-                    type_in_hash_map_tag=42,
-                    type_in_multi_hash_map_tag=43,
-                        
+                
+                    // 27-31: Specialized Ops
+                    reference_to_vecotr_of_nested_for_gpu_ops = 27,
+                    encryption = 28,
+                    decryption = 29,
+                    predict = 30,
+                    linked = 31,
+                
+                    // 32-36: Interface & Events
+                    gui = 32,
+                    capture_event = 33,
+                    confirm_event = 34,
+                    user_defined_binary_code_ops = 35,
+                    other = 36,
+                
+                    // 37-43: Gateway Tags (Prompts for actual enum initialization)
+                    heterogeneous_array = 37,
+                    type_in_vector_tag = 38,
+                    type_in_deque_tag = 39,
+                    type_in_map_tag = 40,
+                    type_in_multi_map_tag = 41,
+                    type_in_hash_map_tag = 42,
+                    type_in_multi_hash_map_tag = 43
                 };
             constexpr inline unsigned char produce_jump_index(Type_tag type_x, Type_tag type_y){
                 (static_cast<unsigned char>(type)>>4)+type_y;
@@ -692,6 +718,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
         }
     }
 }
+
 
 
 
