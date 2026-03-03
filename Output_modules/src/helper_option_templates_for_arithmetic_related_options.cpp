@@ -160,12 +160,12 @@ namespace printing_tools {
                     return false;
                 }
             }
-            struct fixed_size_strings{
+            struct Fixed_size_strings{
             std::string* ptr;
-            inline fixed_size_strings(std::string string_to_build_it_with): 
+            inline Fixed_size_strings(std::string string_to_build_it_with): 
             ptr{    new std::string{  std::move( string_to_build_it_with )  }    } {}
             
-            inline ~fixed_size_strings(){
+            inline ~Fixed_size_strings(){
                 delete ptr;
             }
             
@@ -176,40 +176,38 @@ namespace printing_tools {
             inline std::string& get(std::string& a){
                 return a;
             }
-            inline std::string&& get(fixed_size_strings&& a){
+            inline std::string&& get(Fixed_size_strings&& a){
                 return std::move(*(a.ptr));
             }            
-            inline std::string& get(fixed_size_strings& a){
+            inline std::string& get(Fixed_size_strings& a){
                 return *(a.ptr);
             }
             constexpr common_size= sizeof(uintptr_t);
-            struct fixed_size_floats{
-            using Underlying_t= std::conditional<sizeof(long double)>common_size, long double,
-                    std::conditional<sizeof(double)>common_size, double, float>
+            template<typename T>
+            struct Fancier_floats{
+            using Underlying_t= T;
             Underlying_t *ptr;
             static Underlying_t double_null= NAN;
-            inline fixed_size_floats(Underlying_t raw_double_to_build_it_with): 
+            inline Fancier_floats(Underlying_t raw_double_to_build_it_with): 
             ptr{   new Underlying_t{raw_double_to_build_it_with}   } {}
-            inline fixed_size_floats(fixed_size_floats&& double_to_build_it_with): 
+            inline Fancier_floats(Fancier_floats&& double_to_build_it_with): 
             ptr{   double_to_build_it_with.ptr   } {double_to_build_it_with.ptr=&double_null; }
-            inline fixed_size_floats(fixed_size_floats& double_to_build_it_with): 
+            inline Fancier_floats(Fancier_floats& double_to_build_it_with): 
             ptr{   new Underlying_t{*double_to_build_it_with.ptr}   } { }
             inline  std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>>
-            fixed_size_floats(){
+            Fancier_floats(){
                 
             }
-            inline ~fixed_size_floats(){
+            inline ~Fancier_floats(){
                 delete ptr;
             }
 
             };
-                using long_double= std::conditional<sizeof(long double)>common_size, long double,
-                    std::conditional<sizeof(double)>common_size, double, 
-                    std::conditional<sizeof(float)>common_size, float, 
-                    fixed_size_floats>
-                    >
-                    >
-                using fixed_size_strings_t== std::conditional<sizeof(std::string)<common_size, std::string>;
+            using Fixed_size_floats= Fancier_floats<std::conditional<(sizeof(long double)>common_size), long double,
+                    std::conditional<(sizeof(double)>common_size), double, float>>>;//tries its best atleast, can never beat hardware sadly, too 
+                    //many people mantain that, and you cant tell everyone to follow one rule.
+            using long_double= Fancier_floats<long double>;
+                using Fixed_size_strings_t== std::conditional<sizeof(std::string)<common_size, std::string>;
                 using Hetrogenous_array_type=Hetrogenous_array_type;
                 enum class Type_tag : unsigned char {
                     /* --- [ 00 - 01 ] High-Operand Specialized Tags --- */
@@ -441,11 +439,11 @@ namespace printing_tools {
 using intptr_tag = intptr_t;\
 using uintptr_tag = uintptr_t;\
 using long_double_tag = long_double;\
-using string_tag = fixed_size_strings_t;\
+using string_tag = Fixed_size_strings_t;\
 using vector_intptr = std::vector<intptr_t>;\
 using vector_uintptr = std::vector<uintptr_t>;\
 using vector_double = std::vector<long_double>;\
-using vector_string = std::vector<fixed_size_strings_t>;
+using vector_string = std::vector<Fixed_size_strings_t>;
 #define JuMPEnTeRYGeNAraT0r(op,
 op_action_type,
 name_of_the_class_used_in, 
@@ -467,7 +465,7 @@ ptr_of_second_type)\
             return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, uintptr_t, long_double>(ptr, second_arg);
         
         case produce_jump_index(Type_tag::uintptr_tag, Type_tag::string_tag):
-            return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, uintptr_t, fixed_size_strings_t>(ptr, second_arg);
+            return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, uintptr_t, Fixed_size_strings_t>(ptr, second_arg);
 
 
 
@@ -491,7 +489,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
             return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, uintptr_t, long_double>(ptr, second_arg);
         
         case produce_jump_index(Type_tag::uintptr_tag, Type_tag::string_tag):
-            return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, uintptr_t, fixed_size_strings_t>(ptr, second_arg);
+            return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, uintptr_t, Fixed_size_strings_t>(ptr, second_arg);
 
         // --- LONG_DOUBLE LHS GROUP ---
         case produce_jump_index(Type_tag::long_double_tag, Type_tag::uintptr_tag):
@@ -501,17 +499,17 @@ auto void_op_generator(void **ptr, void* second_arg) ->
             return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, long_double, long_double>(ptr, second_arg);
         
         case produce_jump_index(Type_tag::long_double_tag, Type_tag::string_tag):
-            return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, long_double, fixed_size_strings_t>(ptr, second_arg);
+            return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, long_double, Fixed_size_strings_t>(ptr, second_arg);
 
-        // --- FIXED_SIZE_STRINGS_T LHS GROUP ---
+        // --- Fixed_size_strings_T LHS GROUP ---
         case produce_jump_index(Type_tag::string_tag, Type_tag::uintptr_tag):
-            return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, fixed_size_strings_t, uintptr_t>(ptr, second_arg);
+            return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, Fixed_size_strings_t, uintptr_t>(ptr, second_arg);
         
         case produce_jump_index(Type_tag::string_tag, Type_tag::long_double_tag):
-            return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, fixed_size_strings_t, long_double>(ptr, second_arg);
+            return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, Fixed_size_strings_t, long_double>(ptr, second_arg);
         
         case produce_jump_index(Type_tag::string_tag, Type_tag::string_tag):
-            return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, fixed_size_strings_t, fixed_size_strings_t>(ptr, second_arg);
+            return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, Fixed_size_strings_t, Fixed_size_strings_t>(ptr, second_arg);
 
         // --- NESTED / ARRAY DISPATCH ---
         case produce_jump_index(Type_tag::nested_type, Type_tag::nested_type): {
@@ -718,6 +716,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
         }
     }
 }
+
 
 
 
