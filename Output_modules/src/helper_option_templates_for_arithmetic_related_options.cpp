@@ -320,8 +320,11 @@ namespace printing_tools {
                     type_in_multi_map_tag = 41,
                     type_in_hash_map_tag = 42,
                     type_in_multi_hash_map_tag = 43,
-                    type_in_list,
-                    type_in_forward_list,
+                    type_in_list=44,
+                    type_in_forward_list=45,
+                    type_in_list_parallel= 46,
+                    type_in_forward_list_parallel= 47,
+                    type_in_array=48
                 };
             constexpr inline unsigned char produce_jump_index(Type_tag type_x, Type_tag type_y){
                 (static_cast<unsigned char>(type)>>4)+type_y;
@@ -336,14 +339,15 @@ namespace printing_tools {
             };       
             
             std::vector<std::vector<Extented_type_info>> vector_containing_types;
-            std::deque<std::vector<Extented_type_info>> vector_containing_types;
-            std::list<std::vector<Extented_type_info>> vector_containing_types;
-            std::forward_list<std::vector<Extented_type_info>> vector_containing_types;
+            std::deque<std::vector<Extented_type_info>> deque_containing_types;
+            std::list<std::vector<Extented_type_info>> list_containing_types;
+            std::forward_list<std::vector<Extented_type_info>> forward_list_containing_types;
             std::map<uintptr_t,std::vector<Extented_type_info>> map_containing_types;
-            std::multimap<uintptr_t,std::vector<Extented_type_info>> map_containing_types;
-            std::unordered_map<uintptr_t,std::vector<Extented_type_info>> map_containing_types;
-            std::unordered_multimap<uintptr_t,std::vector<Extented_type_info>> map_containing_types;
-            unordered_map_containing_types;
+            std::multimap<uintptr_t,std::vector<Extented_type_info>> multimap_containing_types;
+            std::unordered_map<uintptr_t,std::vector<Extented_type_info>> hash_map_containing_types;
+            std::unordered_multimap<uintptr_t,std::vector<Extented_type_info>> hash_multimap_containing_types;
+            std::array<std::vector<Extented_type_info>, 100> array_containing_types{{}};
+
              template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, typename Lhs_t, typename Rhs_t>
             inline  std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
             all_action_on_ops_for_simple_ops(Lhs_t lhs,Rhs_t rhs){
@@ -590,7 +594,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
            
             };
             struct Extented_types:public Polymoprhic_extensible_engine{
-//I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
+            //I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
             using Nested_type= std::pair<Extented_type_info, Polymoprhic_extensible_engine*>;
             using Ordinary_type_int= std::pair<Type_tag, uintptr_t>;
             using Ordinary_type_double= std::pair<Type_tag, long double>;
@@ -626,12 +630,39 @@ auto void_op_generator(void **ptr, void* second_arg) ->
                         case Type_tag::vector_containing_types:
                             extra_info_for_extented_types= vector_containing_types[info.index];
                             break;
+                        case Type_tag::type_in_deque_tag:
+                            extra_info_for_extented_types= deque_containing_types[info.index];
+                            break;
+                        case Type_tag::type_in_list:
+                            extra_info_for_extented_types= *(std::find(list_containing_types.begin(), 
+                            list_containing_types.end(), info.index));
+                            break;
+                        case Type_tag::type_in_forward_list:
+                            extra_info_for_extented_types= *(std::find(forward_list_containing_types.begin(), 
+                            forward_list_containing_types.end(), info.index));
+                            break;                        
+                        case Type_tag::type_in_list_parallel:
+                            extra_info_for_extented_types= *(std::find(,std::execution::parallel_policy,
+                            forward_list_containing_types.begin(),  forward_list_containing_types.end(), info.index));                            break;
+                        case Type_tag::type_in_forward_list_parallel:
+                            extra_info_for_extented_types= *(std::find(std::execution::parallel_policy,
+                            forward_list_containing_types.begin(), forward_list_containing_types.end(), info.index));                            break;
                         case Type_tag::type_in_map_tag:
                             extra_info_for_extented_types= map_containing_types[info.index];
                             break;
+                        case Type_tag::type_in_multi_map_tag:
+                            extra_info_for_extented_types= multimap_containing_types[info.index];
+                            break;
                         case Type_tag::type_in_hash_map_tag:
+                            extra_info_for_extented_types= hash_map_containing_types[info.index];
+                            break;
+                        case Type_tag::type_in_multi_hash_map_tag:
                             extra_info_for_extented_types= unordered_map_containing_types[info.index];
                             break;
+                        case Type_tag::type_in_array:
+                            extra_info_for_extented_types= array_containing_types[info.index];
+                            break;
+
                         default:
                             break;
                         }    
@@ -723,6 +754,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
         }
     }
 }
+
 
 
 
