@@ -319,7 +319,9 @@ namespace printing_tools {
                     type_in_map_tag = 40,
                     type_in_multi_map_tag = 41,
                     type_in_hash_map_tag = 42,
-                    type_in_multi_hash_map_tag = 43
+                    type_in_multi_hash_map_tag = 43,
+                    type_in_list,
+                    type_in_forward_list,
                 };
             constexpr inline unsigned char produce_jump_index(Type_tag type_x, Type_tag type_y){
                 (static_cast<unsigned char>(type)>>4)+type_y;
@@ -334,8 +336,13 @@ namespace printing_tools {
             };       
             
             std::vector<std::vector<Extented_type_info>> vector_containing_types;
+            std::deque<std::vector<Extented_type_info>> vector_containing_types;
+            std::list<std::vector<Extented_type_info>> vector_containing_types;
+            std::forward_list<std::vector<Extented_type_info>> vector_containing_types;
             std::map<uintptr_t,std::vector<Extented_type_info>> map_containing_types;
-            std::unordered_map<uintptr_t,std::vector<Extented_type_info>> 
+            std::multimap<uintptr_t,std::vector<Extented_type_info>> map_containing_types;
+            std::unordered_map<uintptr_t,std::vector<Extented_type_info>> map_containing_types;
+            std::unordered_multimap<uintptr_t,std::vector<Extented_type_info>> map_containing_types;
             unordered_map_containing_types;
              template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, typename Lhs_t, typename Rhs_t>
             inline  std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
@@ -716,6 +723,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
         }
     }
 }
+
 
 
 
