@@ -203,140 +203,130 @@ namespace printing_tools {
             }
 
             };
-            using Fixed_size_floats= Fancier_floats<std::conditional<(sizeof(long double)>common_size), long double,
-                    std::conditional<(sizeof(double)>common_size), double, float>>>;//tries its best atleast, can never beat hardware sadly, too 
-                    //many people mantain that, and you cant tell everyone to follow one rule.
-            using long_double= Fancier_floats<long double>;
+            using Fixed_size_floats= std::conditional<(sizeof(long double)>common_size), long double,
+                    std::conditional<(sizeof(double)>common_size), double, std::conditional<(sizeof(float)>common_size),
+                    float, Fancier_floats<float>>>>//tries its best atleast, can never beat hardware sadly, too 
+                    //many people work on that, and you cant tell everyone to follow one rule.
+                    using long_double= Fancier_floats<long double>;
                 using Fixed_size_strings_t== std::conditional<sizeof(std::string)<common_size, std::string>;
                 using Hetrogenous_array_type=Hetrogenous_array_type;
                 enum class Type_tag : unsigned char {
-                    /* --- [ 00 - 01 ] High-Operand Specialized Tags --- */
+                     /* --- [ 00 - 01 ] High-Operand Specialized Tags --- */
                     string_tag_for_15_plus_operand_ops          = 0,
                     uintptr_tag_for_15_plus_operand_ops         = 1,
-                
-                    /* --- [ 02 - 07 ] Scalar Primitive Types --- */
+                    
+                    /* --- [ 02 - 06 ] Scalar Primitive Types --- */
                     long_double_tag_implementation_defined_size = 2,
-                    eight_byte_double_tag                       = 3,
+                    eight_byte_double_tag                        = 3,
                     uintptr_tag                                 = 4,
                     string_tag                                  = 5,
                     intptr_tag                                  = 6,
-                    long_double_tag                             = 7,
-                
-                    /* --- [ 08 - 13 ] Contiguous & Dynamic Containers --- */
-                    vector_string                               = 8,
-                    vector_uintptr                              = 9,
-                    vector_intptr                               = 10,
-                    vector_double                               = 11,
-                    vector_long_double_tag_implementation_defined_size = 12,
-                    nested_type_with_dynamic_container          = 13,
-                
-                    /* --- [ 14 - 20 ] System & Concurrency Handles --- */
-                    object_info                                 = 14,
-                    atomic_nested_owning_type                   = 15,
-                    semaphore                                   = 16,
-                    lock                                        = 17,
-                    process_executioner                         = 18,
-                    socket_executioner                          = 19,
-                    jthread_nested_machine                      = 20,
-                
-                    /* --- [ 21 - 25 ] Computational & Linking Ops --- */
-                    reference_to_vecotr_of_nested_for_gpu_ops   = 21,
-                    encryption                                  = 22,
-                    decryption                                  = 23,
-                    predict                                     = 24,
-                    linked                                      = 25,
-                
-                    /* --- [ 26 - 30 ] Interface, Events & Extensibility --- */
-                    gui                                         = 26,
-                    capture_event                               = 27,
-                    confirm_event                               = 28,
-                    user_defined_binary_code_ops                = 29,
-                    other                                       = 30
+                    
+                    /* --- [ 07 - 12 ] Contiguous & Dynamic Containers --- */
+                    vector_string                               = 7,
+                    vector_uintptr                              = 8,
+                    vector_intptr                               = 9,
+                    vector_double                               = 10,
+                    vector_long_double_tag_implementation_defined_size = 11,
+                    nested_type_with_dynamic_container          = 12,
+                    
+                    /* --- [ 13 - 19 ] System & Concurrency Handles --- */
+                    object_info                                 = 13,
+                    atomic_nested_owning_type                   = 14,
+                    semaphore                                   = 15,
+                    lock                                        = 16,
+                    process_executioner                         = 17,
+                    socket_executioner                          = 18,
+                    jthread_nested_machine                      = 19,
+                    
+                    /* --- [ 20 - 24 ] Computational & Linking Ops --- */
+                    reference_to_vecotr_of_nested_for_gpu_ops   = 20,
+                    encryption                                  = 21,
+                    decryption                                  = 22,
+                    predict                                     = 23,
+                    linked                                      = 24,
+                    
+                    /* --- [ 25 - 29 ] Interface, Events & Extensibility --- */
+                    gui                                         = 25,
+                    capture_event                               = 26,
+                    confirm_event                               = 27,
+                    user_defined_binary_code_ops                = 28,
+                    other                                       = 29
                 
                     // not all of them would be implemented right now, like it would be a step by step process, 
                     // but all of them will have a respective entry until they are implemented
                 };
                       
                 enum class Type_tag_for_input : unsigned char {
-                    //has extra type tags that translate into nested_type, the type tags are:
-                    //heterogeneous_array,type_in_vector_tag, type_in_map_tag, type_in_hash_map_tag, alongside with ( array_nested_type_* )
-                    //types that in the nested_type enum translate to nested_type_with_dynamic_container
-                    // 0-1: Large operand optimizations
-                    string_tag_for_15_plus_operands_ops = 0,
-                    uintptr_tag_for_15_plus_operands_ops = 1,
-                
-                    // 2-6: Basic Scalars
-                    long_double_tag_init = 2, // Renamed slightly to avoid collision with 6
-                    uintptr_tag = 3,
-                    string_tag = 4,
-                    intptr_tag = 5,
-                    long_double_tag = 6,
-                
-                    // 7-10: Standard Vectors
-                    vector_string = 7,
-                    vector_uintptr = 8,
-                    vector_intptr = 9,
-                    vector_double = 10,
-                
-                    // 11-19: Container Nesting (Translates to nested_type_with_dynamic_container)
-                    array_nested_type_vector = 11,
-                    array_nested_type_deque = 12,
-                    array_nested_type_list = 13,
-                    array_nested_type_forward_list = 14,
-                    array_nested_type_set = 15,
-                    array_nested_type_unordered_set = 16,
-                    array_nested_type_multi_set = 17,
-                    array_nested_type_unordered_multi_unordered_set = 18,
-                    array_nested_type_redis_map = 19,
-                
-                    // 20-26: Execution & System
-                    object_info = 20,
-                    atomic_nested_owning_type = 21,
-                    semaphore = 22,
-                    lock = 23,
-                    process_executioner = 24,
-                    socket_executioner = 25,
-                    jthread_nested_machine = 26,
-                
-                    // 27-31: Specialized Ops
-                    reference_to_vecotr_of_nested_for_gpu_ops = 27,
-                    encryption = 28,
-                    decryption = 29,
-                    predict = 30,
-                    linked = 31,
-                
-                    // 32-36: Interface & Events
-                    gui = 32,
-                    capture_event = 33,
-                    confirm_event = 34,
-                    user_defined_binary_code_ops = 35,
-                    other = 36,
-                
-                    // 37-43: Gateway Tags (Prompts for actual enum initialization)
-                    heterogeneous_array = 37,
-                    type_in_vector_tag = 38,
-                    type_in_deque_tag = 39,
-                    type_in_map_tag = 40,
-                    type_in_multi_map_tag = 41,
-                    type_in_hash_map_tag = 42,
-                    type_in_multi_hash_map_tag = 43,
-                    type_in_list=44,
-                    type_in_forward_list=45,
-                    type_in_list_parallel= 46,
-                    type_in_forward_list_parallel= 47,
-                    type_in_array=48
+                    /* --- High-Operand Specialized Tags --- */
+                    string_tag_for_15_plus_operand_ops          = 0,
+                    uintptr_tag_for_15_plus_operand_ops         = 1,
+                    long_double_tag_implementation_defined_size = 2,
+                    
+                    /* --- Scalar Primitive Types --- */
+                    eight_byte_double_tag,
+                    uintptr_tag,
+                    string_tag,
+                    intptr_tag,
+                    
+                    /* --- Contiguous & Dynamic Containers --- */
+                    vector_string,
+                    vector_uintptr,
+                    vector_intptr,
+                    vector_double,
+                    vector_long_double_tag_implementation_defined_size,
+                    nested_type_with_dynamic_container,
+                    
+                    /* --- System & Concurrency Handles --- */
+                    object_info,
+                    atomic_nested_owning_type,
+                    semaphore,
+                    lock,
+                    process_executioner,
+                    socket_executioner,
+                    jthread_nested_machine,
+                    
+                    /* --- Computational & Linking Ops --- */
+                    reference_to_vecotr_of_nested_for_gpu_ops,
+                    encryption,
+                    decryption,
+                    predict,
+                    linked,
+                    
+                    /* --- Interface, Events & Extensibility --- */
+                    gui,
+                    capture_event,
+                    confirm_event,
+                    user_defined_binary_code_ops,
+                    other,
+                    
+                    /* --- Container Nesting (Gateway Tags) --- */
+                    array_nested_type_vector,
+                    array_nested_type_deque,
+                    array_nested_type_list,
+                    array_nested_type_forward_list,
+                    array_nested_type_set,
+                    array_nested_type_unordered_set,
+                    array_nested_type_multi_set,
+                    array_nested_type_unordered_multi_unordered_set,
+                    array_nested_type_redis_map,
+                    heterogeneous_array,
+                    type_in_vector_tag,
+                    type_in_deque_tag,
+                    type_in_map_tag,
+                    type_in_multi_map_tag,
+                    type_in_hash_map_tag,
+                    type_in_multi_hash_map_tag,
+                    type_in_list,
+                    type_in_forward_list,
+                    type_in_list_parallel,
+                    type_in_forward_list_parallel,
+                    type_in_array
                 };
             constexpr inline unsigned char produce_jump_index(Type_tag type_x, Type_tag type_y){
                 (static_cast<unsigned char>(type)>>4)+type_y;
             }
             
-            struct Extented_type_info{
-            Type_tag tag;
-            union{
-            uintptr_t index;//for Extented_types 
-            uintptr_t  size;//for hetrogenous_array_type
-            }
-            };       
             
             std::vector<std::vector<Extented_type_info>> vector_containing_types;
             std::deque<std::vector<Extented_type_info>> deque_containing_types;
@@ -371,7 +361,77 @@ namespace printing_tools {
             static_cast<std::pair<Type_tag, Rhs_t>*>(*ptr)-second
             );
             }
+            template <typename class_used_in>
+            inline construct_void_pointer(void **ptr, void* source, Type_tag type_of_both_sides ){
+                switch(type_of_both_sides){
+                    case Type_tag::string_tag_for_15_plus_operand_ops:
+                        std::pair<Type_tag, std::string>& source_formated= *(static_cast<std::pair<Type_tag, std::string>*>(source));
+                        *ptr= static_cast<void*>(new std::pair<Type_tag, std::string>{source_formated});  
+                    case Type_tag::uintptr_t:
+                        std::pair<Type_tag, uintptr_t>& source_formated= *(static_cast<std::pair<Type_tag, uintptr_t>*>(source));
+                        *ptr= static_cast<void*>(new std::pair<Type_tag, uintptr_t>{source_formated});  
+                    case Type_tag::long_double_tag_implementation_defined_size:
+                        std::pair<Type_tag, long_double>& source_formated= *(static_cast<std::pair<Type_tag, long_double>*>(source));
+                        *ptr= static_cast<void*>(new std::pair<Type_tag, long_double>{source_formated});  
+                    //...4 more tags left over for you (AI), the code above is the template
+                    case Type_tag::vector_string:
+                        std::pair<Type_tag, std::vector<std::string>>& source_formated= *(static_cast<
+                        std::pair<Type_tag, std::vector<std::string>>*
+                        >(source));
+                        *ptr= static_cast<void*>(new std::pair<Type_tag, std::vector<std::string>>{source_formated}); 
+                    //...4 more tags left over for you (AI), the code above is the template
+                    case Type_tag::nested_type_with_dynamic_container:                        
+                        Type_tag* type=static_cast<Type_tag*>(obj.ptr);
+                        switch(*type){
+                            case Type_tag::vector_containing_types:
+                                std::pair<Type_tag, std::vector<void*>>& source= 
+                                *(static_cast<std::pair<Type_tag, std::vector<void*>>*>(obj.ptr));
+                                std::pair<Type_tag, std::vector<void*>>* destination=new std::pair<Type_tag, std::vector<void*>>{source};
+                                *ptr = static_cast<void*>(destination); 
+                                for(){
+                                    
+                                }
+                                break;
+                            case Type_tag::type_in_deque_tag:
+                                extra_info_for_extented_types= deque_containing_types[info.index];
+                                break;
+                            case Type_tag::type_in_list:
+                                extra_info_for_extented_types= *(std::find(list_containing_types.begin(), 
+                                list_containing_types.end(), info.index));
+                                break;
+                            case Type_tag::type_in_forward_list:
+                                extra_info_for_extented_types= *(std::find(forward_list_containing_types.begin(), 
+                                forward_list_containing_types.end(), info.index));
+                                break;                        
+                            case Type_tag::type_in_list_parallel:
+                                extra_info_for_extented_types= *(std::find(,std::execution::parallel_policy,
+                                forward_list_containing_types.begin(),  forward_list_containing_types.end(), info.index));                            break;
+                            case Type_tag::type_in_forward_list_parallel:
+                                extra_info_for_extented_types= *(std::find(std::execution::parallel_policy,
+                                forward_list_containing_types.begin(), forward_list_containing_types.end(), info.index));                            break;
+                            case Type_tag::type_in_map_tag:
+                                extra_info_for_extented_types= map_containing_types[info.index];
+                                break;
+                            case Type_tag::type_in_multi_map_tag:
+                                extra_info_for_extented_types= multimap_containing_types[info.index];
+                                break;
+                            case Type_tag::type_in_hash_map_tag:
+                                extra_info_for_extented_types= hash_map_containing_types[info.index];
+                                break;
+                            case Type_tag::type_in_multi_hash_map_tag:
+                                extra_info_for_extented_types= unordered_map_containing_types[info.index];
+                                break;
+                            case Type_tag::type_in_array:
+                                extra_info_for_extented_types= array_containing_types[info.index];
+                                break;
+    
+                            default:
+                                break;
+                        }
+               
 
+                }
+            }
             template <typename tag_of_type_to_construct_from, typename class_used_in>
             inline construct_void_pointer(void **ptr, tag_of_type_to_construct_from obj ){
                 if constexpr(std::is_same_v(tag_of_type_to_construct_from, uintptr_t) {
@@ -384,20 +444,7 @@ namespace printing_tools {
                         *ptr= static_cast<void*>(new std::pair<Type_tag,  std::string>{ Type_tag::string_tag,obj});  
                 }
                 else if(std::is_same_v(tag_of_type_to_construct_from, class_used_in){
-                    Extented_type_info& temp =*(static_cast<Extented_type_info*>(obj.ptr));
-                    const class_used_in& source_array= *(static_cast<class_used_in*>(static_cast<char*>(obj.ptr)+sizeof(Extented_type_info)));
-                    uintptr_t size= temp.size;
-                    uintptr_t array_size_in_bytes= sizeof(class_used_in*)*size; 
-                    uintptr_t element_size_in_bytes=sizeof(class_used_in)*size;
-                    char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
-                    new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::nested_type, size};
-                    class_used_in* array= reinterpret_cast<class_used_in*>(raw_mem+sizeof(Extented_type_info));
-                    class_used_in* end= array+array_size_in_bytes;
-                    for(int i=0; i<vector_containing_nested_type_info.length(); i++){
-                        array[i]=end+(i*element_size_in_bytes); 
-                            new (array[i]) class_used_in{source_array[i]};
-                        }
-                    *ptr= static_cast<void*>(raw_mem);  
+                    
                 }
                
                 
