@@ -326,7 +326,10 @@ namespace printing_tools {
             constexpr inline unsigned char produce_jump_index(Type_tag type_x, Type_tag type_y){
                 (static_cast<unsigned char>(type)>>4)+type_y;
             }
-            
+            sturct Extented_type_info{
+                Type_tag tag;
+                uintptr_t index;
+            }
             
             std::vector<std::vector<Extented_type_info>> vector_containing_types;
             std::deque<std::vector<Extented_type_info>> deque_containing_types;
@@ -337,7 +340,11 @@ namespace printing_tools {
             std::unordered_map<uintptr_t,std::vector<Extented_type_info>> hash_map_containing_types;
             std::unordered_multimap<uintptr_t,std::vector<Extented_type_info>> hash_multimap_containing_types;
             std::array<std::vector<Extented_type_info>, 100> array_containing_types{{}};
-
+            struct nested_type_info{
+                Type_tag_for_input tag;
+                void* ptr;
+            };
+            
              template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, typename Lhs_t, typename Rhs_t>
             inline  std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
             all_action_on_ops_for_simple_ops(Lhs_t lhs,Rhs_t rhs){
@@ -355,83 +362,13 @@ namespace printing_tools {
             }
             template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, typename Lhs_t, typename Rhs_t>
             inline  std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>> 
-            all_action_on_ops_for_simple_ops_on_void_pointers(void** lhs,void* rhs){
+            all_action_on_ops_for_simple_ops_on_void_pointers(name_of_the_class_used_in lhs,name_of_the_class_used_in rhs){
             all_action_on_ops_for_simple_ops<op, op_action_type, name_of_the_class_used_in>(
-            static_cast<std::pair<Type_tag, Lhs_t>*>(*ptr)-second,
-            static_cast<std::pair<Type_tag, Rhs_t>*>(*ptr)-second
+            static_cast<Lhs_t>*>(*(lhs->ptr)),
+            static_cast<Rhs_t>*>(*(rhs->ptr))
             );
             }
-            template <typename class_used_in>
-            inline construct_void_pointer(void **ptr, void* source, Type_tag type_of_both_sides ){
-                switch(type_of_both_sides){
-                    case Type_tag::string_tag_for_15_plus_operand_ops:
-                        std::pair<Type_tag, std::string>& source_formated= *(static_cast<std::pair<Type_tag, std::string>*>(source));
-                        *ptr= static_cast<void*>(new std::pair<Type_tag, std::string>{source_formated});  
-                    case Type_tag::uintptr_t:
-                        std::pair<Type_tag, uintptr_t>& source_formated= *(static_cast<std::pair<Type_tag, uintptr_t>*>(source));
-                        *ptr= static_cast<void*>(new std::pair<Type_tag, uintptr_t>{source_formated});  
-                    case Type_tag::long_double_tag_implementation_defined_size:
-                        std::pair<Type_tag, long_double>& source_formated= *(static_cast<std::pair<Type_tag, long_double>*>(source));
-                        *ptr= static_cast<void*>(new std::pair<Type_tag, long_double>{source_formated});  
-                    //...4 more tags left over for you (AI), the code above is the template
-                    case Type_tag::vector_string:
-                        std::pair<Type_tag, std::vector<std::string>>& source_formated= *(static_cast<
-                        std::pair<Type_tag, std::vector<std::string>>*
-                        >(source));
-                        *ptr= static_cast<void*>(new std::pair<Type_tag, std::vector<std::string>>{source_formated}); 
-                    //...4 more tags left over for you (AI), the code above is the template
-                    case Type_tag::nested_type_with_dynamic_container:                        
-                        Type_tag* type=static_cast<Type_tag*>(obj.ptr);
-                        switch(*type){
-                            case Type_tag::vector_containing_types:
-                                std::pair<Type_tag, std::vector<void*>>& source= 
-                                *(static_cast<std::pair<Type_tag, std::vector<void*>>*>(obj.ptr));
-                                std::pair<Type_tag, std::vector<void*>>* destination=new std::pair<Type_tag, std::vector<void*>>{source};
-                                *ptr = static_cast<void*>(destination); 
-                                for(){
-                                    
-                                }
-                                break;
-                            case Type_tag::type_in_deque_tag:
-                                extra_info_for_extented_types= deque_containing_types[info.index];
-                                break;
-                            case Type_tag::type_in_list:
-                                extra_info_for_extented_types= *(std::find(list_containing_types.begin(), 
-                                list_containing_types.end(), info.index));
-                                break;
-                            case Type_tag::type_in_forward_list:
-                                extra_info_for_extented_types= *(std::find(forward_list_containing_types.begin(), 
-                                forward_list_containing_types.end(), info.index));
-                                break;                        
-                            case Type_tag::type_in_list_parallel:
-                                extra_info_for_extented_types= *(std::find(,std::execution::parallel_policy,
-                                forward_list_containing_types.begin(),  forward_list_containing_types.end(), info.index));                            break;
-                            case Type_tag::type_in_forward_list_parallel:
-                                extra_info_for_extented_types= *(std::find(std::execution::parallel_policy,
-                                forward_list_containing_types.begin(), forward_list_containing_types.end(), info.index));                            break;
-                            case Type_tag::type_in_map_tag:
-                                extra_info_for_extented_types= map_containing_types[info.index];
-                                break;
-                            case Type_tag::type_in_multi_map_tag:
-                                extra_info_for_extented_types= multimap_containing_types[info.index];
-                                break;
-                            case Type_tag::type_in_hash_map_tag:
-                                extra_info_for_extented_types= hash_map_containing_types[info.index];
-                                break;
-                            case Type_tag::type_in_multi_hash_map_tag:
-                                extra_info_for_extented_types= unordered_map_containing_types[info.index];
-                                break;
-                            case Type_tag::type_in_array:
-                                extra_info_for_extented_types= array_containing_types[info.index];
-                                break;
-    
-                            default:
-                                break;
-                        }
-               
 
-                }
-            }
             template <typename tag_of_type_to_construct_from, typename class_used_in>
             inline construct_void_pointer(void **ptr, tag_of_type_to_construct_from obj ){
                 if constexpr(std::is_same_v(tag_of_type_to_construct_from, uintptr_t) {
@@ -596,25 +533,116 @@ auto void_op_generator(void **ptr, void* second_arg) ->
         default:
             throw std::string{"operand mismatch"};
     }
-}
+}               
+            template<typename underlying_container>
+            requires{
+            typename std::common_type_t
+                <std::iterator_traits<underlying_container>::iterator_category, std::random_access_iterator_tag>;
+            }
+                void copy_nested(){
+                    using source_and_target_type= std::deque<Polymoprhic_extensible_engine>;
+                    source_and_target_type& formated_source= 
+                    *(static_cast<source_and_target_type*>(underlying_obj->ptr));
+                    source_and_target_type& destination_data= *(new source_and_target_type(formated_source.size()));
+                    (ptr) = 
+                    static_cast<void*>(new nested_type_info{Type_tag::vector_containing_types, static_cast<void*>(destination_data)}); 
+                    std::copy(formated_source.begin(), formated_source.end(), destination_data.begin());    
+                }
             struct Polymoprhic_extensible_engine{
+            Type_tag tag;
             void *ptr;
+            inline Polymoprhic_extensible_engine(Polymoprhic_extensible_engine source ){
+                switch(source.tag){
+                    case Type_tag::string_tag_for_15_plus_operand_ops:
+                        using source_and_target_type- std::string;
+                        source_and_target_type& source_formated= *(static_cast<source_and_target_type*>(source.ptr));
+                        (ptr)= static_cast<void*>(new source_and_target_type{source_formated});  
+                        tag= Type_tag::string_tag_for_15_plus_operand_ops;
+                    case Type_tag::long_double_tag_implementation_defined_size:
+                        using source_and_target_type= long double;
+                        source_and_target_type& source_formated= *(static_cast<source_and_target_type*>(source.ptr));
+                        (ptr)= static_cast<void*>(new source_and_target_type{source_formated});  
+                        tag= Type_tag::long_double_tag_implementation_defined_size; 
+                    case Type_tag::uintptr_t:
+                        using source_and_target_type= long double;
+                        source_and_target_type& source_formated= *(static_cast<source_and_target_type*>(source.ptr));
+                        (ptr)= static_cast<void*>(new source_and_target_type{source_formated});  
+                        tag= Type_tag::uintptr_t;    
+                    //...4 more tags left over for you (AI), the code above is the template                    
+                    case Type_tag::vector_string:
+                        using source_and_target_type= std::vector<std::string>;
+                        source_and_target_type& source_formated= *(static_cast<source_and_target_type*>(source.ptr));
+                        (ptr)= static_cast<void*>(new source_and_target_type{source_formated});  
+                        tag= Type_tag::vector_string;    
+                    //...4 more tags left over for you (AI), the code above is the template
+                    case Type_tag::nested_type_with_dynamic_container:       
+                        nested_type_info underlying_obj= *(static_cast<nested_type_info*>(source.ptr));
+                        switch(underlying_obj->tag){
+                            case Type_tag::vector_containing_types:
+                                using source_and_target_type= std::vector<Polymoprhic_extensible_engine>;
+                                source_and_target_type& formated_source= 
+                                *(static_cast<source_and_target_type*>(underlying_obj->ptr));
+                                source_and_target_type& destination_data= *(new source_and_target_type(formated_source.size()));
+                                (ptr) = 
+                                static_cast<void*>(new nested_type_info{Type_tag::vector_containing_types, static_cast<void*>(destination_data)}); 
+                                std::copy(formated_source.begin(), formated_source.end(), destination_data.begin());
+                                break;
+                            case Type_tag::type_in_deque_tag:
+
+                                break;
+                            case Type_tag::type_in_list:
+                                extra_info_for_extented_types= *(std::find(list_containing_types.begin(), 
+                                list_containing_types.end(), info.index));
+                                break;
+                            case Type_tag::type_in_forward_list:
+                                extra_info_for_extented_types= *(std::find(forward_list_containing_types.begin(), 
+                                forward_list_containing_types.end(), info.index));
+                                break;                        
+                            case Type_tag::type_in_list_parallel:
+                                extra_info_for_extented_types= *(std::find(,std::execution::parallel_policy,
+                                forward_list_containing_types.begin(),  forward_list_containing_types.end(), info.index));                            break;
+                            case Type_tag::type_in_forward_list_parallel:
+                                extra_info_for_extented_types= *(std::find(std::execution::parallel_policy,
+                                forward_list_containing_types.begin(), forward_list_containing_types.end(), info.index));                            break;
+                            case Type_tag::type_in_map_tag:
+                                extra_info_for_extented_types= map_containing_types[info.index];
+                                break;
+                            case Type_tag::type_in_multi_map_tag:
+                                extra_info_for_extented_types= multimap_containing_types[info.index];
+                                break;
+                            case Type_tag::type_in_hash_map_tag:
+                                extra_info_for_extented_types= hash_map_containing_types[info.index];
+                                break;
+                            case Type_tag::type_in_multi_hash_map_tag:
+                                extra_info_for_extented_types= unordered_map_containing_types[info.index];
+                                break;
+                            case Type_tag::type_in_array:
+                                extra_info_for_extented_types= array_containing_types[info.index];
+                                break;
+    
+                            default:
+                                break;
+                        }
+                        (target->tag)= Type_tag::nested_type_with_dynamic_container;
+
+                }
+            }
             template <Type_tag tag_of_type_to_construct_from>
             inline Polymoprhic_extensible_engine(tag_of_type_to_construct_from obj)
             {
-              construct_void_pointer<Polymoprhic_extensible_engine>(&ptr, obj);
+              construct_void_pointer<Polymoprhic_extensible_engine>(&ptr, obj, &tag);
             }
             template <typename op, typename op, ternary_state op_action_type>
             requires std::is_arithmetic_v<Op_two_type> || std::is_same_v<std:string, Op_two_type>
             inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Polymoprhic_extensible_engine>>
             void_operator_generator(Op_two_type second_arg) {
-                void_operator_generator<Op_two_type, op, op_action_type, Polymoprhic_extensible_engine>, op_action_type(&ptr,second_arg);
+                void_operator_generator<Op_two_type, op, op_action_type, Polymoprhic_extensible_engine>, op_action_type(&ptr,second_arg, &tag);
             }
                     
             template<typename op, ternary_state op_action_type>
             inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Polymoprhic_extensible_engine>> 
             void_op_generator(Polymoprhic_extensible_engine second_arg){
-                void_op_generator<op, op_action_type, Polymoprhic_extensible_engine>(&ptr, second_arg.ptr);
+                void_op_generator<op, op_action_type, Polymoprhic_extensible_engine>(&ptr, second_arg.ptr, &tag);
             }
             ~Polymoprhic_extensible_engine(){
             switch(static_cast<Type_tag*>(ptr).tag){
@@ -801,6 +829,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
         }
     }
 }
+
 
 
 
