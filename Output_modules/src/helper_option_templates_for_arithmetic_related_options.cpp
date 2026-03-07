@@ -533,59 +533,48 @@ auto void_op_generator(void **ptr, void* second_arg) ->
         default:
             throw std::string{"operand mismatch"};
     }
-}               
-            template<typename underlying_container>
-            requires{
-            typename std::common_type_t
-                <std::iterator_traits<underlying_container>::iterator_category, std::random_access_iterator_tag>;
-            }
-                void copy_nested(){
-                    using source_and_target_type= std::deque<Polymoprhic_extensible_engine>;
-                    source_and_target_type& formated_source= 
-                    *(static_cast<source_and_target_type*>(underlying_obj->ptr));
-                    source_and_target_type& destination_data= *(new source_and_target_type(formated_source.size()));
-                    (ptr) = 
-                    static_cast<void*>(new nested_type_info{Type_tag::vector_containing_types, static_cast<void*>(destination_data)}); 
-                    std::copy(formated_source.begin(), formated_source.end(), destination_data.begin());    
-                }
-            struct Polymoprhic_extensible_engine{
-            Type_tag tag;
-            void *ptr;
-            inline Polymoprhic_extensible_engine(Polymoprhic_extensible_engine source ){
+}   template<typename Class_used_in, typename container_with_forward_iterator_copier,  typename container_with_random_access_iterator_copier>
+    struct Return_copied_class_used_in{
+    using Element_type= Class_used_in;
+    container_with_forward_iterator_copier forward_copy;
+    container_with_random_access_iterator_copier random_access_copy;
+    constexpr return_copied_class_used_in(container_with_forward_iterator_copier a,
+    container_with_random_access_iterator_copier b):forward_copy{a}, random_access_copy{b}{}
+            Class_used_in copy(class_used_in source ){
+                Class_used_in a;
                 switch(source.tag){
                     case Type_tag::string_tag_for_15_plus_operand_ops:
-                        using source_and_target_type- std::string;
-                        source_and_target_type& source_formated= *(static_cast<source_and_target_type*>(source.ptr));
-                        (ptr)= static_cast<void*>(new source_and_target_type{source_formated});  
-                        tag= Type_tag::string_tag_for_15_plus_operand_ops;
+                        using Source_and_target_type= std::string;
+                        Source_and_target_type& source_formated= *(static_cast<Source_and_target_type*>(source.ptr));
+                        return Class_used_in
+                        {static_cast<void*>(new Source_and_target_type{source_formated}),
+                        tag= Type_tag::string_tag_for_15_plus_operand_ops};
                     case Type_tag::long_double_tag_implementation_defined_size:
-                        using source_and_target_type= long double;
-                        source_and_target_type& source_formated= *(static_cast<source_and_target_type*>(source.ptr));
-                        (ptr)= static_cast<void*>(new source_and_target_type{source_formated});  
-                        tag= Type_tag::long_double_tag_implementation_defined_size; 
+                        using Source_and_target_type= long double;
+                        Source_and_target_type& source_formated= *(static_cast<Source_and_target_type*>(source.ptr));
+                        return Class_used_in
+                        {static_cast<void*>(new Source_and_target_type{source_formated}),
+                        tag= Type_tag::string_tag_for_15_plus_operand_ops};
                     case Type_tag::uintptr_t:
-                        using source_and_target_type= long double;
-                        source_and_target_type& source_formated= *(static_cast<source_and_target_type*>(source.ptr));
-                        (ptr)= static_cast<void*>(new source_and_target_type{source_formated});  
-                        tag= Type_tag::uintptr_t;    
+                        using Source_and_target_type= long double;
+                        Source_and_target_type& source_formated= *(static_cast<Source_and_target_type*>(source.ptr));
+                        return Class_used_in
+                        {static_cast<void*>(new Source_and_target_type{source_formated}),
+                        tag= Type_tag::string_tag_for_15_plus_operand_ops};
                     //...4 more tags left over for you (AI), the code above is the template                    
                     case Type_tag::vector_string:
-                        using source_and_target_type= std::vector<std::string>;
-                        source_and_target_type& source_formated= *(static_cast<source_and_target_type*>(source.ptr));
-                        (ptr)= static_cast<void*>(new source_and_target_type{source_formated});  
-                        tag= Type_tag::vector_string;    
+                        using Source_and_target_type= std::vector<std::string>;
+                        Source_and_target_type& source_formated= *(static_cast<Source_and_target_type*>(source.ptr));
+                        return Class_used_in
+                        {static_cast<void*>(new Source_and_target_type{source_formated}),
+                        tag= Type_tag::string_tag_for_15_plus_operand_ops}; 
                     //...4 more tags left over for you (AI), the code above is the template
                     case Type_tag::nested_type_with_dynamic_container:       
                         nested_type_info underlying_obj= *(static_cast<nested_type_info*>(source.ptr));
                         switch(underlying_obj->tag){
                             case Type_tag::vector_containing_types:
                                 using source_and_target_type= std::vector<Polymoprhic_extensible_engine>;
-                                source_and_target_type& formated_source= 
-                                *(static_cast<source_and_target_type*>(underlying_obj->ptr));
-                                source_and_target_type& destination_data= *(new source_and_target_type(formated_source.size()));
-                                (ptr) = 
-                                static_cast<void*>(new nested_type_info{Type_tag::vector_containing_types, static_cast<void*>(destination_data)}); 
-                                std::copy(formated_source.begin(), formated_source.end(), destination_data.begin());
+                                random_access_copy<source_and_target_type>(&ptr, underlying_obj->ptr);
                                 break;
                             case Type_tag::type_in_deque_tag:
 
@@ -627,6 +616,43 @@ auto void_op_generator(void **ptr, void* second_arg) ->
 
                 }
             }
+}
+            template<typename Underlying_container_specialization, typename Function_obj_t>
+            requires{//the concept is weather the expression below works or not
+            typename std::common_type_t
+                <std::iterator_traits<Underlying_container_specialization>::iterator, std::random_access_iterator_tag>;
+            }
+                inline void  copy_nested(void** target, void* source, Function_obj_t obj){
+                    underlying_container_specialization& formated_source= 
+                    *(static_cast<underlying_container_specialization*>(source));
+                    underlying_container_specialization& destination_data= *(new underlying_container_specialization(formated_source.size()));
+                    (*target) = 
+                    static_cast<void*>(new nested_type_info{Type_tag::vector_containing_types, static_cast<void*>(destination_data)}); 
+                    std::copy(std::formated_source.begin(), formated_source.end(), destination_data.begin(), 
+                        [](void* source_ptr){
+                            return function_obj(static_cast<Function_obj_t::Element_type>(source_ptr));
+                        
+                    });    
+                }
+            template<typename Underlying_container_specialization>
+            requires{//the concept is weather the expression below works or not
+            typename std::common_type_t
+                <std::iterator_traits<Underlying_container_specialization>::iterator,  std::forward_iterator_tag>;
+            }
+                inline void  copy_nested(void** target, void* source){
+                    underlying_container_specialization& formated_source= 
+                    *(static_cast<underlying_container_specialization*>(source));
+                    underlying_container_specialization& destination_data= *(new underlying_container_specialization(formated_source.size()));
+                    (*target) = 
+                    static_cast<void*>(new nested_type_info{Type_tag::vector_containing_types, static_cast<void*>(destination_data)}); 
+                    for( auto source =formated_source.begin(), destination = destination_data.begin();  source!=formated_source.end();){
+                        *destination++= *source++;
+                    }    
+                }
+            struct Polymoprhic_extensible_engine{
+            Type_tag tag;
+            void *ptr;
+
             template <Type_tag tag_of_type_to_construct_from>
             inline Polymoprhic_extensible_engine(tag_of_type_to_construct_from obj)
             {
@@ -829,6 +855,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
         }
     }
 }
+
 
 
 
