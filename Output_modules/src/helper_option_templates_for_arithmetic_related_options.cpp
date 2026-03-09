@@ -536,30 +536,22 @@ auto void_op_generator(void **ptr, void* second_arg) ->
 
             
             struct Polymoprhic_extensible_engine{
+
             Type_tag tag;
             void *ptr;
             
-            template<typename Underlying_container_specialization, Type_tag_for_input tag>
-            requires{//the concept is weather the expression below works or not
-            typename std::common_type_t
-                <std::iterator_traits<Underlying_container_specialization>::iterator, std::input_iterator_tag>;
-            }
-                static inline void*  copy_nested(void* source){
-                    underlying_container_specialization& formated_source= 
-                    *(static_cast<underlying_container_specialization*>(source));
-                    //NOTE: underlying_container_specialization is a container type.
-                    underlying_container_specialization& destination_data= *(new underlying_container_specialization(formated_source.size()));
 
-                    std::copy(std::formated_source.begin(), formated_source.end(), destination_data.begin(), 
-                        [](value_type source_ptr){
-                            return Polymoprhic_extensible_engine(source_ptr);
-                        
-                    });    
-                    return static_cast<void*>(new nested_type_info{tag, static_cast<void*>(destination_data)}); 
+            constexpr Polymoprhic_extensible_engine(Type_tag tag_of_type_to_construct_from,void* source):
+            tag{tag_of_type_to_construct_from}, ptr{source}{}
 
-                }
+
             template <Type_tag tag_of_type_to_construct_from>
-            inline Polymoprhic_extensible_engine(tag_of_type_to_construct_from obj){
+            inline Polymoprhic_extensible_engine(void* source):Polymoprhic_extensible_engine{
+            Polymoprhic_extensible_engine{tag_of_type_to_construct_from, source}
+            } {}
+
+
+            inline Polymoprhic_extensible_engine(tag_of_type_to_construct_from source){
                switch(source.tag){
                    /* --- High-Operand Specialized Tags --- */
                     case Type_tag::string_tag_for_15_plus_operand_ops: {
@@ -713,7 +705,25 @@ auto void_op_generator(void **ptr, void* second_arg) ->
 
                 }
             }
+            template<typename Underlying_container_specialization, Type_tag_for_input tag>
+            requires{//the concept is weather the expression below works or not
+            typename std::common_type_t
+                <std::iterator_traits<Underlying_container_specialization>::iterator, std::input_iterator_tag>;
+            }
+                static inline void*  copy_nested(void* source){
+                    underlying_container_specialization& formated_source= 
+                    *(static_cast<underlying_container_specialization*>(source));
+                    //NOTE: underlying_container_specialization is a container type.
+                    underlying_container_specialization& destination_data= *(new underlying_container_specialization(formated_source.size()));
 
+                    std::copy(std::formated_source.begin(), formated_source.end(), destination_data.begin(), 
+                        [](value_type source_ptr){
+                            return Polymoprhic_extensible_engine(source_ptr);
+                        
+                    });    
+                    return static_cast<void*>(new nested_type_info{tag, static_cast<void*>(destination_data)}); 
+
+                }
             template <typename op, typename op, ternary_state op_action_type>
             requires std::is_arithmetic_v<Op_two_type> || std::is_same_v<std:string, Op_two_type>
             inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Polymoprhic_extensible_engine>>
@@ -911,6 +921,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
         }
     }
 }
+
 
 
 
