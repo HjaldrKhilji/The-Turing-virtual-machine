@@ -546,7 +546,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
 
 
             template <Type_tag tag_of_type_to_construct_from>
-            inline Polymoprhic_extensible_engine(void* source):Polymoprhic_extensible_engine{
+            constexpr Polymoprhic_extensible_engine(void* source):Polymoprhic_extensible_engine{
             Polymoprhic_extensible_engine{tag_of_type_to_construct_from, source}
             } {}
 
@@ -921,6 +921,7 @@ auto void_op_generator(void **ptr, void* second_arg) ->
         }
     }
 }
+
 
 
 
