@@ -675,7 +675,10 @@ namespace printing_tools {
                 JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
                 JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
                 JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                /*entries where nested types are the lhs is to be done*/
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                default:
+                    throw std::string{"Unimplemented type"};
+                
                 }    
             }
             ~Polymoprhic_extensible_engine(){
@@ -724,6 +727,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
