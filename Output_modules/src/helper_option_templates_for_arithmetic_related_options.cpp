@@ -359,6 +359,65 @@ namespace printing_tools {
                         return Name_of_the_class_used_in{tag, Op{}(l, r)};
                     }
                 }
+
+            template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, Type_tag_for_input lhs_tag, typename Underlying_container_specialization, absolute_base::Is_String_Or_Numeric Destination_t>
+            requires(){//the concept is weather the expression below works or not
+            typename std::common_type_t
+            <std::iterator_traits<Underlying_container_specialization>::iterator, std::input_iterator_tag>;
+            }
+                static inline void  op_scalar_with_collection(void* lhs,void* rhs){
+                    underlying_container_specialization& formated_rhs= 
+                    *(static_cast<underlying_container_specialization*>(rhs));
+                    Destination_t& formated_lhs= *( static_cast<destination_t*>(lhs) );
+                    for(auto x: formated_rhs) {
+                        formated_lhs+= x;
+                    }
+                    if constexpr (op_action_type == _true) {
+                        
+                    } else if constexpr (op_action_type == _neutral) {
+                        return formated_lhs;
+                    } else {
+                        return Name_of_the_class_used_in{lhs_tag, formated_lhs};
+                    }
+                }
+
+                template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, Type_tag_for_input source_tag, typename Rhs_t, typename Lhs_t>
+                inline typename std::conditional<op_action_type == _true, void, 
+                    typename std::conditional<op_action_type == _neutral, bool, Hetrogenous_array_type>::type
+                >::type
+                all_action_on_ops_for_simple_ops_on_void_pointers_collections(void* lhs, void* rhs) {
+                nested_type_info underlying_obj= *(static_cast<nested_type_info*>(ptr_of_second_arg));
+                switch(underlying_obj->tag){
+                case Type_tag_for_input::vector_containing_types:
+                    using source_and_target_type= std::vector<Polymoprhic_extensible_engine>;
+                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr)};
+                    break;
+                case Type_tag_for_input::type_in_deque_tag:
+                    using source_and_target_type= std::deque<Polymoprhic_extensible_engine>;
+                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
+                    break;
+                case Type_tag_for_input::type_in_list:
+                    using source_and_target_type= std::list<Polymoprhic_extensible_engine>;
+                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
+                case Type_tag_for_input::type_in_forward_list:
+                    using source_and_target_type= std::forward_list<Polymoprhic_extensible_engine>;
+                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
+                case Type_tag_for_input::type_in_map_tag:
+                    using source_and_target_type= std::map<Polymoprhic_extensible_engine>;
+                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
+                case Type_tag_for_input::type_in_multi_map_tag:
+                    using source_and_target_type= std::multimap<Polymoprhic_extensible_engine>;
+                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
+                case Type_tag_for_input::type_in_hash_map_tag:
+                    using source_and_target_type= std::unordered_map<Polymoprhic_extensible_engine>;
+                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
+                case Type_tag_for_input::type_in_multi_hash_map_tag:
+                    using source_and_target_type= std::unordered_multimap<Polymoprhic_extensible_engine>;
+                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
+                default:
+                    throw std::string{"Invalid Container Tag"};
+                    break;
+                }
             #define JuMPEnTeRYGeNAraT0r(op, \
                             op_action_type, \
                             name_of_the_class_used_in, \
@@ -394,11 +453,8 @@ namespace printing_tools {
         return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, std::vector<double>, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_long_double_tag_implementation_defined_size): \
         return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, std::vector<long double>, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::nested_type_with_dynamic_container): \
-        /* Assuming a generic placeholder or specific struct here */ \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, void*, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); 
-
-
+    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::nested_type_with_dynamic_container): \ 
+        all_action_on_ops_for_simple_ops_on_void_pointers_collections<op, op_action_type, name_of_the_class_used_in,only_tag_for_first_paremeter, only_arg_type_for_first_paremeter, double>(ptr_of_first_arg, ptr_of_second_arg)
 
 
 
@@ -534,38 +590,38 @@ namespace printing_tools {
                         switch(underlying_obj->tag){
                             case Type_tag_for_input::vector_containing_types:
                                 using source_and_target_type= std::vector<Polymoprhic_extensible_engine>;
-                                tag= Type_tag::nested_type_with_dynamic_container,
+                                tag= Type_tag::nested_type_with_dynamic_container;
                                 ptr = random_access_copy<source_and_target_type, Type_tag_for_input::vector_containing_types>(underlying_obj->ptr)};
                                 break;
                             case Type_tag_for_input::type_in_deque_tag:
                                 using source_and_target_type= std::deque<Polymoprhic_extensible_engine>;
-                                tag= Type_tag::nested_type_with_dynamic_container,
-                                random_access_copy<source_and_target_type, Type_tag_for_input::type_in_deque_tag>(underlying_obj->ptr);
+                                tag= Type_tag::nested_type_with_dynamic_container;
+                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_deque_tag>(underlying_obj->ptr);
                                 break;
                             case Type_tag_for_input::type_in_list:
                                 using source_and_target_type= std::list<Polymoprhic_extensible_engine>;
-                                tag= Type_tag::nested_type_with_dynamic_container,
-                                random_access_copy<source_and_target_type, Type_tag_for_input::type_in_list>(underlying_obj->ptr);
+                                tag= Type_tag::nested_type_with_dynamic_container;
+                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_list>(underlying_obj->ptr);
                             case Type_tag_for_input::type_in_forward_list:
                                 using source_and_target_type= std::forward_list<Polymoprhic_extensible_engine>;
-                                tag= Type_tag::nested_type_with_dynamic_container,
-                                random_access_copy<source_and_target_type, Type_tag_for_input::type_in_forward_list>(underlying_obj->ptr);
+                                tag= Type_tag::nested_type_with_dynamic_container;
+                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_forward_list>(underlying_obj->ptr);
                             case Type_tag_for_input::type_in_map_tag:
                                 using source_and_target_type= std::map<Polymoprhic_extensible_engine>;
-                                tag= Type_tag::nested_type_with_dynamic_container,
-                                random_access_copy<source_and_target_type, Type_tag_for_input::type_in_map_tag>(underlying_obj->ptr);
+                                tag= Type_tag::nested_type_with_dynamic_container;
+                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_map_tag>(underlying_obj->ptr);
                             case Type_tag_for_input::type_in_multi_map_tag:
                                 using source_and_target_type= std::multimap<Polymoprhic_extensible_engine>;
-                                tag= Type_tag::nested_type_with_dynamic_container,
-                                random_access_copy<source_and_target_type, Type_tag_for_input::type_in_multi_map_tag>(underlying_obj->ptr);
+                                tag= Type_tag::nested_type_with_dynamic_container;
+                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_multi_map_tag>(underlying_obj->ptr);
                             case Type_tag_for_input::type_in_hash_map_tag:
                                 using source_and_target_type= std::unordered_map<Polymoprhic_extensible_engine>;
-                                tag= Type_tag::nested_type_with_dynamic_container,
-                                random_access_copy<source_and_target_type, Type_tag_for_input::type_in_hash_map_tag>(underlying_obj->ptr);
+                                tag= Type_tag::nested_type_with_dynamic_container;
+                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_hash_map_tag>(underlying_obj->ptr);
                             case Type_tag_for_input::type_in_multi_hash_map_tag:
                                 using source_and_target_type= std::unordered_multimap<Polymoprhic_extensible_engine>;
-                                tag= Type_tag::nested_type_with_dynamic_container,
-                                random_access_copy<source_and_target_type, Type_tag_for_input::type_in_multi_hash_map_tag>(underlying_obj->ptr);
+                                tag= Type_tag::nested_type_with_dynamic_container;
+                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_multi_hash_map_tag>(underlying_obj->ptr);
                             default:
                                 throw std::string{"Invalid Container Tag"};
                                 break;
@@ -603,180 +659,57 @@ namespace printing_tools {
             inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Polymoprhic_extensible_engine>> 
             void_op_generator(Polymoprhic_extensible_engine second_arg){
             switch(tag){
-            
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                /*entries where nested types are the lhs is to be done*/
                 }    
             }
             ~Polymoprhic_extensible_engine(){
             switch(static_cast<Type_tag*>(ptr).tag){
-                case Type_tag::uintptr_tag:
-                    delete static_cast<std::pair<Extented_type_info, uintptr_t>*>(ptr);
-                    break;
-                case Type_tag::long_double_tag:
-                    delete static_cast<std::pair<Extented_type_info, long double>*>(ptr);
-                    break;
-                case Type_tag::string_tag:
-                    delete static_cast<std::pair<Extented_type_info, std::string>*>(ptr);
-                    break;
-                default:
-                //assumes that the destructors of the derieved classes (hetrogenous array and extended types are empty)
-                 Polymoprhic_extensible_engine* array= static_cast<Polymoprhic_extensible_engine*>(ptr+sizeof(Extented_type_info));
-                for(int i=0; i<vector_containing_nested_type_info.length(); i++){
-                ~array[i];
-                }
-                delete[] reinterpret_cast<char*>(ptr);
-                break;
+                /*to be done*/
             }
             }
 
            
             };
             struct Extented_types:public Polymoprhic_extensible_engine{
-            //I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
-            using Nested_type= std::pair<Extented_type_info, Polymoprhic_extensible_engine*>;
-            using Ordinary_type_int= std::pair<Type_tag, uintptr_t>;
-            using Ordinary_type_double= std::pair<Type_tag, long double>;
-            using Ordinary_type_string= std::pair<Type_tag, std::string>;
-            using Ordinary_type_hetrogenous_array= std::pair<Type_tag, Hetrogenous_array>;
-            using Hetrogenous_array= std::pair<Type_tag, Hetrogenous_array>;
-         
-             void* ptr;
+
             Extented_types(const Extented_type_info& info, const std::string& string_to_read_from, 
                 std::string:size_type* pos )
             {
-                switch(info.tag){
-                    case Type_tag::uintptr_tag:
-                    ptr= static_cast<void*>(new std::pair<Type_tag, uintptr_t>
-                    {Type_tag::uintptr_tag,read_from_string<uintptr_t>(string_to_read_from, pos)});
-                    break;
-                    case Type_tag::long_double_tag:
-                    ptr= static_cast<void*>(new std::pair<Type_tag, long double>
-                    {Type_tag::long_double_tag,read_from_string<long double>(string_to_read_from, pos)});
-                    break;
-                    case Type_tag::string_tag:
-                    ptr= static_cast<void*>(new std::pair<Type_tag, std::string>
-                    {Type_tag::string_tag,read_from_string<std::string>(string_to_read_from, pos)});
-                    break;
-                    case Type_tag::heterogeneous_array:
-                    Type_tag nested_tag= static_cast<Type_tag>(read_from_string<unsigned char>(string_to_read_from, pos));
-                    ptr= static_cast<void*>(new std::pair<Type_tag, Hetrogenous_array>
-                    {Type_tag::nested_type,{nested_tag, source, pos});
-                    break;
-                    case Type_tag::extended_types:
-                        vector<Extented_type_info>* extra_info_for_extented_types;
-                        switch(info.tag){
-                        case Type_tag::vector_containing_types:
-                            extra_info_for_extented_types= vector_containing_types[info.index];
-                            break;
-                        case Type_tag::type_in_deque_tag:
-                            extra_info_for_extented_types= deque_containing_types[info.index];
-                            break;
-                        case Type_tag::type_in_list:
-                            extra_info_for_extented_types= *(std::find(list_containing_types.begin(), 
-                            list_containing_types.end(), info.index));
-                            break;
-                        case Type_tag::type_in_forward_list:
-                            extra_info_for_extented_types= *(std::find(forward_list_containing_types.begin(), 
-                            forward_list_containing_types.end(), info.index));
-                            break;                        
-                        case Type_tag::type_in_list_parallel:
-                            extra_info_for_extented_types= *(std::find(,std::execution::parallel_policy,
-                            forward_list_containing_types.begin(),  forward_list_containing_types.end(), info.index));                            break;
-                        case Type_tag::type_in_forward_list_parallel:
-                            extra_info_for_extented_types= *(std::find(std::execution::parallel_policy,
-                            forward_list_containing_types.begin(), forward_list_containing_types.end(), info.index));                            break;
-                        case Type_tag::type_in_map_tag:
-                            extra_info_for_extented_types= map_containing_types[info.index];
-                            break;
-                        case Type_tag::type_in_multi_map_tag:
-                            extra_info_for_extented_types= multimap_containing_types[info.index];
-                            break;
-                        case Type_tag::type_in_hash_map_tag:
-                            extra_info_for_extented_types= hash_map_containing_types[info.index];
-                            break;
-                        case Type_tag::type_in_multi_hash_map_tag:
-                            extra_info_for_extented_types= unordered_map_containing_types[info.index];
-                            break;
-                        case Type_tag::type_in_array:
-                            extra_info_for_extented_types= array_containing_types[info.index];
-                            break;
-
-                        default:
-                            break;
-                        }    
-                        auto vec_size= vector_containing_nested_type_info.length();
-                        uintptr_t array_size_in_bytes= sizeof(Polymoprhic_extensible_engine*)*vec_size; 
-                        uintptr_t element_size_in_bytes=sizeof(Extended_types)*vec_size;
-                        char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
-                        new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::nested_type, vec_size};
-                        Polymoprhic_extensible_engine* array= reinterpret_cast<Polymoprhic_extensible_engine*>(raw_mem+sizeof(Extented_type_info));
-                        Polymoprhic_extensible_engine* end= array+array_size_in_bytes;
-                        for(int i=0; i<vec_size; i++){
-                            array[i]=end+(i*element_size_in_bytes); 
-                            new (array[i]) Extented_types{vector_containing_nested_type_info[i], source, location} };
-                        }
-                        ptr= static_cast<void*>(raw_mem);
-                        break;
-                    default:
-                
-                }
                 
             }
-
-    
+           
             };
             struct Hetrogenous_array_type:public Polymoprhic_extensible_engine{
-        //I know its not recommneded to provide "just in case aliases,but this is to show what is getting allocated in each case:
-            using Nested_type= std::pair<Extented_type_info, Polymoprhic_extensible_engine*>;
-            using Ordinary_type_int= std::pair<Type_tag, uintptr_t>;
-            using Ordinary_type_double= std::pair<Type_tag, long double>;
-            using Ordinary_type_string= std::pair<Type_tag, std::string>;
-            using Ordinary_type_hetrogenous_array= std::pair<Type_tag, Hetrogenous_array>;
-            using Hetrogenous_array= std::pair<Type_tag, Hetrogenous_array>;
+
             Hetrogenous_array_type(Type_tag info, const std::string& string_to_read_from, 
                 std::string:size_type* pos )
             {
-                switch(info){
-                    case Type_tag::uintptr_tag:
-                        ptr= static_cast<void*>(new std::pair<Type_tag, uintptr>{Type_tag::uintptr_tag,read_from_string<uintptr>(string_to_read_from, pos)});  
-                        break;
-                    case Type_tag::long_double_tag:
-                        ptr= static_cast<void*>(new std::pair<Type_tag, long double>{Type_tag::long_double_tag,read_from_string<long double>(string_to_read_from, pos)});  
-                        break;
-                    case Type_tag::string_tag:
-                        ptr= static_cast<void*>(new std::pair<Type_tag, std::string>{Type_tag::string_tag,read_from_string<std::string>(string_to_read_from, pos)});  
-                        break;
-                    case Type_tag::Extended_types:
-                        ptr= static_cast<void*>(new std::pair<Type_tag, Extented_types>{Type_tag::extented_types,read_from_string<Extented_types>(string_to_read_from, pos)});  
-                        break;
-                    case Type_tag::hetrogenous_types:
-                        uintptr_t size= read_from_string<uintptr_t>(string_to_read_from, pos);
-                        uintptr_t array_size_in_bytes= sizeof(Polymoprhic_extensible_engine*)*size; 
-                        uintptr_t element_size_in_bytes=sizeof(Hetrogenous_array_type)*size;
-                        char *raw_mem= new char[array_size_in_bytes+element_size_in_bytes+sizeof(Extented_type_info)];
-                        new (reinterpret_cast<Extented_type_info*>) Extented_type_info{Type_tag::nested_type, size};
-                        Polymoprhic_extensible_engine* array= reinterpret_cast<Polymoprhic_extensible_engine*>(raw_mem+sizeof(Extented_type_info));
-                        Polymoprhic_extensible_engine* end= array+array_size_in_bytes;
-                        for(int i=0; i<size; i++){
-                            array[i]=end+(i*element_size_in_bytes); 
-                            new (array[i]) Hetrogenous_array_type{static_cast<Type_tag>(read_from_string<unsigned char>(string_to_read_from, pos)),source, location };
-                        }
-                        ptr= static_cast<void*>(raw_mem);
-                        break;
-                    default:
-                        break;
+            
             }
+                
             };
 
 
 
             Polymoprhic_extensible_engine read_polymorphically_from_string(const std::string& string_to_read_from, std::string::size_type* pos) {
               
-                   
-                    
-                
-
-                
-
+             
             }
             template <bool read_from_x_or_y>
             inline Polymoprhic_extensible_engine read_polymorphically_from_string(const std::string& x, const std::string& y, std::string::size_type* x_pos, std::string::size_type* y_pos) {
@@ -791,6 +724,7 @@ namespace printing_tools {
         }
     }
 }
+
 
 
 
