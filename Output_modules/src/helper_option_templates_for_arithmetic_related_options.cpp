@@ -342,21 +342,31 @@ namespace printing_tools {
                 Type_tag_for_input tag;
                 void* ptr;
             };
-            
+             template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, typename Lhs_t, typename Rhs_t, Type_tag_for_input tag>
+                inline typename std::conditional<op_action_type == _true, void, 
+                    typename std::conditional<op_action_type == _neutral, bool, Hetrogenous_array_type>::type
+                >::type
+               all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs);
+                template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, typename Lhs_t, typename Rhs_t, Type_tag_for_input tag>
+                inline typename std::conditional<op_action_type == _true, void, 
+                    typename std::conditional<op_action_type == _neutral, bool, Hetrogenous_array_type>::type
+                >::type require {{Lhs_t::element_type}}//todo...
+               all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs);
                 template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, typename Lhs_t, typename Rhs_t, Type_tag_for_input tag>
                 inline typename std::conditional<op_action_type == _true, void, 
                     typename std::conditional<op_action_type == _neutral, bool, Hetrogenous_array_type>::type
                 >::type
                 all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs) {
+                    //this specialization is at the top in the chain of arethimetic
                     auto* l = static_cast<Lhs_t*>(lhs);
                     auto* r = static_cast<Rhs_t*>(rhs);
                 
                     if constexpr (op_action_type == _true) {
-                        Op{}(l, r);
+                        void_op_generator<Op, op_action_type, Name_of_the_class_used_in, Lhs_t, Rhs_t, tag>(l, r);
                     } else if constexpr (op_action_type == _neutral) {
-                        return Op{}(l, r);
+                        return void_op_generator<Op, op_action_type, Name_of_the_class_used_in, Lhs_t, Rhs_t, tag>(l, r);
                     } else {
-                        return Name_of_the_class_used_in{tag, Op{}(l, r)};
+                        return Name_of_the_class_used_in{tag, void_op_generator<Op, op_action_type, Name_of_the_class_used_in, Lhs_t, Rhs_t, tag>(l, r)};
                     }
                 }
 
@@ -459,8 +469,6 @@ namespace printing_tools {
 
 
         
-
-
 
 
             
@@ -659,31 +667,166 @@ namespace printing_tools {
             inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Polymoprhic_extensible_engine>> 
             void_op_generator(Polymoprhic_extensible_engine second_arg){
             switch(tag){
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type,name_of_the_class_used_in,/*to be done*/,/*to be done*/,ptr, second_arg.ptr)
+                /* --- Full Outer Dispatch Table --- */
+            
+                // 00 - 01: High-Operand Specialized
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, std::string, Type_tag::string_tag_for_15_plus_operand_ops, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, uintptr_t, Type_tag::uintptr_tag_for_15_plus_operand_ops, ptr_of_first_arg, ptr_of_second_arg)
+                
+                // 02 - 06: Scalar Primitives
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, long double, Type_tag::long_double_tag_implementation_defined_size, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, double, Type_tag::eight_byte_double_tag, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, uintptr_t, Type_tag::uintptr_tag, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, std::string, Type_tag::string_tag, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, intptr_t, Type_tag::intptr_tag, ptr_of_first_arg, ptr_of_second_arg)
+                
+                // 07 - 12: Containers
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, std::vector<std::string>, Type_tag::vector_string, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, std::vector<uintptr_t>, Type_tag::vector_uintptr, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, std::vector<intptr_t>, Type_tag::vector_intptr, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, std::vector<double>, Type_tag::vector_double, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, std::vector<long double>, Type_tag::vector_long_double_tag_implementation_defined_size, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, void*, Type_tag::nested_type_with_dynamic_container, ptr_of_first_arg, ptr_of_second_arg)
+                
                 default:
                     throw std::string{"Unimplemented type"};
                 
                 }    
             }
             ~Polymoprhic_extensible_engine(){
-            switch(static_cast<Type_tag*>(ptr).tag){
-                /*to be done*/
+                switch(tag) {
+                    /* --- [ 00 - 01 ] High-Operand Specialized Tags (DESTRUCTIVE) --- */
+                    case Type_tag::string_tag_for_15_plus_operand_ops: {
+                        using Source_and_target_type = std::string;
+                        delete (static_cast<Source_and_target_type*>(ptr));
+                        break;
+                    }
+                    case Type_tag::uintptr_tag_for_15_plus_operand_ops: {
+                        using Source_and_target_type = uintptr_t;
+                        delete (static_cast<Source_and_target_type*>(ptr));
+                        break;
+                    }
+                    case Type_tag::intptr_tag_for_15_plus_operand_ops: {
+                        using Source_and_target_type = intptr_t;
+                        delete (static_cast<Source_and_target_type*>(ptr));
+                        break;
+                    }
+                    case Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops: {
+                        using Source_and_target_type = long double;
+                        delete (static_cast<Source_and_target_type*>(ptr));
+                        break;
+                    }
+                    case Type_tag::eight_byte_double_tag_for_15_plus_operand_ops: {
+                        using Source_and_target_type = double;
+                        delete (static_cast<Source_and_target_type*>(ptr));
+                        break;
+                    }
+
+                    /* --- [ 02 - 06 ] Scalar Primitive Types (DESTRUCTIVE) --- */
+                    case Type_tag::eight_byte_double_tag: {
+                        using Source_and_target_type = double;
+                        delete (static_cast<Source_and_target_type*>(ptr));
+                        break;
+                    }
+                    case Type_tag::uintptr_tag: {
+                        using Source_and_target_type = uintptr_t;
+                        delete (static_cast<Source_and_target_type*>(ptr));
+                        break;
+                    }
+                    case Type_tag::string_tag: {
+                        using Source_and_target_type = std::string;
+                        delete (static_cast<Source_and_target_type*>(ptr));
+                        break;
+                    }
+                    case Type_tag::intptr_tag: {
+                        using Source_and_target_type = intptr_t;
+                        delete (static_cast<Source_and_target_type*>(ptr));
+                        break;
+                    }
+
+                    /* --- [ 07 - 12 ] Contiguous & Dynamic Containers (DESTRUCTIVE) --- */
+                    case Type_tag::vector_string: {
+                        using Source_and_target_type = std::vector<std::string>;
+                        delete (static_cast<Source_and_target_type*>(ptr));
+                        break;
+                    }
+                    case Type_tag::vector_uintptr: {
+                        using Source_and_target_type = std::vector<uintptr_t>;
+                        delete (static_cast<Source_and_target_type*>(ptr));
+                        break;
+                    }
+                    case Type_tag::vector_intptr: {
+                        using Source_and_target_type = std::vector<intptr_t>;
+                        delete (static_cast<Source_and_target_type*>(ptr));
+                        break;
+                    }
+                    case Type_tag::vector_double: {
+                        using Source_and_target_type = std::vector<double>;
+                        delete (static_cast<Source_and_target_type*>(ptr));
+                        break;
+                    }
+                    case Type_tag::vector_long_double_tag_implementation_defined_size: {
+                        using Source_and_target_type = std::vector<long double>;
+                        delete (static_cast<Source_and_target_type*>(ptr));
+                        break;
+                    }
+
+                    /* --- Nested Types (DESTRUCTIVE) --- */
+                    case Type_tag::nested_type_with_dynamic_container: {
+                        auto* underlying_obj = static_cast<nested_type_info*>(ptr);
+                        
+                        switch(underlying_obj->tag) {
+                            case Type_tag_for_input::vector_containing_types: {
+                                using container_type = std::vector<Polymoprhic_extensible_engine>;
+                                delete (static_cast<container_type*>(underlying_obj->ptr));
+                                break;
+                            }
+                            case Type_tag_for_input::type_in_deque_tag: {
+                                using container_type = std::deque<Polymoprhic_extensible_engine>;
+                                delete (static_cast<container_type*>(underlying_obj->ptr));
+                                break;
+                            }
+                            case Type_tag_for_input::type_in_list: {
+                                using container_type = std::list<Polymoprhic_extensible_engine>;
+                                delete (static_cast<container_type*>(underlying_obj->ptr));
+                                break;
+                            }
+                            case Type_tag_for_input::type_in_forward_list: {
+                                using container_type = std::forward_list<Polymoprhic_extensible_engine>;
+                                delete (static_cast<container_type*>(underlying_obj->ptr));
+                                break;
+                            }
+                            case Type_tag_for_input::type_in_map_tag: {
+                                using container_type = std::map<uintptr_t, Polymoprhic_extensible_engine>;
+                                delete (static_cast<container_type*>(underlying_obj->ptr));
+                                break;
+                            }
+                            case Type_tag_for_input::type_in_multi_map_tag: {
+                                using container_type = std::multimap<uintptr_t, Polymoprhic_extensible_engine>;
+                                delete (static_cast<container_type*>(underlying_obj->ptr));
+                                break;
+                            }
+                            case Type_tag_for_input::type_in_hash_map_tag: {
+                                using container_type = std::unordered_map<uintptr_t, Polymoprhic_extensible_engine>;
+                                delete (static_cast<container_type*>(underlying_obj->ptr));
+                                break;
+                            }
+                            case Type_tag_for_input::type_in_multi_hash_map_tag: {
+                                using container_type = std::unordered_multimap<uintptr_t, Polymoprhic_extensible_engine>;
+                                delete (static_cast<container_type*>(underlying_obj->ptr));
+                                break;
+                            }
+                            default:
+                                break; 
+                        }
+                        delete underlying_obj;
+                        break;
+                    }
+
+                    default:
+                        throw std::string{"Invalid Type Tag during deletion"};
+                        break;
+                }
             }
             }
 
