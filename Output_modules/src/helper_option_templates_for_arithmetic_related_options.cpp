@@ -350,36 +350,34 @@ namespace printing_tools {
                     auto* l = static_cast<Lhs_t*>(lhs);
                     auto* r = static_cast<Rhs_t*>(rhs);
                 
-                    if constexpr (op_action_type == _true) {
-                        return void_op_generator<Op, op_action_type, Name_of_the_class_used_in, Lhs_t, Rhs_t, tag>(l, r);
-                    } else if constexpr (op_action_type == _neutral) {
-                        return void_op_generator<Op, op_action_type, Name_of_the_class_used_in, Lhs_t, Rhs_t, tag>(l, r);
-                    } else {
-                        return Name_of_the_class_used_in{tag, void_op_generator<Op, op_action_type, Name_of_the_class_used_in, Lhs_t, Rhs_t, tag>(l, r)};
+                    if constexpr (op_action_type == true) {
+                        Op{}(l, r);
+                    }
+                    else {
+                        return Op{}(l, r);;
                     }
                 }
 
             template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
             requires(){//the concept is weather the expression below works or not
             typename std::common_type_t
-            <std::iterator_traits<Underlying_container_specialization>::iterator, std::input_iterator_tag>;
+            <std::iterator_traits<Rhs_t::iterator>::iterator_category, std::input_iterator_tag>;
             }
                 inline typename std::conditional<op_action_type == true, void, bool>  
                     op_scalar_with_collection(void* lhs,void* rhs){
+                        
                     underlying_container_specialization& formated_rhs= 
                     *(static_cast<underlying_container_specialization*>(rhs));
-                    if constexpr (op_action_type == _true) {
+                    if constexpr (op_action_type == true) {
                     Destination_t& formated_lhs= *( static_cast<destination_t*>(lhs) );
                     for(auto x: formated_rhs) {
                         formated_lhs+= x;
                     }
-                    Rhs_t
                     }
-                    } else if constexpr (op_action_type == _neutral) {
-                        return formated_lhs;
-                    } else {
-                        return Name_of_the_class_used_in{lhs_tag, formated_lhs};
+                    else {
+                        return Op{}(l, r);;
                     }
+                    
                 }
 
                 template<typename Op, ternary_state op_action_type, typename Rhs_t, typename Lhs_t>
@@ -634,7 +632,7 @@ namespace printing_tools {
             template<typename Underlying_container_specialization, Type_tag_for_input tag>
             requires{//the concept is weather the expression below works or not
             typename std::common_type_t
-                <std::iterator_traits<Underlying_container_specialization>::iterator, std::input_iterator_tag>;
+                <std::iterator_traits<Underlying_container_specialization::iterator>::iterator_category, std::input_iterator_tag>;
             }
                 static inline void*  copy_nested(void* source){
                     underlying_container_specialization& formated_source= 
