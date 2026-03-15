@@ -343,17 +343,17 @@ namespace printing_tools {
                 void* ptr;
             };
              template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, typename Lhs_t, typename Rhs_t, Type_tag_for_input tag>
-                inline typename std::conditional<op_action_type == _true, void, 
+                inline typename std::conditional<op_action_type == _true, Rhs_t, 
                     typename std::conditional<op_action_type == _neutral, bool, Hetrogenous_array_type>::type
                 >::type
                all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs);
                 template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, typename Lhs_t, typename Rhs_t, Type_tag_for_input tag>
-                inline typename std::conditional<op_action_type == _true, void, 
+                inline typename std::conditional<op_action_type == _true, Rhs_t, 
                     typename std::conditional<op_action_type == _neutral, bool, Hetrogenous_array_type>::type
                 >::type require {{Lhs_t::element_type}}//todo...
                all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs);
                 template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, typename Lhs_t, typename Rhs_t, Type_tag_for_input tag>
-                inline typename std::conditional<op_action_type == _true, void, 
+                inline typename std::conditional<op_action_type == _true, Rhs_t, 
                     typename std::conditional<op_action_type == _neutral, bool, Hetrogenous_array_type>::type
                 >::type
                 all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs) {
@@ -362,7 +362,7 @@ namespace printing_tools {
                     auto* r = static_cast<Rhs_t*>(rhs);
                 
                     if constexpr (op_action_type == _true) {
-                        void_op_generator<Op, op_action_type, Name_of_the_class_used_in, Lhs_t, Rhs_t, tag>(l, r);
+                        return void_op_generator<Op, op_action_type, Name_of_the_class_used_in, Lhs_t, Rhs_t, tag>(l, r);
                     } else if constexpr (op_action_type == _neutral) {
                         return void_op_generator<Op, op_action_type, Name_of_the_class_used_in, Lhs_t, Rhs_t, tag>(l, r);
                     } else {
@@ -378,12 +378,13 @@ namespace printing_tools {
                 static inline void  op_scalar_with_collection(void* lhs,void* rhs){
                     underlying_container_specialization& formated_rhs= 
                     *(static_cast<underlying_container_specialization*>(rhs));
+                    if constexpr (op_action_type == _true) {
                     Destination_t& formated_lhs= *( static_cast<destination_t*>(lhs) );
                     for(auto x: formated_rhs) {
                         formated_lhs+= x;
                     }
-                    if constexpr (op_action_type == _true) {
-                        
+                    Rhs_t
+                    }
                     } else if constexpr (op_action_type == _neutral) {
                         return formated_lhs;
                     } else {
@@ -392,7 +393,7 @@ namespace printing_tools {
                 }
 
                 template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, Type_tag_for_input source_tag, typename Rhs_t, typename Lhs_t>
-                inline typename std::conditional<op_action_type == _true, void, 
+                inline typename std::conditional<op_action_type == _true, Rhs_t, 
                     typename std::conditional<op_action_type == _neutral, bool, Hetrogenous_array_type>::type
                 >::type
                 all_action_on_ops_for_simple_ops_on_void_pointers_collections(void* lhs, void* rhs) {
