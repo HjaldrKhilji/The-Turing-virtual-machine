@@ -74,7 +74,7 @@ export namespace driver {
                 using All_entries_output = absolute_base::All_non_terminal_entries<estd::processed_string, string>;
 
                 Config_reader<estd::regex_pattern> read_input_stream_config = Config_reader<estd::regex_pattern>{ file_stream_intializater<std::ifstream>(input_config_file), default_input_config_delimeter };
-                std::unique_ptr<All_entries_input> input_config = std::make_unique<All_entries_input>();
+                auto input_config = std::make_unique<All_entries_input>();
                 std::thread input_config_reader_thread{
                 [] {
                     while (debug_mode_for_reading_intput_config) {
@@ -117,9 +117,9 @@ export namespace driver {
                 using Input_stream_handler_ptr = absolute_base::Streamable_manager<std::ifstream, std::unique_ptr, std::unique_ptr>;
                 using Output_stream_handler_ptr = absolute_base::Streamable_manager<std::ofstream, std::unique_ptr, std::unique_ptr>;
                 //inner and outer means child and parent pointer respectively
-                auto inner_input{ std::unique_ptr<std::ifstream>(std::move(file_stream_intializater<std::ifstream>(input_file))) };
-                auto outer_input{ std::unique_ptr<std::unique_ptr<std::ifstream>>(inner_input) };
-                Input_stream_handler_ptr input{ outer_input };
+                auto inner_input{ std::make_unique<std::ifstream>(std::move(file_stream_intializater<std::ifstream>(input_file))) };
+                auto outer_input{ std::make_unique<std::unique_ptr<std::ifstream>>(inner_input) };
+                Input_stream_handler_ptr input{ std::move(outer_input) };
 
                 auto inner_output{ std::make_unique<std::ofstream>(std::move(file_stream_intializater<std::ofstream>(output_file))) };
                 auto outer_output{ std::make_unique<std::unique_ptr<std::ofstream>>(std::move(inner_output)) };
