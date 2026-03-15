@@ -357,7 +357,27 @@ namespace printing_tools {
                         return Op{}(l, r);;
                     }
                 }
-
+            template<typename T>
+            concept Is_complex_userdefined = require(Lhs_t a){
+                {Lhs_t.ptr}->std::same_as<void>;
+                {Lhs_t.tag}->std::same_as<Type_tag>;
+            };
+                 
+            template<typename Op, bool op_action_type, Is_complex_userdefined Lhs_t, Is_complex_userdefined Rhs_t>
+            inline typename std::conditional<op_action_type == true, void, bool>  
+            op_scalar_or_collection_with_collection(Lhs_t& lhs,Rhs_t& rhs){
+                    
+            }                 
+            template<typename Op, bool op_action_type, Is_complex_userdefined Lhs_t, typename Rhs_t>
+            inline typename std::conditional<op_action_type == true, void, bool>  
+            op_scalar_or_collection_with_collection(Lhs_t& lhs,Rhs_t& rhs){
+                    
+            }
+            template<typename Op, bool op_action_type, typename Lhs_t, Is_complex_userdefined Rhs_t>
+            inline typename std::conditional<op_action_type == true, void, bool>  
+            op_scalar_or_collection_with_collection(Lhs_t& lhs,Rhs_t& rhs){
+                rhs.void_op_generator<>
+            }
             template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
             requires{//the concept is weather the expression below works or not
             typename std::common_type_t
@@ -365,31 +385,24 @@ namespace printing_tools {
             }
             inline typename std::conditional<op_action_type == true, void, bool>  
                 op_scalar_or_collection_with_collection(Lhs_t& lhs,Rhs_t& rhs){
-                        
-
-                    }
-
-            template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
-            inline typename std::conditional<op_action_type == true, void, bool>  
-                op_scalar_or_collection_with_collection(Lhs_t& lhs,Rhs_t& rhs){
-                    auto & formated_rhs= 
-                    *(static_cast<Rhs_t*>(rhs));
-                    auto& formated_lhs= *( static_cast<Lhs_t*>(lhs) );
 
                     if constexpr (op_action_type == true) {
                     for(auto x: formated_lhs) {
-                        op_scalar_or_collection_with_collection<Op, op_action_type>(formated_rhs, x);
+                        Op{}(formated_rhs, x);
                     }
                     }
                     else {
                     for(auto x: formated_lhs) {
-                        if(!op_scalar_or_collection_with_collection<Op, op_action_type>(formated_rhs, x)){
+                        if(!Op{}(formated_rhs, x)){
                             return false;
                         }
                     }
                     return true;
                     }
+
                     }
+
+
             template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
             requires{//the concept is weather the expression below works or not
             typename std::common_type_t
@@ -690,34 +703,34 @@ namespace printing_tools {
                     
                 template<typename Op, ternary_state op_action_type>
                 inline typename std::conditional<op_action_type == true, void, bool>
-            void_op_generator(Polymoprhic_extensible_engine second_arg){
-            switch(tag){
-                /* --- Full Outer Dispatch Table --- */
-            
-                // 00 - 01: High-Operand Specialized
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, ptr_of_first_arg, ptr_of_second_arg)
-                
-                // 02 - 06: Scalar Primitives
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, long double, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, double, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, intptr_t, ptr_of_second_arg)
-                
-                // 07 - 12: Containers
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<std::string>, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<uintptr_t>, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<intptr_t>, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<double>, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<long double>, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, void*, ptr_of_first_arg, ptr_of_second_arg)
-                
-                default:
-                    throw std::string{"Unimplemented type"};
-                
-                }    
-            }
+                    void_op_generator(Polymoprhic_extensible_engine second_arg){
+                    switch(tag){
+                        /* --- Full Outer Dispatch Table --- */
+                    
+                        // 00 - 01: High-Operand Specialized
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, ptr_of_first_arg, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, ptr_of_first_arg, ptr_of_second_arg)
+                        
+                        // 02 - 06: Scalar Primitives
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, long double, ptr_of_first_arg, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, double, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, intptr_t, ptr_of_second_arg)
+                        
+                        // 07 - 12: Containers
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<std::string>, ptr_of_first_arg, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<uintptr_t>, ptr_of_first_arg, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<intptr_t>, ptr_of_first_arg, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<double>, ptr_of_first_arg, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<long double>, ptr_of_first_arg, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, void*, ptr_of_first_arg, ptr_of_second_arg)
+                        
+                        default:
+                            throw std::string{"Unimplemented type"};
+                        
+                        }    
+                    }
             ~Polymoprhic_extensible_engine(){
                 switch(tag) {
                     /* --- [ 00 - 01 ] High-Operand Specialized Tags (DESTRUCTIVE) --- */
