@@ -342,20 +342,9 @@ namespace printing_tools {
                 Type_tag_for_input tag;
                 void* ptr;
             };
-             template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, typename Lhs_t, typename Rhs_t, Type_tag_for_input tag>
-                inline typename std::conditional<op_action_type == _true, Rhs_t, 
-                    typename std::conditional<op_action_type == _neutral, bool, Hetrogenous_array_type>::type
-                >::type
-               all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs);
-                template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, typename Lhs_t, typename Rhs_t, Type_tag_for_input tag>
-                inline typename std::conditional<op_action_type == _true, Rhs_t, 
-                    typename std::conditional<op_action_type == _neutral, bool, Hetrogenous_array_type>::type
-                >::type require {{Lhs_t::element_type}}//todo...
-               all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs);
-                template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, typename Lhs_t, typename Rhs_t, Type_tag_for_input tag>
-                inline typename std::conditional<op_action_type == _true, Rhs_t, 
-                    typename std::conditional<op_action_type == _neutral, bool, Hetrogenous_array_type>::type
-                >::type
+
+                template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
+                inline typename std::conditional<op_action_type == true, void, bool>
                 all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs) {
                     //this specialization is at the top in the chain of arethimetic
                     auto* l = static_cast<Lhs_t*>(lhs);
@@ -370,12 +359,13 @@ namespace printing_tools {
                     }
                 }
 
-            template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, Type_tag_for_input lhs_tag, typename Underlying_container_specialization, absolute_base::Is_String_Or_Numeric Destination_t>
+            template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
             requires(){//the concept is weather the expression below works or not
             typename std::common_type_t
             <std::iterator_traits<Underlying_container_specialization>::iterator, std::input_iterator_tag>;
             }
-                static inline void  op_scalar_with_collection(void* lhs,void* rhs){
+                inline typename std::conditional<op_action_type == true, void, bool>  
+                    op_scalar_with_collection(void* lhs,void* rhs){
                     underlying_container_specialization& formated_rhs= 
                     *(static_cast<underlying_container_specialization*>(rhs));
                     if constexpr (op_action_type == _true) {
@@ -392,10 +382,8 @@ namespace printing_tools {
                     }
                 }
 
-                template<typename Op, ternary_state op_action_type, typename Name_of_the_class_used_in, Type_tag_for_input source_tag, typename Rhs_t, typename Lhs_t>
-                inline typename std::conditional<op_action_type == _true, Rhs_t, 
-                    typename std::conditional<op_action_type == _neutral, bool, Hetrogenous_array_type>::type
-                >::type
+                template<typename Op, ternary_state op_action_type, typename Rhs_t, typename Lhs_t>
+                inline typename std::conditional<op_action_type == true, void, bool>
                 all_action_on_ops_for_simple_ops_on_void_pointers_collections(void* lhs, void* rhs) {
                 nested_type_info underlying_obj= *(static_cast<nested_type_info*>(ptr_of_second_arg));
                 switch(underlying_obj->tag){
@@ -437,35 +425,35 @@ namespace printing_tools {
                             ptr_of_first_arg, \
                             ptr_of_second_arg) \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::string_tag_for_15_plus_operand_ops): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, std::string, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
+        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, std::string>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::uintptr_tag_for_15_plus_operand_ops): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, uintptr_t, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
+        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, uintptr_t>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::intptr_tag_for_15_plus_operand_ops): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, intptr_t, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
+        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, intptr_t>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, long double, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
+        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, long double>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::eight_byte_double_tag_for_15_plus_operand_ops): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, double, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
+        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, double>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::eight_byte_double_tag): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, double, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
+        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, double>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::uintptr_tag): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, uintptr_t, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
+        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, uintptr_t>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::string_tag): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, std::string, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
+        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, std::string>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::intptr_tag): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, intptr_t, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
+        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, intptr_t>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_string): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, std::vector<std::string>, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
+        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, std::vector<std::string>>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_uintptr): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, std::vector<uintptr_t>, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
+        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, std::vector<uintptr_t>>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_intptr): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, std::vector<intptr_t>, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
+        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, std::vector<intptr_t>>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_double): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, std::vector<double>, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
+        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, std::vector<double>>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_long_double_tag_implementation_defined_size): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, name_of_the_class_used_in, only_arg_type_for_first_paremeter, std::vector<long double>, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
+        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, std::vector<long double>>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::nested_type_with_dynamic_container): \ 
-        all_action_on_ops_for_simple_ops_on_void_pointers_collections<op, op_action_type, name_of_the_class_used_in,only_tag_for_first_paremeter, only_arg_type_for_first_paremeter, double>(ptr_of_first_arg, ptr_of_second_arg)
+        all_action_on_ops_for_simple_ops_on_void_pointers_collections<op, op_action_type, only_arg_type_for_first_paremeter, double>(ptr_of_first_arg, ptr_of_second_arg)
 
 
 
@@ -664,30 +652,30 @@ namespace printing_tools {
                 }
 
                     
-            template<typename op, ternary_state op_action_type>
-            inline std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Polymoprhic_extensible_engine>> 
+                template<typename Op, ternary_state op_action_type>
+                inline typename std::conditional<op_action_type == true, void, bool>
             void_op_generator(Polymoprhic_extensible_engine second_arg){
             switch(tag){
                 /* --- Full Outer Dispatch Table --- */
             
                 // 00 - 01: High-Operand Specialized
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, std::string, Type_tag::string_tag_for_15_plus_operand_ops, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, uintptr_t, Type_tag::uintptr_tag_for_15_plus_operand_ops, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, ptr_of_first_arg, ptr_of_second_arg)
                 
                 // 02 - 06: Scalar Primitives
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, long double, Type_tag::long_double_tag_implementation_defined_size, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, double, Type_tag::eight_byte_double_tag, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, uintptr_t, Type_tag::uintptr_tag, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, std::string, Type_tag::string_tag, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, intptr_t, Type_tag::intptr_tag, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, long double, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, double, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, intptr_t, ptr_of_second_arg)
                 
                 // 07 - 12: Containers
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, std::vector<std::string>, Type_tag::vector_string, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, std::vector<uintptr_t>, Type_tag::vector_uintptr, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, std::vector<intptr_t>, Type_tag::vector_intptr, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, std::vector<double>, Type_tag::vector_double, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, std::vector<long double>, Type_tag::vector_long_double_tag_implementation_defined_size, ptr_of_first_arg, ptr_of_second_arg)
-                JuMPEnTeRYGeNAraT0r(op, op_action_type, name_of_the_class_used_in, void*, Type_tag::nested_type_with_dynamic_container, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<std::string>, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<uintptr_t>, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<intptr_t>, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<double>, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<long double>, ptr_of_first_arg, ptr_of_second_arg)
+                JuMPEnTeRYGeNAraT0r(op, op_action_type, void*, ptr_of_first_arg, ptr_of_second_arg)
                 
                 default:
                     throw std::string{"Unimplemented type"};
