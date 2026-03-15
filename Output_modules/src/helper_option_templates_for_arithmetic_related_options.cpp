@@ -359,23 +359,61 @@ namespace printing_tools {
                 }
 
             template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
-            requires(){//the concept is weather the expression below works or not
+            requires{//the concept is weather the expression below works or not
+            typename std::common_type_t
+            <std::iterator_traits<Lhs::iterator>::iterator_category, std::input_iterator_tag>;
+            }
+            inline typename std::conditional<op_action_type == true, void, bool>  
+                op_scalar_or_collection_with_collection(Lhs_t& lhs,Rhs_t& rhs){
+                        
+
+                    }
+
+            template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
+            inline typename std::conditional<op_action_type == true, void, bool>  
+                op_scalar_or_collection_with_collection(Lhs_t& lhs,Rhs_t& rhs){
+                    auto & formated_rhs= 
+                    *(static_cast<Rhs_t*>(rhs));
+                    auto& formated_lhs= *( static_cast<Lhs_t*>(lhs) );
+
+                    if constexpr (op_action_type == true) {
+                    for(auto x: formated_lhs) {
+                        op_scalar_or_collection_with_collection<Op, op_action_type>(formated_rhs, x);
+                    }
+                    }
+                    else {
+                    for(auto x: formated_lhs) {
+                        if(!op_scalar_or_collection_with_collection<Op, op_action_type>(formated_rhs, x)){
+                            return false;
+                        }
+                    }
+                    return true;
+                    }
+                    }
+            template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
+            requires{//the concept is weather the expression below works or not
             typename std::common_type_t
             <std::iterator_traits<Rhs_t::iterator>::iterator_category, std::input_iterator_tag>;
             }
                 inline typename std::conditional<op_action_type == true, void, bool>  
                     op_scalar_with_collection(void* lhs,void* rhs){
                         
-                    underlying_container_specialization& formated_rhs= 
-                    *(static_cast<underlying_container_specialization*>(rhs));
+                    auto & formated_rhs= 
+                    *(static_cast<Rhs_t*>(rhs));
+                    auto& formated_lhs= *( static_cast<Lhs_t*>(lhs) );
+
                     if constexpr (op_action_type == true) {
-                    Destination_t& formated_lhs= *( static_cast<destination_t*>(lhs) );
                     for(auto x: formated_rhs) {
-                        formated_lhs+= x;
+                        op_scalar_or_collection_with_collection<Op, op_action_type>(formated_lhs, x);
                     }
                     }
                     else {
-                        return Op{}(l, r);;
+                    for(auto x: formated_rhs) {
+                        if(!op_scalar_or_collection_with_collection<Op, op_action_type>(formated_lhs, x)){
+                            return false;
+                        }
+                    }
+                    return true;
                     }
                     
                 }
