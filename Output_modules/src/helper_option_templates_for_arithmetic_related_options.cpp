@@ -466,13 +466,13 @@ namespace printing_tools {
                     throw std::string{"Invalid Container Tag"};
                     break;
                 }
-            #define JuMPEnTeRYGeNAraT0r(op, \
+           #define JuMPEnTeRYGeNAraT0r(op, \
                             op_action_type, \
                             name_of_the_class_used_in, \
                             only_arg_type_for_first_paremeter, \
-                            only_tag_for_first_paremeter, \
                             ptr_of_first_arg, \
-                            ptr_of_second_arg) \
+                            ptr_of_second_arg,\
+                            only_tag_for_first_paremeter) \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::string_tag_for_15_plus_operand_ops): \
         return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, std::string>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::uintptr_tag_for_15_plus_operand_ops): \
@@ -504,6 +504,9 @@ namespace printing_tools {
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::nested_type_with_dynamic_container): \ 
         all_action_on_ops_for_simple_ops_on_void_pointers_collections<op, op_action_type, only_arg_type_for_first_paremeter, double>(ptr_of_first_arg, ptr_of_second_arg)
 
+
+
+        
 
 
         
@@ -700,36 +703,40 @@ namespace printing_tools {
 
                 }
 
-                    
                 template<typename Op, ternary_state op_action_type>
                 inline typename std::conditional<op_action_type == true, void, bool>
-                    void_op_generator(Polymoprhic_extensible_engine second_arg){
+                    void_op_generator(void* second_arg_ptr){
                     switch(tag){
                         /* --- Full Outer Dispatch Table --- */
                     
                         // 00 - 01: High-Operand Specialized
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, ptr_of_first_arg, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, ptr, second_arg_ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, ptr, second_arg_ptr)
                         
                         // 02 - 06: Scalar Primitives
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, long double, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, double, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, intptr_t, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, long double, ptr, second_arg_ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, double, ptr, second_arg_ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, ptr, second_arg_ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, ptr, second_arg_ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, intptr_t, ptr, second_arg_ptr)
                         
                         // 07 - 12: Containers
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<std::string>, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<uintptr_t>, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<intptr_t>, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<double>, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<long double>, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, void*, ptr_of_first_arg, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<std::string>, ptr, second_arg_ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<uintptr_t>, ptr, second_arg_ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<intptr_t>, ptr, second_arg_ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<double>, ptr, second_arg_ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<long double>, ptr, second_arg_ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, void*, ptr, second_arg_ptr)
                         
                         default:
                             throw std::string{"Unimplemented type"};
                         
                         }    
+                    }
+                  template<typename Op, ternary_state op_action_type>
+                inline typename std::conditional<op_action_type == true, void, bool>
+                    void_op_generator(void* second_arg_ptr){
+                        
                     }
             ~Polymoprhic_extensible_engine(){
                 switch(tag) {
