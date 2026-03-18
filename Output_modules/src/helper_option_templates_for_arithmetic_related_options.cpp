@@ -436,12 +436,12 @@ namespace printing_tools {
 
                     if constexpr (op_action_type == true) {
                     for(auto x: formated_rhs) {
-                        op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_tag>(&formated_lhs, &x);
+                        op_scalar_or_collection_with_collection<Op, op_action_type,Lhs_tag,Rhs_t,Lhs_t>(&formated_lhs, &x);
                     }
                     }
                     else {
                     for(auto x: formated_rhs) {
-                        if(!op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_tag>(&formated_lhs, &x)){
+                        if(!op_scalar_or_collection_with_collection<Op, op_action_type,Lhs_tag,Rhs_t,Lhs_t>(&formated_lhs, &x)){
                             return false;
                         }
                     }
