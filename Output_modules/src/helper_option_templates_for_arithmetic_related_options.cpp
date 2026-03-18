@@ -211,47 +211,48 @@ namespace printing_tools {
                 using Fixed_size_strings_t== std::conditional<sizeof(std::string)<common_size, std::string>;
                 using Hetrogenous_array_type=Hetrogenous_array_type;
                 enum class Type_tag : unsigned char {
-                     /* --- [ 00 - 01 ] High-Operand Specialized Tags --- */
+                    /* --- High-Operand Specialized Tags --- */
                     string_tag_for_15_plus_operand_ops          = 0,
                     uintptr_tag_for_15_plus_operand_ops         = 1,
+                    intptr_tag_for_15_plus_operand_ops          = 2,
+                    long_double_tag_implementation_defined_size_for_15_plus_operand_ops  = 3,
+                    eight_byte_double_tag_for_15_plus_operand_ops =4,
+                    /* --- Scalar Primitive Types --- */
+                    eight_byte_double_tag,
+                    uintptr_tag,
+                    string_tag,
+                    intptr_tag,
                     
-                    /* --- [ 02 - 06 ] Scalar Primitive Types --- */
-                    long_double_tag_implementation_defined_size = 2,
-                    eight_byte_double_tag                        = 3,
-                    uintptr_tag                                 = 4,
-                    string_tag                                  = 5,
-                    intptr_tag                                  = 6,
+                    /* --- Contiguous & Dynamic Containers --- */
+                    vector_string,
+                    vector_uintptr,
+                    vector_intptr,
+                    vector_double,
+                    vector_long_double_tag_implementation_defined_size,
+                    nested_type_with_dynamic_container,
                     
-                    /* --- [ 07 - 12 ] Contiguous & Dynamic Containers --- */
-                    vector_string                               = 7,
-                    vector_uintptr                              = 8,
-                    vector_intptr                               = 9,
-                    vector_double                               = 10,
-                    vector_long_double_tag_implementation_defined_size = 11,
-                    nested_type_with_dynamic_container          = 12,
+                    /* --- System & Concurrency Handles --- */
+                    object_info,
+                    atomic_nested_owning_type,
+                    semaphore,
+                    lock,
+                    process_executioner,
+                    socket_executioner,
+                    jthread_nested_machine,
                     
-                    /* --- [ 13 - 19 ] System & Concurrency Handles --- */
-                    object_info                                 = 13,
-                    atomic_nested_owning_type                   = 14,
-                    semaphore                                   = 15,
-                    lock                                        = 16,
-                    process_executioner                         = 17,
-                    socket_executioner                          = 18,
-                    jthread_nested_machine                      = 19,
+                    /* --- Computational & Linking Ops --- */
+                    reference_to_vecotr_of_nested_for_gpu_ops,
+                    encryption,
+                    decryption,
+                    predict,
+                    linked,
                     
-                    /* --- [ 20 - 24 ] Computational & Linking Ops --- */
-                    reference_to_vecotr_of_nested_for_gpu_ops   = 20,
-                    encryption                                  = 21,
-                    decryption                                  = 22,
-                    predict                                     = 23,
-                    linked                                      = 24,
-                    
-                    /* --- [ 25 - 29 ] Interface, Events & Extensibility --- */
-                    gui                                         = 25,
-                    capture_event                               = 26,
-                    confirm_event                               = 27,
-                    user_defined_binary_code_ops                = 28,
-                    other                                       = 29
+                    /* --- Interface, Events & Extensibility --- */
+                    gui,
+                    capture_event,
+                    confirm_event,
+                    user_defined_binary_code_ops,
+                    other
                 
                     // not all of them would be implemented right now, like it would be a step by step process, 
                     // but all of them will have a respective entry until they are implemented
@@ -306,10 +307,6 @@ namespace printing_tools {
                     array_nested_type_deque,
                     array_nested_type_list,
                     array_nested_type_forward_list,
-                    array_nested_type_set,
-                    array_nested_type_unordered_set,
-                    array_nested_type_multi_set,
-                    array_nested_type_unordered_multi_unordered_set,
                     array_nested_type_redis_map,
                     heterogeneous_array,
                     type_in_vector_tag,
@@ -343,7 +340,7 @@ namespace printing_tools {
                 void* ptr;
             };
 
-                template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
+                template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t,Type_tag Rhs_t>
                 inline typename std::conditional<op_action_type == true, void, bool>
                 all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs) {
                     //this specialization is at the top in the chain of arethimetic
@@ -356,43 +353,67 @@ namespace printing_tools {
                         return Op{}(l, r);;
                     }
                 }
+
+
+
             template<typename T>
             concept Is_complex_userdefined = require(Lhs_t a){
                 {Lhs_t.ptr}->std::same_as<void>;
                 {Lhs_t.tag}->std::same_as<Type_tag>;
             };
                  
-            template<typename Op, bool op_action_type, Is_complex_userdefined Lhs_t, Is_complex_userdefined Rhs_t>
+            template<Op, op_action_type,Type_tag Lhs_tag,typename Rhs_t,typename Lhs_t>
             inline typename std::conditional<op_action_type == true, void, bool>  
             op_scalar_or_collection_with_collection(Lhs_t& lhs,Rhs_t& rhs){
                     
             }                 
-            template<typename Op, bool op_action_type, Is_complex_userdefined Lhs_t, typename Rhs_t>
+            template<Op, op_action_type,Type_tag Lhs_tag,typename Rhs_t,typename Lhs_t>
             inline typename std::conditional<op_action_type == true, void, bool>  
             op_scalar_or_collection_with_collection(Lhs_t& lhs,Rhs_t& rhs){
                     
             }
-            template<typename Op, bool op_action_type, typename Lhs_t, Is_complex_userdefined Rhs_t>
+            template<Op, op_action_type,Type_tag Lhs_tag,typename Rhs_t,typename Lhs_t>
             inline typename std::conditional<op_action_type == true, void, bool>  
             op_scalar_or_collection_with_collection(Lhs_t& lhs,Rhs_t& rhs){
                 rhs.void_op_generator<>
             }
-            template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
+            template<Op, op_action_type,Type_tag Lhs_tag,typename Rhs_t,typename Lhs_t>
             requires{//the concept is weather the expression below works or not
             typename std::common_type_t
             <std::iterator_traits<Lhs::iterator>::iterator_category, std::input_iterator_tag>;
             }
             inline typename std::conditional<op_action_type == true, void, bool>  
-                op_scalar_or_collection_with_collection(Lhs_t& lhs,Rhs_t& rhs){
+                op_scalar_or_collection_with_collection(Lhs_t* lhs,Rhs_t* rhs){
 
                     if constexpr (op_action_type == true) {
-                    for(auto x: formated_lhs) {
-                        Op{}(formated_rhs, x);
+                    for(auto x: *lhs) {
+                        lhs->void_op_generator<Op, op_action_type>(*rhs);
                     }
                     }
                     else {
-                    for(auto x: formated_lhs) {
-                        if(!Op{}(formated_rhs, x)){
+                    for(auto x: *lhs) {
+                        if(!lhs->void_op_generator<Op, op_action_type>(*rhs)){
+                            return false;
+                        }
+                    }
+                    return true;
+                    }
+
+                    }
+                        template<Op, op_action_type, Lhs_tag, Rhs_t, Lhs_t>
+
+            template<typename Op, bool op_action_type,Type_tag Lhs_tag, absolute_base::Is_String_Or_Numeric Lhs_t, typename Rhs_t>
+            inline typename std::conditional<op_action_type == true, void, bool>  
+                op_scalar_or_collection_with_collection(Lhs_t* lhs,Rhs_t* rhs){
+
+                    if constexpr (op_action_type == true) {
+                    for(auto x: *rhs) {
+                        op_scalar_or_collection_with_collection{}(*lhs, x);
+                    }
+                    }
+                    else {
+                    for(auto x: *rhs) {
+                        if(!op_scalar_or_collection_with_collection{}(*lhs, x)){
                             return false;
                         }
                     }
@@ -401,8 +422,7 @@ namespace printing_tools {
 
                     }
 
-
-            template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
+            template<Op, op_action_type,Type_tag Lhs_tag,typename Rhs_t,typename Lhs_t>
             requires{//the concept is weather the expression below works or not
             typename std::common_type_t
             <std::iterator_traits<Rhs_t::iterator>::iterator_category, std::input_iterator_tag>;
@@ -416,12 +436,12 @@ namespace printing_tools {
 
                     if constexpr (op_action_type == true) {
                     for(auto x: formated_rhs) {
-                        op_scalar_or_collection_with_collection<Op, op_action_type>(formated_lhs, x);
+                        op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_tag>(&formated_lhs, &x);
                     }
                     }
                     else {
                     for(auto x: formated_rhs) {
-                        if(!op_scalar_or_collection_with_collection<Op, op_action_type>(formated_lhs, x)){
+                        if(!op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_tag>(&formated_lhs, &x)){
                             return false;
                         }
                     }
@@ -430,37 +450,26 @@ namespace printing_tools {
                     
                 }
 
-                template<typename Op, ternary_state op_action_type, typename Rhs_t, typename Lhs_t>
-                inline typename std::conditional<op_action_type == true, void, bool>
+                template<typename Op, bool op_action_type, Type_tag lhs_tag, typename Lhs_t>
+                inline inline typename std::conditional<op_action_type == true, void, bool>  
                 all_action_on_ops_for_simple_ops_on_void_pointers_collections(void* lhs, void* rhs) {
                 nested_type_info underlying_obj= *(static_cast<nested_type_info*>(ptr_of_second_arg));
                 switch(underlying_obj->tag){
-                case Type_tag_for_input::vector_containing_types:
-                    using source_and_target_type= std::vector<Polymoprhic_extensible_engine>;
-                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr)};
+                case Type_tag_for_input::array_nested_type_vector:
+                    using Rhs_t= std::vector<Polymoprhic_extensible_engine>;
+                    return op_scalar_with_collection<Op, op_action_type, Lhs_tag, Rhs_t, Lhs_t>(underlying_obj->ptr)};
                     break;
-                case Type_tag_for_input::type_in_deque_tag:
-                    using source_and_target_type= std::deque<Polymoprhic_extensible_engine>;
-                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
+                case Type_tag_for_input::array_nested_type_deque:
+                    using Rhs_t= std::deque<Polymoprhic_extensible_engine>;
+                    return op_scalar_with_collection<Op, op_action_type, Lhs_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
                     break;
-                case Type_tag_for_input::type_in_list:
-                    using source_and_target_type= std::list<Polymoprhic_extensible_engine>;
-                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
-                case Type_tag_for_input::type_in_forward_list:
-                    using source_and_target_type= std::forward_list<Polymoprhic_extensible_engine>;
-                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
-                case Type_tag_for_input::type_in_map_tag:
-                    using source_and_target_type= std::map<Polymoprhic_extensible_engine>;
-                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
-                case Type_tag_for_input::type_in_multi_map_tag:
-                    using source_and_target_type= std::multimap<Polymoprhic_extensible_engine>;
-                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
-                case Type_tag_for_input::type_in_hash_map_tag:
-                    using source_and_target_type= std::unordered_map<Polymoprhic_extensible_engine>;
-                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
-                case Type_tag_for_input::type_in_multi_hash_map_tag:
-                    using source_and_target_type= std::unordered_multimap<Polymoprhic_extensible_engine>;
-                    op_scalar_with_collection<Op, op_action_type, Name_of_the_class_used_in,source_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
+                case Type_tag_for_input::array_nested_type_list:
+                    using Rhs_t= std::list<Polymoprhic_extensible_engine>;
+                    return op_scalar_with_collection<Op, op_action_type, Lhs_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
+                case Type_tag_for_input::array_nested_type_forward_list:
+                    using Rhs_t= std::forward_list<Polymoprhic_extensible_engine>;
+                    return op_scalar_with_collection<Op, op_action_type, Lhs_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
+                //Todo redis maps 
                 default:
                     throw std::string{"Invalid Container Tag"};
                     break;
@@ -500,7 +509,7 @@ namespace printing_tools {
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_long_double_tag_implementation_defined_size): \
         return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, std::vector<long double>, only_tag_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::nested_type_with_dynamic_container): \ 
-        all_action_on_ops_for_simple_ops_on_void_pointers_collections<op, op_action_type,only_tag_for_first_paremeter, only_arg_type_for_first_paremeter, double>(ptr_of_first_arg, ptr_of_second_arg)
+        all_action_on_ops_for_simple_ops_on_void_pointers_collections<op, op_action_type,only_tag_for_first_paremeter, only_arg_type_for_first_paremeter>(ptr_of_first_arg, ptr_of_second_arg)
 
 
 
@@ -526,7 +535,7 @@ namespace printing_tools {
             Polymoprhic_extensible_engine{tag, source->ptr}
             } {}
 
-
+        
             inline Polymoprhic_extensible_engine(tag_of_type_to_construct_from source){
                switch(source.tag){
                    /* --- High-Operand Specialized Tags --- */
@@ -632,43 +641,36 @@ namespace printing_tools {
                         tag = Type_tag::vector_long_double_tag_implementation_defined_size;
                         break;
                     }
+                   array_nested_type_vector,
+                    array_nested_type_deque,
+                    array_nested_type_list,
+                    array_nested_type_forward_list,
+                    array_nested_type_set,
+                    array_nested_type_unordered_set,
+                    array_nested_type_multi_set,
+                    array_nested_type_unordered_multi_unordered_set,
+                    array_nested_type_redis_map,
                     case Type_tag::nested_type_with_dynamic_container:       
                         nested_type_info underlying_obj= *(static_cast<nested_type_info*>(source.ptr));
                         switch(underlying_obj->tag){
-                            case Type_tag_for_input::vector_containing_types:
+                            case Type_tag_for_input::array_nested_type_vector:
                                 using source_and_target_type= std::vector<Polymoprhic_extensible_engine>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
                                 ptr = random_access_copy<source_and_target_type, Type_tag_for_input::vector_containing_types>(underlying_obj->ptr)};
                                 break;
-                            case Type_tag_for_input::type_in_deque_tag:
+                            case Type_tag_for_input::array_nested_type_deque:
                                 using source_and_target_type= std::deque<Polymoprhic_extensible_engine>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
                                 ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_deque_tag>(underlying_obj->ptr);
                                 break;
-                            case Type_tag_for_input::type_in_list:
+                            case Type_tag_for_input::array_nested_type_list:
                                 using source_and_target_type= std::list<Polymoprhic_extensible_engine>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
                                 ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_list>(underlying_obj->ptr);
-                            case Type_tag_for_input::type_in_forward_list:
+                            case Type_tag_for_input::array_nested_type_forward_list:
                                 using source_and_target_type= std::forward_list<Polymoprhic_extensible_engine>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
                                 ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_forward_list>(underlying_obj->ptr);
-                            case Type_tag_for_input::type_in_map_tag:
-                                using source_and_target_type= std::map<Polymoprhic_extensible_engine>;
-                                tag= Type_tag::nested_type_with_dynamic_container;
-                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_map_tag>(underlying_obj->ptr);
-                            case Type_tag_for_input::type_in_multi_map_tag:
-                                using source_and_target_type= std::multimap<Polymoprhic_extensible_engine>;
-                                tag= Type_tag::nested_type_with_dynamic_container;
-                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_multi_map_tag>(underlying_obj->ptr);
-                            case Type_tag_for_input::type_in_hash_map_tag:
-                                using source_and_target_type= std::unordered_map<Polymoprhic_extensible_engine>;
-                                tag= Type_tag::nested_type_with_dynamic_container;
-                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_hash_map_tag>(underlying_obj->ptr);
-                            case Type_tag_for_input::type_in_multi_hash_map_tag:
-                                using source_and_target_type= std::unordered_multimap<Polymoprhic_extensible_engine>;
-                                tag= Type_tag::nested_type_with_dynamic_container;
-                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_multi_hash_map_tag>(underlying_obj->ptr);
                             default:
                                 throw std::string{"Invalid Container Tag"};
                                 break;
@@ -703,31 +705,31 @@ namespace printing_tools {
 
                 template<typename Op, ternary_state op_action_type>
                 inline typename std::conditional<op_action_type == true, void, bool>
-                    void_op_generator(void* second_arg_ptr){
+                    void_op_generator(Polymoprhic_extensible_engine second_arg){
                     switch(tag){
                         /* --- Full Outer Dispatch Table --- */
                     
                         // [beginning(0 index) - 05): High-Operand Specialized
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, Type_tag::string_tag_for_15_plus_operand_ops, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, Type_tag::uintptr_tag_for_15_plus_operand_ops, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, intptr_t, Type_tag::intptr_tag_for_15_plus_operand_ops, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, long_double, Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, Fixed_size_floats, Type_tag::eight_byte_double_tag_for_15_plus_operand_ops, ptr_of_first_arg, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, Type_tag::string_tag_for_15_plus_operand_ops, ptr_of_first_arg, second_arg->ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, Type_tag::uintptr_tag_for_15_plus_operand_ops, ptr_of_first_arg,  second_arg->ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, intptr_t, Type_tag::intptr_tag_for_15_plus_operand_ops, ptr_of_first_arg,  second_arg->ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, long_double, Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops, ptr_of_first_arg, second_arg->ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, Fixed_size_floats, Type_tag::eight_byte_double_tag_for_15_plus_operand_ops, ptr_of_first_arg, second_arg->ptr)
                         
                         // [05 - 11): Scalar Primitives
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, long double, Type_tag::long_double_tag_implementation_defined_size, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, double, Type_tag::eight_byte_double_tag, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, Type_tag::uintptr_tag, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, Type_tag::string_tag, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, intptr_t, Type_tag::intptr_tag, ptr_of_first_arg, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, long double, Type_tag::long_double_tag_implementation_defined_size, ptr_of_first_arg, second_arg->ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, double, Type_tag::eight_byte_double_tag, ptr_of_first_arg, second_arg->ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, Type_tag::uintptr_tag, ptr_of_first_arg, second_arg->ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, Type_tag::string_tag, ptr_of_first_arg, second_arg->ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, intptr_t, Type_tag::intptr_tag, ptr_of_first_arg, second_arg->ptr)
                         
                         // [11 - 12): Containers
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<std::string>, Type_tag::vector_string, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<uintptr_t>, Type_tag::vector_uintptr, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<intptr_t>, Type_tag::vector_intptr, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<double>, Type_tag::vector_double, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<long double>, Type_tag::vector_long_double_tag_implementation_defined_size, ptr_of_first_arg, ptr_of_second_arg)
-                        JuMPEnTeRYGeNAraT0r(op, op_action_type, void*, Type_tag::nested_type_with_dynamic_container, ptr_of_first_arg, ptr_of_second_arg)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<std::string>, Type_tag::vector_string, ptr_of_first_arg, second_arg->ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<uintptr_t>, Type_tag::vector_uintptr, ptr_of_first_arg, second_arg->ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<intptr_t>, Type_tag::vector_intptr, ptr_of_first_arg, second_arg->ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<double>, Type_tag::vector_double, ptr_of_first_arg, second_arg->ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, std::vector<long double>, Type_tag::vector_long_double_tag_implementation_defined_size, ptr_of_first_arg, second_arg->ptr)
+                        JuMPEnTeRYGeNAraT0r(op, op_action_type, void*, Type_tag::nested_type_with_dynamic_container, ptr_of_first_arg, second_arg->ptr)
                         
                         default:
                             throw std::string{"Unimplemented type"};
