@@ -413,7 +413,7 @@ namespace printing_tools {
             }
             inline typename std::conditional<op_action_type == true, void, bool>  
                 op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
-                    switch(source->execution_policy){
+                    switch(lhs->execution_policy){
                         case thread_policy::unsequenced_exec:
                             std::for_each(std::execution::unseq , lhs->begin(), lhs->end(),
                                 [](Lhs_t::value_type lhs_sub_element){
@@ -438,16 +438,16 @@ namespace printing_tools {
             }
                 inline typename std::conditional<op_action_type == true, void, bool>  
                     op_scalar_with_collection(Lhs_t* lhs,No_tag_nested_type_info rhs){
-                    Rhs_t& formated_rhs= *(static_cast<Rhs_t*>(rhs->ptr));
+                    Rhs_t formated_rhs= *(static_cast<Rhs_t*>(rhs->ptr));
                         switch(rhs->execution_policy){
                             case thread_policy::unsequenced_exec:
-                                std::for_each(std::execution::unseq, formated_rhs.begin(), formated_rhs.end(),
+                                std::for_each(std::execution::unseq, formated_rhs->begin(), formated_rhs->end(),
                                     [](const Rhs_t::value_type rhs_sub_element){
                                         return op_scalar_or_collection_with_collection<Op, true, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
                                     
                                 });
                             case thread_policy::unsequenced_parrallel_exec:
-                                std::for_each(std::execution::par_unseq, formated_rhs.begin(), formated_rhs.end(), Lhs_t{},
+                                std::for_each(std::execution::par_unseq, formated_rhs->begin(), formated_rhs->end(), Lhs_t{},
                                     [](const Rhs_t::value_type rhs_sub_element){
                                         return op_scalar_or_collection_with_collection<Op, true, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
                                     
