@@ -335,12 +335,17 @@ namespace printing_tools {
             std::unordered_map<uintptr_t,std::vector<Extented_type_info>> hash_map_containing_types;
             std::unordered_multimap<uintptr_t,std::vector<Extented_type_info>> hash_multimap_containing_types;
             std::array<std::vector<Extented_type_info>, 100> array_containing_types{{}};
-            struct nested_type_info{
+            enum class thread_policy : unsigned char {
+            unsequenced_exec,
+            unsequenced_parrallel_exec
+            }; //notice that all operations are unsequenced
+            struct Nested_type_info{
                 Type_tag_for_input tag;
+                bool execution_policy;
                 void* ptr;
             };
 
-                template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t,Type_tag Rhs_t>
+                template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
                 inline typename std::conditional<op_action_type == true, void, bool>
                 all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs) {
                     //this specialization is at the top in the chain of arethimetic
@@ -362,22 +367,22 @@ namespace printing_tools {
                 {Lhs_t.tag}->std::same_as<Type_tag>;
             };
                  
-            template<Op, op_action_type,Type_tag Lhs_tag,typename Rhs_t,typename Lhs_t>
+                template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
             inline typename std::conditional<op_action_type == true, void, bool>  
             op_scalar_or_collection_with_collection(Lhs_t& lhs,Rhs_t& rhs){
                     
             }                 
-            template<Op, op_action_type,Type_tag Lhs_tag,typename Rhs_t,typename Lhs_t>
+                template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
             inline typename std::conditional<op_action_type == true, void, bool>  
             op_scalar_or_collection_with_collection(Lhs_t& lhs,Rhs_t& rhs){
                     
             }
-            template<Op, op_action_type,Type_tag Lhs_tag,typename Rhs_t,typename Lhs_t>
+                template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
             inline typename std::conditional<op_action_type == true, void, bool>  
             op_scalar_or_collection_with_collection(Lhs_t& lhs,Rhs_t& rhs){
                 rhs.void_op_generator<>
             }
-            template<Op, op_action_type,Type_tag Lhs_tag,typename Rhs_t,typename Lhs_t>
+                template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
             requires{//the concept is weather the expression below works or not
             typename std::common_type_t
             <std::iterator_traits<Lhs::iterator>::iterator_category, std::input_iterator_tag>;
@@ -402,27 +407,49 @@ namespace printing_tools {
                     }
                         template<Op, op_action_type, Lhs_tag, Rhs_t, Lhs_t>
 
-            template<typename Op, bool op_action_type,Type_tag Lhs_tag, absolute_base::Is_String_Or_Numeric Lhs_t, typename Rhs_t>
+            template<typename Op, bool op_action_type, absolute_base::Is_String_Or_Numeric Lhs_t, typename Rhs_t>
             inline typename std::conditional<op_action_type == true, void, bool>  
                 op_scalar_or_collection_with_collection(Lhs_t* lhs,Rhs_t* rhs){
 
                     if constexpr (op_action_type == true) {
-                    for(auto x: *rhs) {
-                        op_scalar_or_collection_with_collection{}(*lhs, x);
+                    switch(source->execution_policy){
+                        case thread_policy::unsequenced_exec:
+                            return std::accumulate(std::execution::unseq , rhs.begin(), rhs.end(), Lhs_t{},
+                                [](Rhs_t::value_type rhs_sub_element){
+                                    return op_scalar_or_collection_with_collection<Op, true, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
+                                
+                            });
+                        case thread_policy::unsequenced_parrallel_exec:
+                            return std::accumulate(std::execution::par_unseq , rhs.begin(), rhs.end(), Lhs_t{},
+                                [](Rhs_t::value_type rhs_sub_element){
+                                    return op_scalar_or_collection_with_collection<Op, true, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
+                                
+                            });
                     }
                     }
                     else {
-                    for(auto x: *rhs) {
-                        if(!op_scalar_or_collection_with_collection{}(*lhs, x)){
-                            return false;
-                        }
+                    switch(source->execution_policy){
+                        case thread_policy::unsequenced_exec:
+                            return std::all_of(std::execution::unseq , rhs.begin(), rhs.end(),
+                                [](Rhs_t::value_type rhs_sub_element){
+                                    if (op_scalar_or_collection_with_collection<Op, false, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element)){
+                                        return false;
+                                    }
+                                
+                            });
+                        case thread_policy::unsequenced_parrallel_exec:
+                            return std::all_of(std::execution::par_unseq , rhs.begin(), rhs.end(),
+                                [](Rhs_t::value_type rhs_sub_element){
+                                    if (op_scalar_or_collection_with_collection<Op, false, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element)){
+                                        return false; 
+                                    }
+                            });
                     }
-                    return true;
                     }
 
                     }
 
-            template<Op, op_action_type,Type_tag Lhs_tag,typename Rhs_t,typename Lhs_t>
+                template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
             requires{//the concept is weather the expression below works or not
             typename std::common_type_t
             <std::iterator_traits<Rhs_t::iterator>::iterator_category, std::input_iterator_tag>;
@@ -435,6 +462,7 @@ namespace printing_tools {
                     auto& formated_lhs= *( static_cast<Lhs_t*>(lhs) );
 
                     if constexpr (op_action_type == true) {
+                        
                     for(auto x: formated_rhs) {
                         op_scalar_or_collection_with_collection<Op, op_action_type,Lhs_tag,Rhs_t,Lhs_t>(&formated_lhs, &x);
                     }
@@ -450,30 +478,35 @@ namespace printing_tools {
                     
                 }
 
-                template<typename Op, bool op_action_type, typename Rhs_t>
+                template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
                 inline inline typename std::conditional<op_action_type == true, void, bool>  
                 all_action_on_ops_for_simple_ops_on_void_pointers_collections(void* lhs, void* rhs) {
-                nested_type_info underlying_obj= *(static_cast<nested_type_info*>(ptr_of_second_arg));
+                Nested_type_info underlying_obj= *(static_cast<Nested_type_info*>(ptr_of_second_arg));
                 switch(underlying_obj->tag){
                 case Type_tag_for_input::array_nested_type_vector:
                     using Rhs_t= std::vector<Polymoprhic_extensible_engine>;
-                    return op_scalar_with_collection<Op, op_action_type, Lhs_tag, Rhs_t, Lhs_t>(underlying_obj->ptr)};
+                    return op_scalar_with_collection<Op, op_action_type, Lhs_t, Rhs_t>(underlying_obj->ptr)};
                     break;
                 case Type_tag_for_input::array_nested_type_deque:
                     using Rhs_t= std::deque<Polymoprhic_extensible_engine>;
-                    return op_scalar_with_collection<Op, op_action_type, Lhs_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
+                    return op_scalar_with_collection<Op, op_action_type, Lhs_t, Rhs_t>(underlying_obj->ptr);
                     break;
                 case Type_tag_for_input::array_nested_type_list:
                     using Rhs_t= std::list<Polymoprhic_extensible_engine>;
-                    return op_scalar_with_collection<Op, op_action_type, Lhs_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
+                    return op_scalar_with_collection<Op, op_action_type,Lhs_t, Rhs_t>(underlying_obj->ptr);
                 case Type_tag_for_input::array_nested_type_forward_list:
                     using Rhs_t= std::forward_list<Polymoprhic_extensible_engine>;
-                    return op_scalar_with_collection<Op, op_action_type, Lhs_tag, Rhs_t, Lhs_t>(underlying_obj->ptr);
+                    return op_scalar_with_collection<Op, op_action_type, Lhs_t, Rhs_t>(underlying_obj->ptr);
                 //Todo redis maps 
                 default:
                     throw std::string{"Invalid Container Tag"};
                     break;
                 }
+                 //notice a pattern that what ever template is used, the first two arguments are the constant "op, op_action_type", while 
+                 //the last two is the lhs_type(first hand) and rhs_type(second hand).
+                 //the same exact pattern is consistent in the implementations of these templates
+                 //all tags are resolved here or (in the case of nested types only) in all_action_on_ops_for_simple_ops_on_void_pointers_collections.
+                 //In the implementations, only the types speak
             #define FLAAAT_JuMPEnTeRYGeNAraT0r(op, \
                             op_action_type,
                             only_tag_for_first_paremeter\
@@ -509,7 +542,7 @@ namespace printing_tools {
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_long_double_tag_implementation_defined_size): \
         return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, std::vector<long double>>(ptr_of_first_arg, ptr_of_second_arg); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::nested_type_with_dynamic_container): \ 
-        all_action_on_ops_for_simple_ops_on_void_pointers_collections<op, op_action_type, only_arg_type_for_first_paremeter, nested_type_info>(ptr_of_first_arg, ptr_of_second_arg)
+        all_action_on_ops_for_simple_ops_on_void_pointers_collections<op, op_action_type, only_arg_type_for_first_paremeter, Nested_type_info>(ptr_of_first_arg, ptr_of_second_arg)
 
 
 
@@ -641,36 +674,27 @@ namespace printing_tools {
                         tag = Type_tag::vector_long_double_tag_implementation_defined_size;
                         break;
                     }
-                   array_nested_type_vector,
-                    array_nested_type_deque,
-                    array_nested_type_list,
-                    array_nested_type_forward_list,
-                    array_nested_type_set,
-                    array_nested_type_unordered_set,
-                    array_nested_type_multi_set,
-                    array_nested_type_unordered_multi_unordered_set,
-                    array_nested_type_redis_map,
                     case Type_tag::nested_type_with_dynamic_container:       
-                        nested_type_info underlying_obj= *(static_cast<nested_type_info*>(source.ptr));
+                        Nested_type_info underlying_obj= *(static_cast<Nested_type_info*>(source.ptr));
                         switch(underlying_obj->tag){
                             case Type_tag_for_input::array_nested_type_vector:
-                                using source_and_target_type= std::vector<Polymoprhic_extensible_engine>;
+                                using Source_and_target_type= std::vector<Polymoprhic_extensible_engine>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
-                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::vector_containing_types>(underlying_obj->ptr)};
+                                ptr = copy_nested<Source_and_target_type, Type_tag_for_input::vector_containing_types>(underlying_obj);
                                 break;
                             case Type_tag_for_input::array_nested_type_deque:
-                                using source_and_target_type= std::deque<Polymoprhic_extensible_engine>;
+                                using Source_and_target_type= std::deque<Polymoprhic_extensible_engine>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
-                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_deque_tag>(underlying_obj->ptr);
+                                ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_deque_tag>(underlying_obj);
                                 break;
                             case Type_tag_for_input::array_nested_type_list:
-                                using source_and_target_type= std::list<Polymoprhic_extensible_engine>;
+                                using Source_and_target_type= std::list<Polymoprhic_extensible_engine>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
-                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_list>(underlying_obj->ptr);
+                                ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_list>(underlying_obj);
                             case Type_tag_for_input::array_nested_type_forward_list:
-                                using source_and_target_type= std::forward_list<Polymoprhic_extensible_engine>;
+                                using Source_and_target_type= std::forward_list<Polymoprhic_extensible_engine>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
-                                ptr = random_access_copy<source_and_target_type, Type_tag_for_input::type_in_forward_list>(underlying_obj->ptr);
+                                ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_forward_list>(underlying_obj);
                             default:
                                 throw std::string{"Invalid Container Tag"};
                                 break;
@@ -688,18 +712,26 @@ namespace printing_tools {
             typename std::common_type_t
                 <std::iterator_traits<Underlying_container_specialization::iterator>::iterator_category, std::input_iterator_tag>;
             }
-                static inline void*  copy_nested(void* source){
+                static inline void*  copy_nested(Nested_type_info source){
                     underlying_container_specialization& formated_source= 
-                    *(static_cast<underlying_container_specialization*>(source));
+                    *(static_cast<underlying_container_specialization*>(source->ptr));
                     //NOTE: underlying_container_specialization is a container type.
                     underlying_container_specialization& destination_data= *(new underlying_container_specialization(formated_source.size()));
-
-                    std::copy(std::formated_source.begin(), formated_source.end(), destination_data.begin(), 
-                        [](value_type source_ptr){
-                            return Polymoprhic_extensible_engine(source_ptr);
-                        
-                    });    
-                    return static_cast<void*>(new nested_type_info{tag, static_cast<void*>(destination_data)}); 
+                    switch(source->execution_policy){
+                    case thread_policy::unsequenced_exec:
+                        std::copy(std::execution::unseq , formated_source.begin(), formated_source.end(), destination_data.begin(), 
+                            [](value_type source_ptr){
+                                return Polymoprhic_extensible_engine(source_ptr);
+                            
+                        });
+                    case thread_policy::unsequenced_parrallel_exec:
+                        std::copy(std::execution::par_unseq , formated_source.begin(), formated_source.end(), destination_data.begin(), 
+                            [](value_type source_ptr){
+                                return Polymoprhic_extensible_engine(source_ptr);
+                            
+                        });
+                    }
+                    return static_cast<void*>(new Nested_type_info{tag, source->execution_policy, static_cast<void*>(destination_data)}); 
 
                 }
 
@@ -821,7 +853,7 @@ namespace printing_tools {
 
                     /* --- Nested Types (DESTRUCTIVE) --- */
                     case Type_tag::nested_type_with_dynamic_container: {
-                        auto* underlying_obj = static_cast<nested_type_info*>(ptr);
+                        auto* underlying_obj = static_cast<Nested_type_info*>(ptr);
                         
                         switch(underlying_obj->tag) {
                             case Type_tag_for_input::vector_containing_types: {
