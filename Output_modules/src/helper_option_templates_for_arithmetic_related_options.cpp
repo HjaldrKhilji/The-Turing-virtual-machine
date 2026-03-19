@@ -391,21 +391,13 @@ namespace printing_tools {
                 op_scalar_or_collection_with_collection(Lhs_t* lhs,Rhs_t& rhs){
 
                     if constexpr (op_action_type == true) {
-                    for(auto x: *lhs) {
-                        lhs->void_op_generator<Op, op_action_type>(*rhs);
-                    }
+                    
                     }
                     else {
-                    for(auto x: *lhs) {
-                        if(!lhs->void_op_generator<Op, op_action_type>(*rhs)){
-                            return false;
-                        }
-                    }
-                    return true;
+                    
                     }
 
                     }
-                        template<Op, op_action_type, Lhs_tag, Rhs_t, Lhs_t>
 
 
 
