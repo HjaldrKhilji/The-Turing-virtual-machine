@@ -160,55 +160,7 @@ namespace printing_tools {
                     return false;
                 }
             }
-            struct Fixed_size_strings{
-            std::string* ptr;
-            inline Fixed_size_strings(std::string string_to_build_it_with): 
-            ptr{    new std::string{  std::move( string_to_build_it_with )  }    } {}
-            
-            inline ~Fixed_size_strings(){
-                delete ptr;
-            }
-            
-            };
-            inline std::string&& get(std::string&& a){
-                return std::move(a);
-            }            
-            inline std::string& get(std::string& a){
-                return a;
-            }
-            inline std::string&& get(Fixed_size_strings&& a){
-                return std::move(*(a.ptr));
-            }            
-            inline std::string& get(Fixed_size_strings& a){
-                return *(a.ptr);
-            }
-            constexpr common_size= sizeof(uintptr_t);
-            template<typename T>
-            struct Fancier_floats{
-            using Underlying_t= T;
-            Underlying_t *ptr;
-            static Underlying_t double_null= NAN;
-            inline Fancier_floats(Underlying_t raw_double_to_build_it_with): 
-            ptr{   new Underlying_t{raw_double_to_build_it_with}   } {}
-            inline Fancier_floats(Fancier_floats&& double_to_build_it_with): 
-            ptr{   double_to_build_it_with.ptr   } {double_to_build_it_with.ptr=&double_null; }
-            inline Fancier_floats(Fancier_floats& double_to_build_it_with): 
-            ptr{   new Underlying_t{*double_to_build_it_with.ptr}   } { }
-            inline  std::contional<op_action_type==_true, void,  std::contional<op_action_type==_nuteral, bool, Hetrogenous_array_type>>
-            Fancier_floats(){
-                
-            }
-            inline ~Fancier_floats(){
-                delete ptr;
-            }
 
-            };
-            using Fixed_size_floats= std::conditional<(sizeof(long double)>common_size), long double,
-                    std::conditional<(sizeof(double)>common_size), double, std::conditional<(sizeof(float)>common_size),
-                    float, Fancier_floats<float>>>>//tries its best atleast, can never beat hardware sadly, too 
-                    //many people work on that, and you cant tell everyone to follow one rule.
-                    using long_double= Fancier_floats<long double>;
-                using Fixed_size_strings_t== std::conditional<sizeof(std::string)<common_size, std::string>;
                 using Hetrogenous_array_type=Hetrogenous_array_type;
                 enum class Type_tag : unsigned char {
                     /* --- High-Operand Specialized Tags --- */
@@ -344,7 +296,14 @@ namespace printing_tools {
                 thread_policy execution_policy;
                 void* ptr;
             };
-
+            template<typename T>
+            struct No_tag_template_type_info{
+            using underlying_type= T;
+            thread_policy execution_policy;
+            void* ptr;
+            //Nested_type_info resolves to  No_tag_template_type_info
+            //vectors of primitive types and strings are wrapped inside No_tag_template_type_info
+            };
                 template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
                 inline typename std::conditional<op_action_type == true, void, bool>
                 all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs) {
@@ -631,35 +590,35 @@ namespace printing_tools {
                 
                     /* --- Contiguous & Dynamic Containers --- */
                     case Type_tag::vector_string: {
-                        using Source_and_target_type = std::vector<std::string>;
+                        using Source_and_target_type = No_tag_template_type_info<std::vector<std::string>>;
                         auto& source_formatted = *(static_cast<Source_and_target_type*>(source.ptr));
                         ptr = static_cast<void*>(new Source_and_target_type{source_formatted});
                         tag = Type_tag::vector_string;
                         break;
                     }
                     case Type_tag::vector_uintptr: {
-                        using Source_and_target_type = std::vector<uintptr_t>;
+                        using Source_and_target_type = No_tag_template_type_info<std::vector<uintptr_t>>;
                         auto& source_formatted = *(static_cast<Source_and_target_type*>(source.ptr));
                         ptr = static_cast<void*>(new Source_and_target_type{source_formatted});
                         tag = Type_tag::vector_uintptr;
                         break;
                     }
                     case Type_tag::vector_intptr: {
-                        using Source_and_target_type = std::vector<intptr_t>;
+                        using Source_and_target_type = No_tag_template_type_info<std::vector<intptr_t>>;
                         auto& source_formatted = *(static_cast<Source_and_target_type*>(source.ptr));
                         ptr = static_cast<void*>(new Source_and_target_type{source_formatted});
                         tag = Type_tag::vector_intptr;
                         break;
                     }
                     case Type_tag::vector_double: {
-                        using Source_and_target_type = std::vector<double>;
+                        using Source_and_target_type = No_tag_template_type_info<std::vector<double>>;
                         auto& source_formatted = *(static_cast<Source_and_target_type*>(source.ptr));
                         ptr = static_cast<void*>(new Source_and_target_type{source_formatted});
                         tag = Type_tag::vector_double;
                         break;
                     }
                     case Type_tag::vector_long_double_tag_implementation_defined_size: {
-                        using Source_and_target_type = std::vector<long double>;
+                        using Source_and_target_type = No_tag_template_type_info<std::vector<long double>>;
                         auto& source_formatted = *(static_cast<Source_and_target_type*>(source.ptr));
                         ptr = static_cast<void*>(new Source_and_target_type{source_formatted});
                         tag = Type_tag::vector_long_double_tag_implementation_defined_size;
