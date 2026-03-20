@@ -302,195 +302,191 @@ namespace printing_tools {
             //Nested_type_info resolves to  No_tag_template_type_info
             //vectors of primitive types and strings are wrapped inside No_tag_template_type_info
             };
-                template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
-                inline typename std::conditional<op_action_type == true, void, bool>
-                all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs) {
-                    //this specialization is at the top in the chain of arethimetic
-                    auto* l = static_cast<Lhs_t*>(lhs);
-                    auto* r = static_cast<Rhs_t*>(rhs);
-                    if constexpr (op_action_type == true) {
-                        Op{}(l, r);
+            namespace polymorphic_extensible_engine{
+            namespace implementation_of_the_interface_used_by_macro{
+            namespace scalar_to_scalar{
+                template<typename T>
+                concept Polymorphic_object = require(Lhs_t a){
+                    {Lhs_t.ptr}->std::same_as<void>;
+                    {Lhs_t.tag}->std::same_as<Type_tag>;
+                };
+                    template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
+                    inline typename std::conditional<op_action_type == true, void, bool>
+                    all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs) {
+                        //this specialization is at the top in the chain of arethimetic
+                        auto* l = static_cast<Lhs_t*>(lhs);
+                        auto* r = static_cast<Rhs_t*>(rhs);
+                        if constexpr (op_action_type == true) {
+                            Op{}(l, r);
+                        }
+                        else {
+                            return Op{}(l, r);;
+                        }
                     }
-                    else {
-                        return Op{}(l, r);;
-                    }
-                }
+    
+                };
 
-
-
-            template<typename T>
-            concept Polymorphic_object = require(Lhs_t a){
-                {Lhs_t.ptr}->std::same_as<void>;
-                {Lhs_t.tag}->std::same_as<Type_tag>;
-            };
-                 
-                template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
-            inline typename std::conditional<op_action_type == true, void, bool>  
-            all_action_on_ops_for_simple_ops_on_void_pointers(Lhs_t& lhs,Rhs_t& rhs){
-                    
-            }                 
-                template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
-            inline typename std::conditional<op_action_type == true, void, bool>  
-            all_action_on_ops_for_simple_ops_on_void_pointers(Lhs_t& lhs,Rhs_t& rhs){
-                    
-            }
-                template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
-            inline typename std::conditional<op_action_type == true, void, bool>  
-            all_action_on_ops_for_simple_ops_on_void_pointers(Lhs_t& lhs,Rhs_t& rhs){
-                rhs.void_op_generator<>
-            }
-            template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
-            requires{//the concept is weather the expression below works or not
-            typename std::common_type_t
-            <Polymoprhic_extensible_engine, Rhs_t>;
-            }
-            inline typename std::conditional<op_action_type == true, void, bool>  
-            all_action_on_ops_for_simple_ops_on_void_pointers(Lhs_t* lhs,Rhs_t& rhs){
-
-                if constexpr (op_action_type == true) {
-                    all_action_on_ops_for_simple_ops_on_void_pointers<Op, op_action_type, Lhs_t, Rhs_t>(lhs, rhs);
-                }
-                else {
-                    return all_action_on_ops_for_simple_ops_on_void_pointers<Op, op_action_type, Lhs_t, Rhs_t>(lhs, rhs);
-                }
-
-            }
-            template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
-            inline typename std::conditional<op_action_type == true, void, bool>  
-                op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
-                    all_action_on_ops_for_simple_ops_on_void_pointers<Op, op_action_type, Lhs_t, Rhs_t>(lhs, rhs);
-            }
-
-
-            template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
-            requires{//the concept is weather the expression below works or not
-            typename std::common_type_t
-            <std::iterator_traits<Lhs_t::iterator>::iterator_category, std::input_iterator_tag>;
-                //note this only handles if left hand side was a vector of strings or arethimetic types
-            }
-            inline typename std::conditional<op_action_type == true, void, bool>  
-                op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
-                    switch(lhs->execution_policy){
-                        case thread_policy::unsequenced_exec:
-                            std::for_each(std::execution::unseq , lhs->begin(), lhs->end(),
-                                [](Lhs_t::value_type lhs_sub_element){
-                                     return all_action_on_ops_for_simple_ops_on_void_pointers<Op, op_action_type, Lhs_t::value_type,Rhs_t>(lhs_sub_element,rhs);
-                            });
-                        case thread_policy::unsequenced_parrallel_exec:
-                            std::for_each(std::execution::par_unseq , lhs->begin(), lhs->end(),
-                                [](Lhs_t::value_type lhs_sub_element){
-                                    return all_action_on_ops_for_simple_ops_on_void_pointers<Op, op_action_type, Lhs_t::value_type,Rhs_t>(lhs_sub_element,rhs);
-                            });
-                    }
-                   
-
-                    }
-
-            template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
-            require{
-                std::common_type_t(Nested_type_info, Lhs_t); //requirement is 
-                //just to make clear that Lhs_t is Nested_type_info, while keeping the interface uniform 
-            }
-            inline typename std::conditional<op_action_type == true, void, bool> 
-                 
-                op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
-            
-            switch(lhs->tag){
-                case Type_tag_for_input::array_nested_type_vector:
-                    using Lhs_t_forwarded= std::vector<Polymoprhic_extensible_engine>;
-                    return op_scalar_or_collection_with_collection<Op, op_action_type>(No_tag_template_type_info<Lhs_t_forwarded>{
-                        lhs->execution_policy,
-                        static_cast<Lhs_t_forwarded>(lhs->ptr)},
-                        rhs);
-                    break;
-                case Type_tag_for_input::array_nested_type_deque:
-                    using Rhs_t_forwarded= std::deque<Polymoprhic_extensible_engine>;
-                    return op_scalar_or_collection_with_collection<Op, op_action_type>(No_tag_template_type_info<Lhs_t_forwarded>{
-                        lhs->execution_policy,
-                        static_cast<Lhs_t_forwarded>(lhs->ptr)},
-                        rhs);
-                    break;
-                case Type_tag_for_input::array_nested_type_list:
-                    using Rhs_t_forwarded= std::list<Polymoprhic_extensible_engine>;
-                    return op_scalar_or_collection_with_collection<Op, op_action_type>(No_tag_template_type_info<Lhs_t_forwarded>{
-                        lhs->execution_policy,
-                        static_cast<Lhs_t_forwarded>(lhs->ptr)},
-                        rhs);
-                case Type_tag_for_input::array_nested_type_forward_list:
-                    using Rhs_t_forwarded= std::forward_list<Polymoprhic_extensible_engine>;
-                    return op_scalar_or_collection_with_collection<Op, op_action_type>(No_tag_template_type_info<Lhs_t_forwarded>{
-                        lhs->execution_policy,
-                        static_cast<Lhs_t_forwarded>(lhs->ptr)},
-                        rhs);
-                //Todo redis maps 
-                default:
-                    throw std::string{"Invalid Container Tag"};
-                    break;
-                }
-                    
-                    }        
-            template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
-            requires{//the concept is weather the expression below works or not
-            typename std::common_type_t
-            <std::iterator_traits<Rhs_t::iterator>::iterator_category, std::input_iterator_tag>;
-            //note this handles containers of any type and Polymoprhic_extensible_engine objects.
-            }
+                     
+                template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
                 inline typename std::conditional<op_action_type == true, void, bool>  
-                    op_potential_scalar_with_collection(Lhs_t* lhs,const Rhs_t rhs){
-                    auto& formated_rhs= *(rhs->ptr);
-                        switch(rhs.execution_policy){
+                    op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
+                        all_action_on_ops_for_simple_ops_on_void_pointers<Op, op_action_type, Lhs_t, Rhs_t>(lhs, rhs);
+                }
+    
+    
+                
+                template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
+                requires{//the concept is weather the expression below works or not
+                typename std::common_type_t
+                <std::iterator_traits<Lhs_t::iterator>::iterator_category, std::input_iterator_tag>;
+                    //note this only handles if left hand side was a vector of strings or arethimetic types
+                }
+                inline typename std::conditional<op_action_type == true, void, bool>  
+                    op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
+                        switch(lhs->execution_policy){
                             case thread_policy::unsequenced_exec:
-                                std::for_each(std::execution::unseq, formated_rhs->begin(), formated_rhs->end(),
-                                    [](const Rhs_t::value_type rhs_sub_element){
-                                        return op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
+                                std::for_each(std::execution::unseq , lhs->begin(), lhs->end(),
+                                    [](Lhs_t::value_type lhs_sub_element){
+                                         return all_action_on_ops_for_simple_ops_on_void_pointers<Op, op_action_type, Lhs_t::value_type,Rhs_t>(lhs_sub_element,rhs);
                                 });
                             case thread_policy::unsequenced_parrallel_exec:
-                                std::for_each(std::execution::par_unseq, formated_rhs->begin(), formated_rhs->end(), Lhs_t{},
-                                    [](const Rhs_t::value_type rhs_sub_element){
-                                        return op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
+                                std::for_each(std::execution::par_unseq , lhs->begin(), lhs->end(),
+                                    [](Lhs_t::value_type lhs_sub_element){
+                                        return all_action_on_ops_for_simple_ops_on_void_pointers<Op, op_action_type, Lhs_t::value_type,Rhs_t>(lhs_sub_element,rhs);
                                 });
                         }
+                       
+    
+                        }
+    
+                template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
+                require{
+                    std::common_type_t(Nested_type_info, Lhs_t); //requirement is 
+                    //just to make clear that Lhs_t is Nested_type_info, while keeping the interface uniform 
                 }
-
-                template<typename Op, bool op_action_type,typename Lhs_t, typename Rhs_t>
-                inline inline typename std::conditional<op_action_type == true, void, bool>  
-                 require{
-                     std::common_type_t(Nested_type_info, Rhs_t); //requirement is 
-                     //just to make clear that Rhs_t is Nested_type_info, while keeping the interface uniform 
-                 }
-                all_action_on_ops_for_simple_ops_on_void_pointers_collections(const Polymoprhic_extensible_engine first_obj, const Polymoprhic_extensible_engine second_obj) {
-                Lhs_t* formated_lhs= static_cast<Lhs_t*>(first_obj->ptr);
-                Rhs_t* formated_rhs= static_cast<Rhs_t*>(second_obj->ptr);
-                switch(second_obj->tag){
-                case Type_tag_for_input::array_nested_type_vector:
-                    using Rhs_t_forwarded= std::vector<Polymoprhic_extensible_engine>;
-                    return op_potential_scalar_with_collection<Op, op_action_type>(formated_lhs, No_tag_template_type_info<Rhs_t_forwarded>{
-                        second_obj->execution_policy,
-                        static_cast<Rhs_t_forwarded>(second_obj->ptr)});
-                    break;
-                case Type_tag_for_input::array_nested_type_deque:
-                    using Rhs_t_forwarded= std::deque<Polymoprhic_extensible_engine>;
-                    return op_potential_scalar_with_collection<Op, op_action_type>(formated_lhs, No_tag_nested_type_info<Rhs_t_forwarded>{
-                        second_obj->execution_policy,
-                        static_cast<Rhs_t_forwarded>(second_obj->ptr)});
-                    break;
-                case Type_tag_for_input::array_nested_type_list:
-                    using Rhs_t_forwarded= std::list<Polymoprhic_extensible_engine>;
-                    return op_potential_scalar_with_collection<Op, op_action_type>(formated_lhs, No_tag_nested_type_info<Rhs_t_forwarded>{
-                        second_obj->execution_policy,
-                        static_cast<Rhs_t_forwarded>(second_obj->ptr)});
-                case Type_tag_for_input::array_nested_type_forward_list:
-                    using Rhs_t_forwarded= std::forward_list<Polymoprhic_extensible_engine>;
-                    return op_potential_scalar_with_collection<Op, op_action_type>(formated_lhs, No_tag_nested_type_info<Rhs_t_forwarded>{
-                        second_obj->execution_policy,
-                        static_cast<Rhs_t_forwarded>(second_obj->ptr)});
-                //Todo redis maps 
-                default:
-                    throw std::string{"Invalid Container Tag"};
-                    break;
-                }
-                }
+                inline typename std::conditional<op_action_type == true, void, bool> 
+                     
+                    op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
                 
+                switch(lhs->tag){
+                    case Type_tag_for_input::array_nested_type_vector:
+                        using Lhs_t_forwarded= std::vector<Polymoprhic_extensible_engine>;
+                        return op_scalar_or_collection_with_collection<Op, op_action_type>(No_tag_template_type_info<Lhs_t_forwarded>{
+                            lhs->execution_policy,
+                            static_cast<Lhs_t_forwarded>(lhs->ptr)},
+                            rhs);
+                        break;
+                    case Type_tag_for_input::array_nested_type_deque:
+                        using Rhs_t_forwarded= std::deque<Polymoprhic_extensible_engine>;
+                        return op_scalar_or_collection_with_collection<Op, op_action_type>(No_tag_template_type_info<Lhs_t_forwarded>{
+                            lhs->execution_policy,
+                            static_cast<Lhs_t_forwarded>(lhs->ptr)},
+                            rhs);
+                        break;
+                    case Type_tag_for_input::array_nested_type_list:
+                        using Rhs_t_forwarded= std::list<Polymoprhic_extensible_engine>;
+                        return op_scalar_or_collection_with_collection<Op, op_action_type>(No_tag_template_type_info<Lhs_t_forwarded>{
+                            lhs->execution_policy,
+                            static_cast<Lhs_t_forwarded>(lhs->ptr)},
+                            rhs);
+                    case Type_tag_for_input::array_nested_type_forward_list:
+                        using Rhs_t_forwarded= std::forward_list<Polymoprhic_extensible_engine>;
+                        return op_scalar_or_collection_with_collection<Op, op_action_type>(No_tag_template_type_info<Lhs_t_forwarded>{
+                            lhs->execution_policy,
+                            static_cast<Lhs_t_forwarded>(lhs->ptr)},
+                            rhs);
+                    //Todo redis maps 
+                    default:
+                        throw std::string{"Invalid Container Tag"};
+                        break;
+                    }
+                        
+                        }        
+                };
+
+                namespace interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro{
+                template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
+                requires{//the concept is weather the expression below works or not
+                typename std::common_type_t
+                <std::iterator_traits<Rhs_t::iterator>::iterator_category, std::input_iterator_tag>;
+                //note this handles containers of any type and Polymoprhic_extensible_engine objects.
+                }
+                    inline typename std::conditional<op_action_type == true, void, bool>  
+                        op_potential_scalar_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
+                        auto& formated_rhs= *(rhs->ptr);
+                            switch(rhs.execution_policy){
+                                case thread_policy::unsequenced_exec:
+                                    std::for_each(std::execution::unseq, formated_rhs->begin(), formated_rhs->end(),
+                                        [](const Rhs_t::value_type rhs_sub_element){
+                                            return op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
+                                    });
+                                case thread_policy::unsequenced_parrallel_exec:
+                                    std::for_each(std::execution::par_unseq, formated_rhs->begin(), formated_rhs->end(), Lhs_t{},
+                                        [](const Rhs_t::value_type rhs_sub_element){
+                                            return op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
+                                    });
+                            }
+                    }
+                };    
+
+
+
+                namespace interface_used_by_macro{
+
+
+                    template<typename Op, bool op_action_type,typename Lhs_t, typename Rhs_t>
+                    inline inline typename std::conditional<op_action_type == true, void, bool>  
+                     require{
+                         std::common_type_t(Nested_type_info, Rhs_t); //requirement is 
+                         //just to make clear that Rhs_t is Nested_type_info, while keeping the interface uniform 
+                     }
+                    interface_of_all_operations_on_potential_scaler_with_potential_scalar(const Polymoprhic_extensible_engine first_obj, const Polymoprhic_extensible_engine second_obj) {
+                    Lhs_t* formated_lhs= static_cast<Lhs_t*>(first_obj->ptr);
+                    Rhs_t* formated_rhs= static_cast<Rhs_t*>(second_obj->ptr);
+                    op_potential_scalar_with_collection<Op, op_action_type>(formated_lhs, formated_rhs);
+                    }
+                    template<typename Op, bool op_action_type,typename Lhs_t, typename Rhs_t>
+                    inline inline typename std::conditional<op_action_type == true, void, bool>  
+                     require{
+                         std::common_type_t(Nested_type_info, Rhs_t); //requirement is 
+                         //just to make clear that Rhs_t is Nested_type_info, while keeping the interface uniform 
+                     }
+                    interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects(const Polymoprhic_extensible_engine first_obj, const Polymoprhic_extensible_engine second_obj) {
+                    Lhs_t* formated_lhs= static_cast<Lhs_t*>(first_obj->ptr);
+                    Rhs_t* formated_rhs= static_cast<Rhs_t*>(second_obj->ptr);
+                    switch(second_obj->tag){
+                    case Type_tag_for_input::array_nested_type_vector:
+                        using Rhs_t_forwarded= std::vector<Polymoprhic_extensible_engine>;
+                        return op_potential_scalar_with_collection<Op, op_action_type>(formated_lhs, No_tag_template_type_info<Rhs_t_forwarded>{
+                            second_obj->execution_policy,
+                            static_cast<Rhs_t_forwarded>(second_obj->ptr)});
+                        break;
+                    case Type_tag_for_input::array_nested_type_deque:
+                        using Rhs_t_forwarded= std::deque<Polymoprhic_extensible_engine>;
+                        return op_potential_scalar_with_collection<Op, op_action_type>(formated_lhs, No_tag_nested_type_info<Rhs_t_forwarded>{
+                            second_obj->execution_policy,
+                            static_cast<Rhs_t_forwarded>(second_obj->ptr)});
+                        break;
+                    case Type_tag_for_input::array_nested_type_list:
+                        using Rhs_t_forwarded= std::list<Polymoprhic_extensible_engine>;
+                        return op_potential_scalar_with_collection<Op, op_action_type>(formated_lhs, No_tag_nested_type_info<Rhs_t_forwarded>{
+                            second_obj->execution_policy,
+                            static_cast<Rhs_t_forwarded>(second_obj->ptr)});
+                    case Type_tag_for_input::array_nested_type_forward_list:
+                        using Rhs_t_forwarded= std::forward_list<Polymoprhic_extensible_engine>;
+                        return op_potential_scalar_with_collection<Op, op_action_type>(formated_lhs, No_tag_nested_type_info<Rhs_t_forwarded>{
+                            second_obj->execution_policy,
+                            static_cast<Rhs_t_forwarded>(second_obj->ptr)});
+                    //Todo redis maps 
+                    default:
+                        throw std::string{"Invalid Container Tag"};
+                        break;
+                    }
+                    }
+                };
+
+
+                // note: the macro is pure text substituion, so dont expect it to do anything else!
                  //notice a pattern that what ever template is used, the first two arguments are the constant "op, op_action_type", while 
                  //the last two is the lhs_type(first hand) and rhs_type(second hand).
                  //the same exact pattern is consistent in the implementations of these templates
@@ -506,35 +502,35 @@ namespace printing_tools {
                             second_obj,\
                              ) \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::string_tag_for_15_plus_operand_ops): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, std::string>(first_obj, second_obj); \
+        return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, std::string>(first_obj, second_obj); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::uintptr_tag_for_15_plus_operand_ops): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, uintptr_t>(first_obj, second_obj); \
+        return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, uintptr_t>(first_obj, second_obj); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::intptr_tag_for_15_plus_operand_ops): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, intptr_t>(first_obj, second_obj); \
+        return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, intptr_t>(first_obj, second_obj); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, long double>(first_obj, second_obj); \
+        return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, long double>(first_obj, second_obj); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::eight_byte_double_tag_for_15_plus_operand_ops): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, double>(first_obj, second_obj); \
+        return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, double>(first_obj, second_obj); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::eight_byte_double_tag): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, double>(first_obj, second_obj); \
+        return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, double>(first_obj, second_obj); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::uintptr_tag): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, uintptr_t>(first_obj, second_obj); \
+        return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, uintptr_t>(first_obj, second_obj); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::string_tag): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, std::string>(first_obj, second_obj); \
+        return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, std::string>(first_obj, second_obj); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::intptr_tag): \
-        return all_action_on_ops_for_simple_ops_on_void_pointers<op, op_action_type, only_arg_type_for_first_paremeter, intptr_t>(first_obj, second_obj); \
+        return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, intptr_t>(first_obj, second_obj); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_string): \
-        return op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<std::string>>>(first_obj, second_obj); \
+        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<std::string>>>(first_obj, second_obj); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_uintptr): \
-        return op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<uintptr_t>>>(first_obj, second_obj); \
+        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<uintptr_t>>>(first_obj, second_obj); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_intptr): \
-        return op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<intptr_t>>>(first_obj, second_obj); \
+        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<intptr_t>>>(first_obj, second_obj); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_double): \
-        return op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<double>>>(first_obj, second_obj); \
+        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<double>>>(first_obj, second_obj); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_long_double_tag_implementation_defined_size): \
-        return op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<long double>>>(first_obj, second_obj); \
+        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<long double>>>(first_obj, second_obj); \
     case produce_jump_index(only_tag_for_first_paremeter, Type_tag::nested_type_with_dynamic_container): \ 
-        return all_action_on_ops_for_simple_ops_on_void_pointers_collections<op, op_action_type, only_arg_type_for_first_paremeter, Nested_type_info>(first_obj, second_obj);
+        return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects<op, op_action_type, only_arg_type_for_first_paremeter, Nested_type_info>(first_obj, second_obj);
 
 
 
@@ -901,7 +897,8 @@ namespace printing_tools {
 
            
             };
-            struct Extented_types:public Polymoprhic_extensible_engine{
+            };
+            struct Extented_types:public polymorphic_extensible_engine::Polymoprhic_extensible_engine{
 
             Extented_types(const Extented_type_info& info, const std::string& string_to_read_from, 
                 std::string:size_type* pos )
@@ -910,7 +907,7 @@ namespace printing_tools {
             }
            
             };
-            struct Hetrogenous_array_type:public Polymoprhic_extensible_engine{
+            struct Hetrogenous_array_type:public polymorphic_extensible_engine::Polymoprhic_extensible_engine{
 
             Hetrogenous_array_type(Type_tag info, const std::string& string_to_read_from, 
                 std::string:size_type* pos )
