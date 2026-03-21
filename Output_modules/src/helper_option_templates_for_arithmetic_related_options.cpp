@@ -297,6 +297,7 @@ namespace printing_tools {
             };
             template<typename T>
             struct No_tag_template_type_info{
+            using underlying_container= t;
             thread_policy execution_policy;
             T ptr;
             //Nested_type_info resolves to  No_tag_template_type_info
@@ -310,27 +311,50 @@ namespace printing_tools {
                     {Lhs_t.ptr}->std::same_as<void>;
                     {Lhs_t.tag}->std::same_as<Type_tag>;
                 };
-                    template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
+                template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
                     inline typename std::conditional<op_action_type == true, void, bool>
-                    all_action_on_ops_for_simple_ops_on_void_pointers(void* lhs, void* rhs) {
-                        //this specialization is at the top in the chain of arethimetic
-                        auto* l = static_cast<Lhs_t*>(lhs);
-                        auto* r = static_cast<Rhs_t*>(rhs);
+                    all_action_on_ops_for_simple_ops_on_void_pointers(Lhs_t* lhs,const Rhs_t& rhs) {
+
                         if constexpr (op_action_type == true) {
-                            Op{}(l, r);
+                            Op{}(*lhs, rhs);
                         }
                         else {
-                            return Op{}(l, r);;
+                            return Op{}(*Lhs_t, rhs);;
+                        }
+                    }
+                template<typename Op, bool op_action_type, typename Lhs_t,Polymorphic_object Rhs_t>
+                    inline typename std::conditional<op_action_type == true, void, bool>
+                    all_action_on_ops_for_simple_ops_on_void_pointers(Lhs_t* lhs,const Rhs_t& rhs) {
+
+                        //to do
+                    }
+                    template<typename Op, bool op_action_type, Polymorphic_object Lhs_t,typename Rhs_t>
+                    inline typename std::conditional<op_action_type == true, void, bool>
+                    all_action_on_ops_for_simple_ops_on_void_pointers(Lhs_t* lhs,const Rhs_t& rhs) {
+
+                        //to do
+
+                    }
+    
+                };
+                 template<typename Op, bool op_action_type, Polymorphic_object Lhs_t,Polymorphic_object Rhs_t>
+                    inline typename std::conditional<op_action_type == true, void, bool>
+                    all_action_on_ops_for_simple_ops_on_void_pointers(Lhs_t* lhs, const Rhs_t rhs) {
+
+                        if constexpr (op_action_type == true) {
+                            lhs.void_op_generator<Op, op_action_type>(rhs)
+                        }
+                        else {
+                            return lhs.void_op_generator<Op, op_action_type>(rhs)
                         }
                     }
     
                 };
-
                      
                 template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
                 inline typename std::conditional<op_action_type == true, void, bool>  
                     op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
-                        all_action_on_ops_for_simple_ops_on_void_pointers<Op, op_action_type, Lhs_t, Rhs_t>(lhs, rhs);
+                        return all_action_on_ops_for_simple_ops_on_void_pointers<Op, op_action_type, Lhs_t, Rhs_t>(lhs, rhs);
                 }
     
     
@@ -338,8 +362,7 @@ namespace printing_tools {
                 template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
                 requires{//the concept is weather the expression below works or not
                 typename std::common_type_t
-                <std::iterator_traits<Lhs_t::iterator>::iterator_category, std::input_iterator_tag>;
-                    //note this only handles if left hand side was a vector of strings or arethimetic types
+                <std::iterator_traits<Lhs_t::underlying_container::iterator>::iterator_category, std::input_iterator_tag>;
                 }
                 inline typename std::conditional<op_action_type == true, void, bool>  
                     op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
@@ -408,8 +431,7 @@ namespace printing_tools {
                 template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
                 requires{//the concept is weather the expression below works or not
                 typename std::common_type_t
-                <std::iterator_traits<Rhs_t::iterator>::iterator_category, std::input_iterator_tag>;
-                //note this handles containers of any type and Polymoprhic_extensible_engine objects.
+                <std::iterator_traits<Rhs_t::underlying_container::iterator>::iterator_category, std::input_iterator_tag>;
                 }
                     inline typename std::conditional<op_action_type == true, void, bool>  
                         op_potential_scalar_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
@@ -497,39 +519,40 @@ namespace printing_tools {
                  //In the implementations(functions not directly called by the macros), only the types speak.
             #define FLAAAT_JuMPEnTeRYGeNAraT0r(op, \
                             op_action_type,
-                            only_tag_for_first_paremeter\
+                            second_arg_tag,\
+                            only_arg_type_for_first_paremeter,\
                             first_obj,\
                             second_obj,\
                              ) \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::string_tag_for_15_plus_operand_ops): \
+    case produce_jump_index(second_arg.tag, Type_tag::string_tag_for_15_plus_operand_ops): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, std::string>(first_obj, second_obj); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::uintptr_tag_for_15_plus_operand_ops): \
+    case produce_jump_index(second_arg.tag, Type_tag::uintptr_tag_for_15_plus_operand_ops): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, uintptr_t>(first_obj, second_obj); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::intptr_tag_for_15_plus_operand_ops): \
+    case produce_jump_index(second_arg.tag, Type_tag::intptr_tag_for_15_plus_operand_ops): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, intptr_t>(first_obj, second_obj); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops): \
+    case produce_jump_index(second_arg.tag, Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, long double>(first_obj, second_obj); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::eight_byte_double_tag_for_15_plus_operand_ops): \
+    case produce_jump_index(second_arg.tag, Type_tag::eight_byte_double_tag_for_15_plus_operand_ops): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, double>(first_obj, second_obj); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::eight_byte_double_tag): \
+    case produce_jump_index(second_arg.tag, Type_tag::eight_byte_double_tag): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, double>(first_obj, second_obj); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::uintptr_tag): \
+    case produce_jump_index(second_arg.tag, Type_tag::uintptr_tag): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, uintptr_t>(first_obj, second_obj); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::string_tag): \
+    case produce_jump_index(second_arg.tag, Type_tag::string_tag): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, std::string>(first_obj, second_obj); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::intptr_tag): \
+    case produce_jump_index(second_arg.tag, Type_tag::intptr_tag): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, intptr_t>(first_obj, second_obj); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_string): \
+    case produce_jump_index(second_arg.tag, Type_tag::vector_string): \
         return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<std::string>>>(first_obj, second_obj); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_uintptr): \
+    case produce_jump_index(second_arg.tag, Type_tag::vector_uintptr): \
         return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<uintptr_t>>>(first_obj, second_obj); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_intptr): \
+    case produce_jump_index(second_arg.tag, Type_tag::vector_intptr): \
         return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<intptr_t>>>(first_obj, second_obj); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_double): \
+    case produce_jump_index(second_arg.tag, Type_tag::vector_double): \
         return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<double>>>(first_obj, second_obj); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::vector_long_double_tag_implementation_defined_size): \
+    case produce_jump_index(second_arg.tag, Type_tag::vector_long_double_tag_implementation_defined_size): \
         return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<long double>>>(first_obj, second_obj); \
-    case produce_jump_index(only_tag_for_first_paremeter, Type_tag::nested_type_with_dynamic_container): \ 
+    case produce_jump_index(second_arg.tag, Type_tag::nested_type_with_dynamic_container): \ 
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects<op, op_action_type, only_arg_type_for_first_paremeter, Nested_type_info>(first_obj, second_obj);
 
 
@@ -755,7 +778,7 @@ namespace printing_tools {
                     }
                   template<typename Op, ternary_state op_action_type>
                 inline typename std::conditional<op_action_type == true, void, bool>
-                    void_op_generator(void* second_arg_ptr){
+                    op_generator(void* second_arg_ptr){
                         
                     }
             ~Polymoprhic_extensible_engine(){
