@@ -309,9 +309,9 @@ namespace printing_tools {
                 template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
                     inline typename std::conditional<op_action_type == true, void, bool>
                     all_action_on_ops_for_simple_ops_on_void_pointers(Lhs_t* lhs,const Rhs_t& rhs) {
-
+                        //Everything will naturally use this!
                         if constexpr (op_action_type == true) {
-                            Op{}(*lhs, rhs);
+                            *lhs = Op{}(*lhs, rhs); 
                         }
                         else {
                             return Op{}(*Lhs_t, rhs);;
@@ -543,7 +543,35 @@ namespace printing_tools {
         return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<long double>>>(first_obj, second_obj); \
     case produce_jump_index(tag_for_switching, Type_tag::nested_type_with_dynamic_container): \ 
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects<op, op_action_type, only_arg_type_for_first_paremeter, Nested_type_info>(first_obj, second_obj);
-            
+   //this macro may use the implementation functions that are used by the interface of the macro "FLAAAT_JuMPEnTeRYGeNAraT0r".
+    #define sWItChiNG_For_Hybrid_C0mPutAti0N_F0r_FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_Sec0nd_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe(op, \
+                            op_action_type,
+                            only_arg_type_for_first_paremeter,\
+                            first_non_polymorphic_obj,\
+                            second_obj,\
+                            )\
+            switch(second_obj->tag){\
+                \
+            }\
+    #define FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_Sec0nd_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe(op, \
+                            op_action_type,
+                            only_arg_type_for_first_paremeter,\
+                            first_non_polymorphic_obj,
+                            second_obj,
+                            ) \
+            if(std::is_same<second_non_polymorphic_obj, uintptr_t>){\
+            \
+            \}
+   //this macro may use the implementation functions that are used by the interface of the macro "FLAAAT_JuMPEnTeRYGeNAraT0r".
+       #define sWItChiNG_For_Hybrid_C0mPutAti0N_F0r_FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_First_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe(op, \
+                            op_action_type,
+                            only_arg_type_for_first_paremeter,\
+                            first_obj,\
+                            second_non_polymorphic_obj,\
+                            )\
+            switch(second_obj->tag){\
+                \
+            }\                             
     #define FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_First_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe(op, \
                             op_action_type,
                             second_arg_tag,\
@@ -551,8 +579,9 @@ namespace printing_tools {
                             first_obj,\
                             second_non_polymorphic_obj,\
                              ) \
-            if(std::is_same)
-
+            if(std::is_same<second_non_polymorphic_obj, uintptr_t>){\
+            \
+            \}
         
 
 
