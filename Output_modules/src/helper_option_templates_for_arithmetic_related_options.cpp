@@ -506,6 +506,7 @@ namespace printing_tools {
                  //In the implementations(functions not directly called by the macros), only the types speak.
 
 
+
         #define FLAAAT_JuMPEnTeRYGeNAraT0r(op, \
         op_action_type,\
         only_arg_type_for_first_paremeter,\
@@ -540,80 +541,75 @@ namespace printing_tools {
     case produce_jump_index(tag_for_switching, Type_tag::nested_type_with_dynamic_container): \ 
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects<op, op_action_type, only_arg_type_for_first_paremeter, Nested_type_info>(first_obj, second_obj);
 
-    #define sWItChiNG_For_RunTime__BRAnChIng_F0r_FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_Sec0nd_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe
-        (op,\
-        op_action_type,\
-        only_arg_type_for_first_paremeter,\
-        first_non_polymorphic_obj,\
-        second_obj,\
-        )\
-        switch(second_obj->tag){\
-            case Type_tag::string_tag_for_15_plus_operand_ops: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,std::string>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::uintptr_tag_for_15_plus_operand_ops: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,uintptr_t>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::intptr_tag_for_15_plus_operand_ops: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,intptr_t>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,long double>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::long_double_tag_implementation_defined_size: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,long double>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::uintptr_tag: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,uintptr_t>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::string_tag: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,std::string>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::intptr_tag: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,intptr_t>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::vector_string: \
-                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<std::string>>>(first_obj, second_obj); \
-            case Type_tag::vector_uintptr: \
-                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<uintptr_t>>>(first_obj, second_obj); \
-            case Type_tag::vector_intptr: \
-                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<intptr_t>>>(first_obj, second_obj); \
-            case Type_tag::vector_double: \
-                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<double>>>(first_obj, second_obj); \
-            case Type_tag::vector_long_double_tag_implementation_defined_size: \
-                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<long double>>>(first_obj, second_obj); \
-            case Type_tag::nested_type_with_dynamic_container: \ 
-                return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects<op, op_action_type, only_arg_type_for_first_paremeter, Nested_type_info>(first_obj, second_obj);\
-        }\
-       #define sWItChiNG_For_RunTime__BRAnChIng_F0r_FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_First_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe
-        (op,\
-        op_action_type,\
-        only_arg_type_for_second_paremeter,\
-        first_obj,\
-        second_non_polymorphic_obj,\
-        )\
-        switch(second_obj->tag){\
-            case Type_tag::string_tag_for_15_plus_operand_ops: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,std::string, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::uintptr_tag_for_15_plus_operand_ops: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,uintptr_t, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::intptr_tag_for_15_plus_operand_ops: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,intptr_t, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,long double, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::long_double_tag_implementation_defined_size: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,long double, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::uintptr_tag: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,uintptr_t, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::string_tag: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,std::string, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::intptr_tag: \
-                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,intptr_t, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); \
-            case Type_tag::vector_string: \
-                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, No_tag_nested_type_info<std::vector<std::string>, only_arg_type_for_second_paremeter>>(first_obj, second_obj); \
-            case Type_tag::vector_uintptr: \
-                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, No_tag_nested_type_info<std::vector<uintptr_t>>,  only_arg_type_for_second_paremeter>(first_obj, second_obj); \
-            case Type_tag::vector_intptr: \
-                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, No_tag_nested_type_info<std::vector<intptr_t>>,   only_arg_type_for_second_paremeter>(first_obj, second_obj); \
-            case Type_tag::vector_double: \
-                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, No_tag_nested_type_info<std::vector<double>>,     only_arg_type_for_second_paremeter>(first_obj, second_obj); \
-            case Type_tag::vector_long_double_tag_implementation_defined_size: \
-                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, No_tag_nested_type_info<std::vector<long double>>,only_arg_type_for_second_paremeter>(first_obj, second_obj); \
-            case Type_tag::nested_type_with_dynamic_container: \ 
-                return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects<op, op_action_type, Nested_type_info, only_arg_type_for_second_paremeter>(first_obj, second_obj);\
-        }\                       
+        template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t, Type_tag tag_for_switching>
+        inline typename std::conditional<op_action_type == true, void, bool> 
+        runtime_branching_using_only_second_arg(first_non_polymorphic_obj, second_obj){
+        switch(second_obj->tag){
+            case Type_tag::string_tag_for_15_plus_operand_ops: 
+                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,std::string>(first_non_polymorphic_obj, second_obj); 
+            case Type_tag::uintptr_tag_for_15_plus_operand_ops: 
+                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,uintptr_t>(first_non_polymorphic_obj, second_obj); 
+            case Type_tag::intptr_tag_for_15_plus_operand_ops: 
+                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,intptr_t>(first_non_polymorphic_obj, second_obj); 
+            case Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops: 
+                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,long double>(first_non_polymorphic_obj, second_obj); 
+            case Type_tag::long_double_tag_implementation_defined_size: 
+                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,long double>(first_non_polymorphic_obj, second_obj); 
+            case Type_tag::uintptr_tag: 
+                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,uintptr_t>(first_non_polymorphic_obj, second_obj); 
+            case Type_tag::string_tag: 
+                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,std::string>(first_non_polymorphic_obj, second_obj); 
+            case Type_tag::intptr_tag: 
+                return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,intptr_t>(first_non_polymorphic_obj, second_obj); 
+            case Type_tag::vector_string: 
+                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<std::string>>>(first_obj, second_obj); 
+            case Type_tag::vector_uintptr: 
+                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<uintptr_t>>>(first_obj, second_obj); 
+            case Type_tag::vector_intptr: 
+                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<intptr_t>>>(first_obj, second_obj); 
+            case Type_tag::vector_double: 
+                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<double>>>(first_obj, second_obj); 
+            case Type_tag::vector_long_double_tag_implementation_defined_size: 
+                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<long double>>>(first_obj, second_obj); 
+            case Type_tag::nested_type_with_dynamic_container: 
+                return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects<op, op_action_type, only_arg_type_for_first_paremeter, Nested_type_info>(first_obj, second_obj);
+        }
+        }
+        
+        template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t, Type_tag tag_for_switching>
+        inline typename std::conditional<op_action_type == true, void, bool> 
+        runtime_branching_using_only_first_arg(first_non_polymorphic_obj, second_obj){
+            switch(second_obj->tag){
+                case Type_tag::string_tag_for_15_plus_operand_ops: 
+                    return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,std::string, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); 
+                case Type_tag::uintptr_tag_for_15_plus_operand_ops: 
+                    return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,uintptr_t, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); 
+                case Type_tag::intptr_tag_for_15_plus_operand_ops: 
+                    return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,intptr_t, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); 
+                case Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops: 
+                    return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,long double, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); 
+                case Type_tag::long_double_tag_implementation_defined_size: 
+                    return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,long double, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); 
+                case Type_tag::uintptr_tag: 
+                    return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,uintptr_t, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); 
+                case Type_tag::string_tag: 
+                    return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,std::string, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); 
+                case Type_tag::intptr_tag: 
+                    return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,intptr_t, only_arg_type_for_second_paremeter>(first_non_polymorphic_obj, second_obj); 
+                case Type_tag::vector_string: 
+                    return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, No_tag_nested_type_info<std::vector<std::string>, only_arg_type_for_second_paremeter>>(first_obj, second_obj); 
+                case Type_tag::vector_uintptr: 
+                    return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, No_tag_nested_type_info<std::vector<uintptr_t>>,  only_arg_type_for_second_paremeter>(first_obj, second_obj); 
+                case Type_tag::vector_intptr: 
+                    return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, No_tag_nested_type_info<std::vector<intptr_t>>,   only_arg_type_for_second_paremeter>(first_obj, second_obj); 
+                case Type_tag::vector_double: 
+                    return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, No_tag_nested_type_info<std::vector<double>>,     only_arg_type_for_second_paremeter>(first_obj, second_obj); 
+                case Type_tag::vector_long_double_tag_implementation_defined_size:
+                    return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, No_tag_nested_type_info<std::vector<long double>>,only_arg_type_for_second_paremeter>(first_obj, second_obj); 
+                case Type_tag::nested_type_with_dynamic_container: 
+                    return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects<op, op_action_type, Nested_type_info, only_arg_type_for_second_paremeter>(first_obj, second_obj);
+            }
+        }
 
         
 
@@ -923,40 +919,32 @@ namespace printing_tools {
                 inline typename std::conditional<op_action_type == true, void, bool>
                     op_generator(Lhs_t& first_arg,const Polymoprhic_extensible_engine second_arg){
                         constexpr if(std::is_same_v(Lhs_t, uintptr_t)){
-                        sWItChiNG_For_RunTime__BRAnChIng_F0r_FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_Sec0nd_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe
-                        (Op, op_action_type, uintptr_t, first_arg,second_arg)
+                        runtime_branching_using_only_second_arg<Op, op_action_type, uintptr_t>(first_arg,second_arg);
                         }                        
                         else if(std::is_same_v(Lhs_t, intptr_t)){
-                        sWItChiNG_For_RunTime__BRAnChIng_F0r_FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_Sec0nd_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe
-                        (Op, op_action_type, intptr_t, first_arg,second_arg)
+                        runtime_branching_using_only_second_arg<Op, op_action_type, intptr_t>(first_arg,second_arg);
                         }
                         else if(std::is_same_v(Lhs_t, long double)){
-                        sWItChiNG_For_RunTime__BRAnChIng_F0r_FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_Sec0nd_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe
-                        (Op, op_action_type, long double, first_arg,second_arg)
+                        runtime_branching_using_only_second_arg<Op, op_action_type, long double>(first_arg,second_arg);
                         }
                         else if(std::is_same_v(Lhs_t, std::string)){
-                        sWItChiNG_For_RunTime__BRAnChIng_F0r_FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_Sec0nd_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe
-                        (Op, op_action_type, std::string, first_arg,second_arg)
+                        runtime_branching_using_only_second_arg<Op, op_action_type, std::string>(first_arg,second_arg);
                         }
                     }
                   template<typename Op, ternary_state op_action_type, absolute_base::Is_String_Or_Numeric Rhs_t>
                   inline typename std::conditional<op_action_type == true, void, bool>
                     op_generator(const Polymoprhic_extensible_engine first_arg,const Rhs_t& second_arg){
-                        constexpr if(std::is_same_v(Rhs_t, uintptr_t)){
-                        sWItChiNG_For_RunTime__BRAnChIng_F0r_FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_First_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe
-                        (Op, op_action_type, uintptr_t, first_arg,second_arg)
+                        constexpr if(std::is_same_v(Lhs_t, uintptr_t)){
+                        runtime_branching_using_only_first_arg<Op, op_action_type, uintptr_t>(first_arg,second_arg);
                         }                        
                         else if(std::is_same_v(Rhs_t, intptr_t)){
-                        sWItChiNG_For_RunTime__BRAnChIng_F0r_FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_First_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe
-                        (Op, op_action_type, intptr_t, first_arg,second_arg)
+                        runtime_branching_using_only_first_arg<Op, op_action_type, intptr_t>(first_arg,second_arg);
                         }
                         else if(std::is_same_v(Rhs_t, long double)){
-                        sWItChiNG_For_RunTime__BRAnChIng_F0r_FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_First_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe
-                        (Op, op_action_type, long double, first_arg,second_arg)
+                        runtime_branching_using_only_first_arg<Op, op_action_type, long double>(first_arg,second_arg);
                         }
                         else if(std::is_same_v(Rhs_t, std::string)){
-                        sWItChiNG_For_RunTime__BRAnChIng_F0r_FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_First_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe
-                        (Op, op_action_type, std::string, first_arg,second_arg)
+                        runtime_branching_using_only_first_arg<Op, op_action_type, std::string>(first_arg,second_arg);
                         }
                     }
                 template<typename Op, ternary_state op_action_type>
