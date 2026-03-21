@@ -167,9 +167,8 @@ namespace printing_tools {
                     uintptr_tag_for_15_plus_operand_ops         = 1,
                     intptr_tag_for_15_plus_operand_ops          = 2,
                     long_double_tag_implementation_defined_size_for_15_plus_operand_ops  = 3,
-                    eight_byte_double_tag_for_15_plus_operand_ops =4,
                     /* --- Scalar Primitive Types --- */
-                    eight_byte_double_tag,
+                    long_double_tag_implementation_defined_size,
                     uintptr_tag,
                     string_tag,
                     intptr_tag,
@@ -178,10 +177,10 @@ namespace printing_tools {
                     vector_string,
                     vector_uintptr,
                     vector_intptr,
-                    vector_double,
                     vector_long_double_tag_implementation_defined_size,
                     nested_type_with_dynamic_container,
-                    
+                    predict,
+                    user_defined_binary_code_ops,
                     /* --- System & Concurrency Handles --- */
                     object_info,
                     atomic_nested_owning_type,
@@ -195,14 +194,12 @@ namespace printing_tools {
                     reference_to_vecotr_of_nested_for_gpu_ops,
                     encryption,
                     decryption,
-                    predict,
                     linked,
                     
                     /* --- Interface, Events & Extensibility --- */
                     gui,
                     capture_event,
                     confirm_event,
-                    user_defined_binary_code_ops,
                     other
                 
                     // not all of them would be implemented right now, like it would be a step by step process, 
@@ -215,9 +212,8 @@ namespace printing_tools {
                     uintptr_tag_for_15_plus_operand_ops         = 1,
                     intptr_tag_for_15_plus_operand_ops          = 2,
                     long_double_tag_implementation_defined_size_for_15_plus_operand_ops  = 3,
-                    eight_byte_double_tag_for_15_plus_operand_ops =4,
                     /* --- Scalar Primitive Types --- */
-                    eight_byte_double_tag,
+                    long_double_tag_implementation_defined_size,
                     uintptr_tag,
                     string_tag,
                     intptr_tag,
@@ -226,10 +222,11 @@ namespace printing_tools {
                     vector_string,
                     vector_uintptr,
                     vector_intptr,
-                    vector_double,
                     vector_long_double_tag_implementation_defined_size,
                     nested_type_with_dynamic_container,
-                    
+                    predict,
+                    user_defined_binary_code_ops,
+
                     /* --- System & Concurrency Handles --- */
                     object_info,
                     atomic_nested_owning_type,
@@ -243,14 +240,12 @@ namespace printing_tools {
                     reference_to_vecotr_of_nested_for_gpu_ops,
                     encryption,
                     decryption,
-                    predict,
                     linked,
                     
                     /* --- Interface, Events & Extensibility --- */
                     gui,
                     capture_event,
                     confirm_event,
-                    user_defined_binary_code_ops,
                     other,
                     
                     /* --- Container Nesting (Gateway Tags) --- */
@@ -519,43 +514,44 @@ namespace printing_tools {
                  //In the implementations(functions not directly called by the macros), only the types speak.
             #define FLAAAT_JuMPEnTeRYGeNAraT0r(op, \
                             op_action_type,
-                            second_arg_tag,\
                             only_arg_type_for_first_paremeter,\
                             first_obj,\
                             second_obj,\
+                            tag_for_switching\
                              ) \
-    case produce_jump_index(second_arg.tag, Type_tag::string_tag_for_15_plus_operand_ops): \
+    case produce_jump_index(tag_for_switching, Type_tag::string_tag_for_15_plus_operand_ops): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, std::string>(first_obj, second_obj); \
-    case produce_jump_index(second_arg.tag, Type_tag::uintptr_tag_for_15_plus_operand_ops): \
+    case produce_jump_index(tag_for_switching, Type_tag::uintptr_tag_for_15_plus_operand_ops): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, uintptr_t>(first_obj, second_obj); \
-    case produce_jump_index(second_arg.tag, Type_tag::intptr_tag_for_15_plus_operand_ops): \
+    case produce_jump_index(tag_for_switching, Type_tag::intptr_tag_for_15_plus_operand_ops): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, intptr_t>(first_obj, second_obj); \
-    case produce_jump_index(second_arg.tag, Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops): \
+    case produce_jump_index(tag_for_switching, Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, long double>(first_obj, second_obj); \
-    case produce_jump_index(second_arg.tag, Type_tag::eight_byte_double_tag_for_15_plus_operand_ops): \
-        return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, double>(first_obj, second_obj); \
-    case produce_jump_index(second_arg.tag, Type_tag::eight_byte_double_tag): \
-        return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, double>(first_obj, second_obj); \
-    case produce_jump_index(second_arg.tag, Type_tag::uintptr_tag): \
+    case produce_jump_index(tag_for_switching, Type_tag::uintptr_tag): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, uintptr_t>(first_obj, second_obj); \
-    case produce_jump_index(second_arg.tag, Type_tag::string_tag): \
+    case produce_jump_index(tag_for_switching, Type_tag::string_tag): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, std::string>(first_obj, second_obj); \
-    case produce_jump_index(second_arg.tag, Type_tag::intptr_tag): \
+    case produce_jump_index(tag_for_switching, Type_tag::intptr_tag): \
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, intptr_t>(first_obj, second_obj); \
-    case produce_jump_index(second_arg.tag, Type_tag::vector_string): \
+    case produce_jump_index(tag_for_switching, Type_tag::vector_string): \
         return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<std::string>>>(first_obj, second_obj); \
-    case produce_jump_index(second_arg.tag, Type_tag::vector_uintptr): \
+    case produce_jump_index(tag_for_switching, Type_tag::vector_uintptr): \
         return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<uintptr_t>>>(first_obj, second_obj); \
-    case produce_jump_index(second_arg.tag, Type_tag::vector_intptr): \
+    case produce_jump_index(tag_for_switching, Type_tag::vector_intptr): \
         return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<intptr_t>>>(first_obj, second_obj); \
-    case produce_jump_index(second_arg.tag, Type_tag::vector_double): \
-        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<double>>>(first_obj, second_obj); \
-    case produce_jump_index(second_arg.tag, Type_tag::vector_long_double_tag_implementation_defined_size): \
+    case produce_jump_index(tag_for_switching, Type_tag::vector_long_double_tag_implementation_defined_size): \
         return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::op_potential_scalar_with_collection<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<long double>>>(first_obj, second_obj); \
-    case produce_jump_index(second_arg.tag, Type_tag::nested_type_with_dynamic_container): \ 
+    case produce_jump_index(tag_for_switching, Type_tag::nested_type_with_dynamic_container): \ 
         return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects<op, op_action_type, only_arg_type_for_first_paremeter, Nested_type_info>(first_obj, second_obj);
-
-
+            
+    #define FLAAAT_JuMPEnTeRYGeNAraT0r_f0r_0nlY_First_Type_AS_P0lYm0PrHic_EXtEnsIbLe_EnGiNe(op, \
+                            op_action_type,
+                            second_arg_tag,\
+                            only_arg_type_for_first_paremeter,\
+                            first_obj,\
+                            second_non_polymorphic_obj,\
+                             ) \
+            if(std::is_same)
 
         
 
@@ -608,20 +604,12 @@ namespace printing_tools {
                         tag = Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops;
                         break;
                     }
-                    case Type_tag::eight_byte_double_tag_for_15_plus_operand_ops: {
-                        using Source_and_target_type = double;
-                        auto& source_formatted = *(static_cast<Source_and_target_type*>(source.ptr));
-                        ptr = static_cast<void*>(new Source_and_target_type{source_formatted});
-                        tag = Type_tag::eight_byte_double_tag_for_15_plus_operand_ops;
-                        break;
-                    }
-                
                     /* --- Scalar Primitive Types --- */
-                    case Type_tag::eight_byte_double_tag: {
+                    case Type_tag::long_double_tag_implementation_defined_size: {
                         using Source_and_target_type = double;
                         auto& source_formatted = *(static_cast<Source_and_target_type*>(source.ptr));
                         ptr = static_cast<void*>(new Source_and_target_type{source_formatted});
-                        tag = Type_tag::eight_byte_double_tag;
+                        tag = Type_tag::long_double_tag_implementation_defined_size;
                         break;
                     }
                     case Type_tag::uintptr_tag: {
@@ -666,13 +654,6 @@ namespace printing_tools {
                         auto& source_formatted = *(static_cast<Source_and_target_type*>(source.ptr));
                         ptr = static_cast<void*>(new Source_and_target_type{source_formatted});
                         tag = Type_tag::vector_intptr;
-                        break;
-                    }
-                    case Type_tag::vector_double: {
-                        using Source_and_target_type = No_tag_template_type_info<std::vector<double>>;
-                        auto& source_formatted = *(static_cast<Source_and_target_type*>(source.ptr));
-                        ptr = static_cast<void*>(new Source_and_target_type{source_formatted});
-                        tag = Type_tag::vector_double;
                         break;
                     }
                     case Type_tag::vector_long_double_tag_implementation_defined_size: {
@@ -743,33 +724,36 @@ namespace printing_tools {
 
                 }
 
+                    
                 template<typename Op, ternary_state op_action_type>
                 inline typename std::conditional<op_action_type == true, void, bool>
                     void_op_generator(Polymoprhic_extensible_engine second_arg){
                     switch(produce_jump_index(tag, second_arg.tag)){
-                        /* --- Full Outer Dispatch Table Dispatch for first ARG(also known as Lhs) (using macros); the code generated would be a flat map. The macro takes care of the second arg(also known as Rhs)--- */
+                        /* --- Full Outer Dispatch Table Dispatch for first ARG(also known as Lhs) (using macros); the code generated would be a flat map. The macro takes care of the tags or both args--- */
                     
                         // [beginning(0 index) - 05): High-Operand Specialized
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, *this, second_arg)
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, *this, second_arg)
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, intptr_t, *this, second_arg)
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, long_double, *this, second_arg)
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, Fixed_size_floats, *this, second_arg)
+                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, *this, second_arg, Type_tag::string_tag_for_15_plus_operand_ops)
+                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, *this, second_arg, Type_tag::uintptr_tag_for_15_plus_operand_ops)
+                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, intptr_t, *this, second_arg, Type_tag::intptr_tag_for_15_plus_operand_ops)
+                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, long double, *this, second_arg,Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops)
                         
                         // [05 - 11): Scalar Primitives
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, long_double, *this, second_arg)
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, Fixed_size_floats, *this, second_arg)
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, *this, second_arg)
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, *this, second_arg)
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, intptr_t, *this, second_arg)
+                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, long double, *this, second_arg,Type_tag::long_double_tag_implementation_defined_size)
+                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, uintptr_t, *this, second_arg,Type_tag::uintptr_tag)
+                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, std::string, *this, second_arg,Type_tag::string_tag)
+                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, intptr_t, *this, second_arg,Type_tag::intptr_tag)
                         
                         // [11 - 12): Containers
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, No_tag_template_type_info<std::vector<std::string>>, *this, second_arg)
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, No_tag_template_type_info<std::vector<uintptr_t>>, *this, second_arg)
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, No_tag_template_type_info<std::vector<intptr_t>>, *this, second_arg)
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, No_tag_template_type_info<std::vector<double>>, *this, second_arg)
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, No_tag_template_type_info<std::vector<long double>>, *this, second_arg)
-                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, Nested_type_info, *this, second_arg)
+                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, 
+                        No_tag_template_type_info<std::vector<std::string>>, *this, second_arg,Type_tag::vector_string)
+                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, 
+                        No_tag_template_type_info<std::vector<uintptr_t>>, *this, second_arg,Type_tag::vector_uintptr)
+                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, 
+                        No_tag_template_type_info<std::vector<intptr_t>>, *this, second_arg,Type_tag::vector_intptr)
+                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, 
+                        No_tag_template_type_info<std::vector<long double>>, *this, second_arg,Type_tag::vector_long_double_tag_implementation_defined_size)
+                        FLAAAT_JuMPEnTeRYGeNAraT0r(op, op_action_type, 
+                        Nested_type_info, *this, second_arg,Type_tag::nested_type_with_dynamic_container)
                         
                         default:
                             throw std::string{"Unimplemented type"};
@@ -783,7 +767,7 @@ namespace printing_tools {
                     }
             ~Polymoprhic_extensible_engine(){
                 switch(tag) {
-                    /* --- [ 00 - 01 ] High-Operand Specialized Tags (DESTRUCTIVE) --- */
+                    /* --- [ 00 - 05 ) High-Operand Specialized Tags (DESTRUCTIVE) --- */
                     case Type_tag::string_tag_for_15_plus_operand_ops: {
                         using Source_and_target_type = std::string;
                         delete (static_cast<Source_and_target_type*>(ptr));
@@ -804,18 +788,8 @@ namespace printing_tools {
                         delete (static_cast<Source_and_target_type*>(ptr));
                         break;
                     }
-                    case Type_tag::eight_byte_double_tag_for_15_plus_operand_ops: {
-                        using Source_and_target_type = double;
-                        delete (static_cast<Source_and_target_type*>(ptr));
-                        break;
-                    }
 
-                    /* --- [ 02 - 06 ] Scalar Primitive Types (DESTRUCTIVE) --- */
-                    case Type_tag::eight_byte_double_tag: {
-                        using Source_and_target_type = double;
-                        delete (static_cast<Source_and_target_type*>(ptr));
-                        break;
-                    }
+                    /* --- [ 05 - 08 ) Scalar Primitive Types (DESTRUCTIVE) --- */
                     case Type_tag::uintptr_tag: {
                         using Source_and_target_type = uintptr_t;
                         delete (static_cast<Source_and_target_type*>(ptr));
@@ -832,7 +806,7 @@ namespace printing_tools {
                         break;
                     }
 
-                    /* --- [ 07 - 12 ] Contiguous & Dynamic Containers (DESTRUCTIVE) --- */
+                    /* --- [ 08 - 12 ) Contiguous & Dynamic Containers (DESTRUCTIVE) --- */
                     case Type_tag::vector_string: {
                         using Source_and_target_type = No_tag_template_type_info<std::vector<std::string>>;
                         delete (static_cast<Source_and_target_type*>(ptr));
@@ -845,11 +819,6 @@ namespace printing_tools {
                     }
                     case Type_tag::vector_intptr: {
                         using Source_and_target_type = No_tag_template_type_info<std::vector<intptr_t>>;
-                        delete (static_cast<Source_and_target_type*>(ptr));
-                        break;
-                    }
-                    case Type_tag::vector_double: {
-                        using Source_and_target_type = No_tag_template_type_info<std::vector<double>>;
                         delete (static_cast<Source_and_target_type*>(ptr));
                         break;
                     }
