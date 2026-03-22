@@ -161,7 +161,7 @@ namespace printing_tools {
                 }
             }
 
-                enum class Type_tag : unsigned char {
+                enum class Type_tag : uint8_t {
                     /* --- High-Operand Specialized Tags --- */
                     string_tag_for_15_plus_operand_ops          = 0,
                     uintptr_tag_for_15_plus_operand_ops         = 1,
@@ -206,7 +206,7 @@ namespace printing_tools {
                     // but all of them will have a respective entry until they are implemented
                 };
                       
-                enum class Type_tag_for_input : unsigned char {
+                enum class Type_tag_for_input : uint8_t {
                     /* --- High-Operand Specialized Tags --- */
                     string_tag_for_15_plus_operand_ops          = 0,
                     uintptr_tag_for_15_plus_operand_ops         = 1,
@@ -254,34 +254,36 @@ namespace printing_tools {
                     array_nested_type_list,
                     array_nested_type_forward_list,
                     array_nested_type_redis_map,
-                    heterogeneous_array,
-                    type_in_vector_tag,
-                    type_in_deque_tag,
-                    type_in_map_tag,
-                    type_in_multi_map_tag,
-                    type_in_hash_map_tag,
-                    type_in_multi_hash_map_tag,
-                    type_in_list,
-                    type_in_forward_list
             };
-            constexpr inline unsigned char produce_jump_index(Type_tag type_x, Type_tag type_y){
-                return (static_cast<unsigned char>(type)>>4)+type_y;
+            constexpr inline uint8_t produce_jump_index(Type_tag type_x, Type_tag type_y){
+                return (static_cast<uint8_t>(type)>>4)+type_y;
             }
+           enum class Type_storage_facility: uint8_t{
+                type_in_array_tag=0,
+                type_in_vector_tag=1,
+                type_in_deque_tag=2,
+                type_in_map_tag=3,
+                type_in_hash_map_tag,
+                type_in_list,
+                type_in_forward_list,
+                newly_defined_temp_type,
+                newly_defined_type,
+                just_trying_to_define_a_new_type_without_making_any_objects
+            };
             sturct Extented_type_info{
-                Type_tag tag;
+                Type_storage_facility tag;
                 uintptr_t index;
-            }
+            };
             
             std::vector<std::vector<Extented_type_info>> vector_containing_types;
             std::deque<std::vector<Extented_type_info>> deque_containing_types;
             std::list<std::vector<Extented_type_info>> list_containing_types;
             std::forward_list<std::vector<Extented_type_info>> forward_list_containing_types;
             std::map<uintptr_t,std::vector<Extented_type_info>> map_containing_types;
-            std::multimap<uintptr_t,std::vector<Extented_type_info>> multimap_containing_types;
             std::unordered_map<uintptr_t,std::vector<Extented_type_info>> hash_map_containing_types;
-            std::unordered_multimap<uintptr_t,std::vector<Extented_type_info>> hash_multimap_containing_types;
             std::array<std::vector<Extented_type_info>, 100> array_containing_types{{}};
-            enum class thread_policy : unsigned char {
+
+            enum class thread_policy : uint8_t {
             unsequenced_exec,
             unsequenced_parrallel_exec
             }; //notice that all operations are unsequenced
@@ -347,12 +349,12 @@ namespace printing_tools {
                         switch(lhs->execution_policy){
                             case thread_policy::unsequenced_exec:
                                 std::for_each(std::execution::unseq , lhs->begin(), lhs->end(),
-                                    [](Lhs_t::value_type lhs_sub_element){
+                                    [](const auto& lhs_sub_element){
                                          return all_ops<Op, op_action_type, Lhs_t::value_type,Rhs_t>(lhs_sub_element,rhs);
                                 });
                             case thread_policy::unsequenced_parrallel_exec:
                                 std::for_each(std::execution::par_unseq , lhs->begin(), lhs->end(),
-                                    [](Lhs_t::value_type lhs_sub_element){
+                                    [](const auto& lhs_sub_element){
                                         return all_ops<Op, op_action_type, Lhs_t::value_type,Rhs_t>(lhs_sub_element,rhs);
                                 });
                         }
@@ -417,12 +419,12 @@ namespace printing_tools {
                             switch(rhs.execution_policy){
                                 case thread_policy::unsequenced_exec:
                                     std::for_each(std::execution::unseq, formated_rhs->begin(), formated_rhs->end(),
-                                        [](const Rhs_t::value_type rhs_sub_element){
+                                        [](const auto& rhs_sub_element){
                                             return op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
                                     });
                                 case thread_policy::unsequenced_parrallel_exec:
                                     std::for_each(std::execution::par_unseq, formated_rhs->begin(), formated_rhs->end(), Lhs_t{},
-                                        [](const Rhs_t::value_type rhs_sub_element){
+                                        [](const auto& rhs_sub_element){
                                             return op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
                                     });
                             }
@@ -614,7 +616,7 @@ namespace printing_tools {
         
 
 
-            
+            thread_local std::pmr::polymorphic_allocator allocator_for_the_current_thread{};
             struct Polymoprhic_extensible_engine{
 
             Type_tag tag;
@@ -630,8 +632,8 @@ namespace printing_tools {
             Polymoprhic_extensible_engine{tag, source->ptr}
             } {}
 
-        
-            inline Polymoprhic_extensible_engine(tag_of_type_to_construct_from source){
+            
+            inline Polymoprhic_extensible_engine(Polymoprhic_extensible_engine source){
                switch(source.tag){
                    /* --- High-Operand Specialized Tags --- */
                     case Type_tag::string_tag_for_15_plus_operand_ops: {
@@ -754,6 +756,40 @@ namespace printing_tools {
 
                 }
             }
+            inline  Polymoprhic_extensible_engine
+            (const std::string& string_to_read_from, std::string:size_type* pos_size,const uintptr_t size_you_can_read){
+                switch(data_type){
+                    case Type_tag::string_tag_for_15_plus_operand_ops: 
+                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,std::string>(first_non_polymorphic_obj, second_obj); 
+                    case Type_tag::uintptr_tag_for_15_plus_operand_ops: 
+                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,uintptr_t>(first_non_polymorphic_obj, second_obj); 
+                    case Type_tag::intptr_tag_for_15_plus_operand_ops: 
+                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,intptr_t>(first_non_polymorphic_obj, second_obj); 
+                    case Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops: 
+                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,long double>(first_non_polymorphic_obj, second_obj); 
+                    case Type_tag::long_double_tag_implementation_defined_size: 
+                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,long double>(first_non_polymorphic_obj, second_obj); 
+                    case Type_tag::uintptr_tag: 
+                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,uintptr_t>(first_non_polymorphic_obj, second_obj); 
+                    case Type_tag::string_tag: 
+                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,std::string>(first_non_polymorphic_obj, second_obj); 
+                    case Type_tag::intptr_tag: 
+                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,intptr_t>(first_non_polymorphic_obj, second_obj); 
+                    case Type_tag::vector_string: 
+                        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<std::string>>>(first_obj, second_obj); 
+                    case Type_tag::vector_uintptr: 
+                        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<uintptr_t>>>(first_obj, second_obj); 
+                    case Type_tag::vector_intptr: 
+                        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<intptr_t>>>(first_obj, second_obj); 
+                    case Type_tag::vector_double: 
+                        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<double>>>(first_obj, second_obj); 
+                    case Type_tag::vector_long_double_tag_implementation_defined_size: 
+                        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<long double>>>(first_obj, second_obj); 
+                    case Type_tag::nested_type_with_dynamic_container: 
+                        return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects<op, op_action_type, only_arg_type_for_first_paremeter, Nested_type_info>(first_obj, second_obj);
+                }
+            }
+
             template<typename Underlying_container_specialization, Type_tag_for_input tag>
             requires{//the concept is weather the expression below works or not
             typename std::common_type_t
@@ -767,13 +803,13 @@ namespace printing_tools {
                     switch(source->execution_policy){
                     case thread_policy::unsequenced_exec:
                         std::copy(std::execution::unseq , formated_source.begin(), formated_source.end(), destination_data.begin(), 
-                            [](value_type source_ptr){
+                            [](const Polymoprhic_extensible_engine source_ptr){
                                 return Polymoprhic_extensible_engine(source_ptr);
                             
                         });
                     case thread_policy::unsequenced_parrallel_exec:
                         std::copy(std::execution::par_unseq , formated_source.begin(), formated_source.end(), destination_data.begin(), 
-                            [](value_type source_ptr){
+                            [](const Polymoprhic_extensible_engine source_ptr){
                                 return Polymoprhic_extensible_engine(source_ptr);
                             
                         });
@@ -781,10 +817,11 @@ namespace printing_tools {
                     return static_cast<void*>(new Nested_type_info{tag, source->execution_policy, static_cast<void*>(destination_data)}); 
 
                 }
-
+            
                     
 
-            ~Polymoprhic_extensible_engine(){
+
+            inline ~Polymoprhic_extensible_engine(){
                 switch(tag) {
                     /* --- [ 00 - 05 ) High-Operand Specialized Tags (DESTRUCTIVE) --- */
                     case Type_tag::string_tag_for_15_plus_operand_ops: {
@@ -985,24 +1022,37 @@ namespace printing_tools {
                     }
     
             };
-            struct Extented_types:public polymorphic_extensible_engine::Polymoprhic_extensible_engine{
 
-            Extented_types(const Extented_type_info& info, const std::string& string_to_read_from, 
+
+            inline Polymoprhic_extensible_engine object_and_type_factory(const Extented_type_info& info, const std::string& string_to_read_from, 
                 std::string:size_type* pos )
             {
-                
+                uintptr_t size_to_preallocate=0;
+                switch(info.tag){
+                    case Type_storage_facility::type_in_array_tag:
+                        
+                    case Type_storage_facility::type_in_vector_tag:
+                    
+                    case Type_storage_facility::type_in_deque_tag:
+                    
+                    case Type_storage_facility::type_in_map_tag:
+                    
+                    case Type_storage_facility::type_in_hash_map_tag:
+                    
+                    case Type_storage_facility::type_in_list:
+                    
+                    case Type_storage_facility::type_in_forward_list:
+                    
+                    
+                }
+      
             }
            
-            };
-            struct Hetrogenous_array_type:public polymorphic_extensible_engine::Polymoprhic_extensible_engine{
-
-            Hetrogenous_array_type(Type_tag info, const std::string& string_to_read_from, 
-                std::string:size_type* pos )
-            {
             
-            }
+
+
                 
-            };
+            
 
 
 
