@@ -627,7 +627,7 @@ namespace printing_tools {
 
 
             struct Polymoprhic_extensible_engine{
-
+            //least confusing cpp code in the world, hahahaha.
             Type_tag tag;
             void *ptr;
             
@@ -964,6 +964,8 @@ namespace printing_tools {
                     return static_cast<void*>(new Nested_type_info{tag, source->execution_policy, static_cast<void*>(destination_data)}); 
 
                 }
+            static constexpr auto indexes_to_skip = std::max(monolithic_buffer_resource_index, all_elements_size_uintptr_t_index);
+
             template<typename Underlying_container_specialization, Type_tag_for_input tag>
             requires{//the concept is weather the expression below works or not
             typename std::common_type_t
@@ -981,7 +983,6 @@ namespace printing_tools {
                     underlying_container_specialization& destination_data= *(allocator_used.new_object<underlying_container_specialization_and_thread_execution_policy>(source->execution_policy,formated_source.size()));
                     destination_data[monolithic_buffer_resource_index] = {monolithic_buffer_resource_tag, static_cast<void*>(buffer)};
                     destination_data[all_elements_size_uintptr_t_index]= {all_elements_size_uintptr_t_tag,static_cast<void*>(allocator_used.new_object<size_t>(formated_size))};
-                    constexpr auto indexes_to_skip = std::max(monolithic_buffer_resource_index, all_elements_size_uintptr_t_index);
                     switch(source->execution_policy){
                     case thread_policy::unsequenced_exec:
                         std::copy(std::execution::unseq , formated_source.begin()+indexes_to_skip, formated_source.end(), destination_data.begin()+indexes_to_skip, 
@@ -997,8 +998,26 @@ namespace printing_tools {
                     return static_cast<void*>(new Nested_type_info{tag, source->execution_policy, static_cast<void*>(destination_data)}); 
 
                 }
-                    
-
+            template<typename Sequence_t>
+            require{
+            typename std::common_type_t
+                <std::iterator_traits<Sequence_t::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
+            }
+            inline void destruct_sequence_from_the_globally_specified_indexes_to_skip_variable(const Sequence_t& sequence_with_policy){
+                const auto* container= sequence_with_policy.ptr;
+                switch(sequence_with_policy->execution_policy){
+                    case thread_policy::unsequenced_exec:
+                        std::for_each(std::execution::unseq, container->begin()+indexes_to_skip, container->end(), 
+                        [](const Polymoprhic_extensible_engine source_ptr){
+                            source_ptr.~Polymoprhic_extensible_engine();
+                        });
+                    case thread_policy::unsequenced_parrallel_exec:
+                        std::for_each(std::execution::par_unseq, container->begin()+indexes_to_skip, container->end(), 
+                        [](const Polymoprhic_extensible_engine source_ptr){
+                            source_ptr.~Polymoprhic_extensible_engine();
+                        });
+            }
+    
 
             inline ~Polymoprhic_extensible_engine(){
                 switch(tag) {
@@ -1077,13 +1096,18 @@ namespace printing_tools {
                         switch(underlying_obj->tag) {
                             case Type_tag_for_input::vector_containing_types: {
                                 using underlying_container_specialization_and_thread_execution_policy = No_tag_template_type_info<std::vector<Polymoprhic_extensible_engine>>;
-                                ~static_cast<underlying_container_specialization_and_thread_execution_policy*>((underlying_obj->ptr)->ptr)[monolithic_buffer_resource_index]();
+                                const underlying_container_specialization_and_thread_execution_policy& sequence_with_policy = 
+                                *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(underlying_obj->ptr));
+                                destruct_sequence_from_the_globally_specified_indexes_to_skip_variable(sequence_with_policy);
+                                ~((sequence_with_policy->ptr)[monolithic_buffer_resource_index])();
                                 break;
                             }
                             case Type_tag_for_input::type_in_deque_tag: {
                                 using underlying_container_specialization_and_thread_execution_policy = No_tag_template_type_info<std::deque<Polymoprhic_extensible_engine>>;
-                                ~static_cast<underlying_container_specialization_and_thread_execution_policy*>((underlying_obj->ptr)->ptr)[monolithic_buffer_resource_index]();
-                                break;
+                                const underlying_container_specialization_and_thread_execution_policy& sequence_with_policy = 
+                                *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(underlying_obj->ptr));
+                                destruct_sequence_from_the_globally_specified_indexes_to_skip_variable(sequence_with_policy);
+                                ~((sequence_with_policy->ptr)[monolithic_buffer_resource_index])();                                break;
                             }
                             case Type_tag_for_input::type_in_list: {
                                 using underlying_container_specialization_and_thread_execution_policy = No_tag_template_type_info<std::list<Polymoprhic_extensible_engine>>;
