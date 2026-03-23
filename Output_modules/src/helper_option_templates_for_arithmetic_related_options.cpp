@@ -743,24 +743,28 @@ namespace printing_tools {
                     case Type_tag::nested_type_with_dynamic_container:       
                         Nested_type_info underlying_obj= *(static_cast<Nested_type_info*>(source.ptr));
                         switch(underlying_obj->tag){
-                            case Type_tag_for_input::array_nested_type_vector:
-                                using Source_and_target_type= std::vector<Polymoprhic_extensible_engine>;
+                            case Type_tag_for_input::array_nested_type_vector:{
+                                using Source_and_target_type= No_tag_template_type_info<std::vector<Polymoprhic_extensible_engine>>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
                                 ptr = copy_nested<Source_and_target_type, Type_tag_for_input::vector_containing_types>(underlying_obj);
-                                break;
-                            case Type_tag_for_input::array_nested_type_deque:
-                                using Source_and_target_type= std::deque<Polymoprhic_extensible_engine>;
+                                break;}
+                            case Type_tag_for_input::array_nested_type_deque:{
+                                using Source_and_target_type= No_tag_template_type_info<std::deque<Polymoprhic_extensible_engine>>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
                                 ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_deque_tag>(underlying_obj);
-                                break;
-                            case Type_tag_for_input::array_nested_type_list:
-                                using Source_and_target_type= std::list<Polymoprhic_extensible_engine>;
+                                break;}
+                            case Type_tag_for_input::array_nested_type_list:{
+                                using Source_and_target_type= No_tag_template_type_info<std::list<Polymoprhic_extensible_engine>>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
                                 ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_list>(underlying_obj);
-                            case Type_tag_for_input::array_nested_type_forward_list:
-                                using Source_and_target_type= std::forward_list<Polymoprhic_extensible_engine>;
+                                break;
+                            }
+                            case Type_tag_for_input::array_nested_type_forward_list:{
+                                using Source_and_target_type= No_tag_template_type_info<std::forward_list<Polymoprhic_extensible_engine>>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
                                 ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_forward_list>(underlying_obj);
+                                break;
+                            }
                             default:
                                 throw std::string{"Invalid Container Tag"};
                                 break;
@@ -867,24 +871,26 @@ namespace printing_tools {
                     case Type_tag::nested_type_with_dynamic_container:       
                         Nested_type_info underlying_obj= *(static_cast<Nested_type_info*>(source.ptr));
                         switch(underlying_obj->tag){
-                            case Type_tag_for_input::array_nested_type_vector:
-                                using Source_and_target_type= std::vector<Polymoprhic_extensible_engine>;
+                            case Type_tag_for_input::array_nested_type_vector:{
+                                using Source_and_target_type= No_tag_template_type_info<std::vector<Polymoprhic_extensible_engine>>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
                                 ptr = copy_nested<Source_and_target_type, Type_tag_for_input::vector_containing_types>(underlying_obj);
-                                break;
-                            case Type_tag_for_input::array_nested_type_deque:
-                                using Source_and_target_type= std::deque<Polymoprhic_extensible_engine>;
+                                break;}
+                            case Type_tag_for_input::array_nested_type_deque:{
+                                using Source_and_target_type= No_tag_template_type_info<std::deque<Polymoprhic_extensible_engine>>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
                                 ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_deque_tag>(underlying_obj);
-                                break;
-                            case Type_tag_for_input::array_nested_type_list:
-                                using Source_and_target_type= std::list<Polymoprhic_extensible_engine>;
+                                break;}
+                            case Type_tag_for_input::array_nested_type_list:{
+                                using Source_and_target_type= No_tag_template_type_info<std::list<Polymoprhic_extensible_engine>>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
                                 ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_list>(underlying_obj);
-                            case Type_tag_for_input::array_nested_type_forward_list:
-                                using Source_and_target_type= std::forward_list<Polymoprhic_extensible_engine>;
+                                break;}
+                            case Type_tag_for_input::array_nested_type_forward_list:{
+                                using Source_and_target_type= No_tag_template_type_info<std::forward_list<Polymoprhic_extensible_engine>>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
                                 ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_forward_list>(underlying_obj);
+                                break;}
                             default:
                                 throw std::string{"Invalid Container Tag"};
                                 break;
@@ -937,10 +943,10 @@ namespace printing_tools {
                 <std::iterator_traits<Underlying_container_specialization::iterator>::iterator_category, std::input_iterator_tag>;
             }
                 static inline void*  copy_nested(Nested_type_info source){
-                    underlying_container_specialization& formated_source= 
-                    *(static_cast<underlying_container_specialization*>(source->ptr));
+                    underlying_container_specialization_and_thread_execution_policy& formated_source= 
+                    *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(source->ptr));
                     //NOTE: underlying_container_specialization is a container type.
-                    underlying_container_specialization& destination_data= *(new underlying_container_specialization(formated_source.size()));
+                    underlying_container_specialization_and_thread_execution_policy& destination_data= *(new underlying_container_specialization_and_thread_execution_policy(source->execution_policy, formated_source.size()));
                     switch(source->execution_policy){
                     case thread_policy::unsequenced_exec:
                         std::copy(std::execution::unseq , formated_source.begin(), formated_source.end(), destination_data.begin(), 
@@ -965,14 +971,14 @@ namespace printing_tools {
             }
                 static inline void*  copy_nested(Nested_type_info source){
 
-                    underlying_container_specialization& formated_source= 
-                    *(static_cast<underlying_container_specialization*>(source->ptr));
+                    underlying_container_specialization_and_thread_execution_policy& formated_source= 
+                    *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(source->ptr));
                     //NOTE: underlying_container_specialization is a container type.
                     size_t formated_size= *(static_cast<uintptr_t*>(formated_source[monolithic_buffer_resource_index].ptr));
                     using memory_region=std::pmr::monotonic_buffer_resource::monotonic_buffer_resource;
-                    memory_region* buffer= new memory_region{formated_size};
+                    memory_region* buffer= new memory_region(formated_size);
                     std::pmr::polymorphic_allocator<std::byte> allocator_used{buffer};
-                    underlying_container_specialization& destination_data= *(allocator_used.new_object<Source_and_target_type>(formated_source.size()));
+                    underlying_container_specialization& destination_data= *(allocator_used.new_object<underlying_container_specialization_and_thread_execution_policy>(source->execution_policy,formated_source.size()));
                     destination_data[monolithic_buffer_resource_index] = {monolithic_buffer_resource_tag, static_cast<void*>(buffer)};
                     destination_data[all_elements_size_uintptr_t_index]= {all_elements_size_uintptr_t_tag,static_cast<void*>(allocator_used.new_object<size_t>(formated_size))};
                     constexpr auto indexes_to_skip = std::max(monolithic_buffer_resource_index, all_elements_size_uintptr_t_index);
@@ -998,113 +1004,95 @@ namespace printing_tools {
                 switch(tag) {
                     /* --- [ 00 - 05 ) High-Operand Specialized Tags (DESTRUCTIVE) --- */
                     case Type_tag::string_tag_for_15_plus_operand_ops: {
-                        using Source_and_target_type = std::string;
-                        delete (static_cast<Source_and_target_type*>(ptr));
+                        using Underlying_t = std::string;
+                        delete (static_cast<Underlying_t*>(ptr));
                         break;
                     }
                     case Type_tag::uintptr_tag_for_15_plus_operand_ops: {
-                        using Source_and_target_type = uintptr_t;
-                        delete (static_cast<Source_and_target_type*>(ptr));
+                        using Underlying_t = uintptr_t;
+                        delete (static_cast<Underlying_t*>(ptr));
                         break;
                     }
                     case Type_tag::intptr_tag_for_15_plus_operand_ops: {
-                        using Source_and_target_type = intptr_t;
-                        delete (static_cast<Source_and_target_type*>(ptr));
+                        using Underlying_t = intptr_t;
+                        delete (static_cast<Underlying_t*>(ptr));
                         break;
                     }
                     case Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops: {
-                        using Source_and_target_type = long double;
-                        delete (static_cast<Source_and_target_type*>(ptr));
+                        using Underlying_t = long double;
+                        delete (static_cast<Underlying_t*>(ptr));
                         break;
                     }
 
                     /* --- [ 06 - 09 ) Scalar Primitive Types (DESTRUCTIVE) --- */
                     case Type_tag::long_double_tag_implementation_defined_size: {
-                        using Source_and_target_type = long double;
-                        delete (static_cast<Source_and_target_type*>(ptr));
+                        using Underlying_t = long double;
+                        delete (static_cast<Underlying_t*>(ptr));
                         break;
                     }
                     case Type_tag::uintptr_tag: {
-                        using Source_and_target_type = uintptr_t;
-                        delete (static_cast<Source_and_target_type*>(ptr));
+                        using Underlying_t = uintptr_t;
+                        delete (static_cast<Underlying_t*>(ptr));
                         break;
                     }
                     case Type_tag::string_tag: {
-                        using Source_and_target_type = std::string;
-                        delete (static_cast<Source_and_target_type*>(ptr));
+                        using Underlying_t = std::string;
+                        delete (static_cast<Underlying_t*>(ptr));
                         break;
                     }
                     case Type_tag::intptr_tag: {
-                        using Source_and_target_type = intptr_t;
-                        delete (static_cast<Source_and_target_type*>(ptr));
+                        using Underlying_t = intptr_t;
+                        delete (static_cast<Underlying_t*>(ptr));
                         break;
                     }
 
                     /* --- [ 09 - 13 ) Contiguous & Dynamic Containers (DESTRUCTIVE) --- */
                     case Type_tag::vector_string: {
-                        using Source_and_target_type = No_tag_template_type_info<std::vector<std::string>>;
-                        delete (static_cast<Source_and_target_type*>(ptr));
+                        using Underlying_t = No_tag_template_type_info<std::vector<std::string>>;
+                        delete (static_cast<Underlying_t*>(ptr));
                         break;
                     }
                     case Type_tag::vector_uintptr: {
-                        using Source_and_target_type = No_tag_template_type_info<std::vector<uintptr_t>>;
-                        delete (static_cast<Source_and_target_type*>(ptr));
+                        using Underlying_t = No_tag_template_type_info<std::vector<uintptr_t>>;
+                        delete (static_cast<Underlying_t*>(ptr));
                         break;
                     }
                     case Type_tag::vector_intptr: {
-                        using Source_and_target_type = No_tag_template_type_info<std::vector<intptr_t>>;
-                        delete (static_cast<Source_and_target_type*>(ptr));
+                        using Underlying_t = No_tag_template_type_info<std::vector<intptr_t>>;
+                        delete (static_cast<Underlying_t*>(ptr));
                         break;
                     }
                     case Type_tag::vector_long_double_tag_implementation_defined_size: {
-                        using Source_and_target_type = No_tag_template_type_info<std::vector<long double>>;
-                        delete (static_cast<Source_and_target_type*>(ptr));
+                        using Underlying_t = No_tag_template_type_info<std::vector<long double>>;
+                        delete (static_cast<Underlying_t*>(ptr));
                         break;
                     }
-                    
+                    case monolithic_buffer_resource_tag:
+                        using Underlying_t = std::pmr::monotonic_buffer_resource::monotonic_buffer_resource;
+                        delete (static_cast<Underlying_t*>(ptr));
                     /* --- [ 13 - 14 ) Nested Types (DESTRUCTIVE) --- */
                     case Type_tag::nested_type_with_dynamic_container: {
                         auto* underlying_obj = static_cast<Nested_type_info*>(ptr);
-                        
+                        //all of the code below relies on recursive destructor calls
                         switch(underlying_obj->tag) {
                             case Type_tag_for_input::vector_containing_types: {
-                                using container_type = std::vector<Polymoprhic_extensible_engine>;
-                                delete (static_cast<container_type*>(underlying_obj->ptr));
+                                using underlying_container_specialization_and_thread_execution_policy = No_tag_template_type_info<std::vector<Polymoprhic_extensible_engine>>;
+                                ~static_cast<underlying_container_specialization_and_thread_execution_policy*>((underlying_obj->ptr)->ptr)[monolithic_buffer_resource_index]();
                                 break;
                             }
                             case Type_tag_for_input::type_in_deque_tag: {
-                                using container_type = std::deque<Polymoprhic_extensible_engine>;
-                                delete (static_cast<container_type*>(underlying_obj->ptr));
+                                using underlying_container_specialization_and_thread_execution_policy = No_tag_template_type_info<std::deque<Polymoprhic_extensible_engine>>;
+                                ~static_cast<underlying_container_specialization_and_thread_execution_policy*>((underlying_obj->ptr)->ptr)[monolithic_buffer_resource_index]();
                                 break;
                             }
                             case Type_tag_for_input::type_in_list: {
-                                using container_type = std::list<Polymoprhic_extensible_engine>;
-                                delete (static_cast<container_type*>(underlying_obj->ptr));
+                                using underlying_container_specialization_and_thread_execution_policy = No_tag_template_type_info<std::list<Polymoprhic_extensible_engine>>;
+                                delete (static_cast<underlying_container_specialization_and_thread_execution_policy*>(underlying_obj->ptr));
                                 break;
                             }
                             case Type_tag_for_input::type_in_forward_list: {
-                                using container_type = std::forward_list<Polymoprhic_extensible_engine>;
-                                delete (static_cast<container_type*>(underlying_obj->ptr));
-                                break;
-                            }
-                            case Type_tag_for_input::type_in_map_tag: {
-                                using container_type = std::map<uintptr_t, Polymoprhic_extensible_engine>;
-                                delete (static_cast<container_type*>(underlying_obj->ptr));
-                                break;
-                            }
-                            case Type_tag_for_input::type_in_multi_map_tag: {
-                                using container_type = std::multimap<uintptr_t, Polymoprhic_extensible_engine>;
-                                delete (static_cast<container_type*>(underlying_obj->ptr));
-                                break;
-                            }
-                            case Type_tag_for_input::type_in_hash_map_tag: {
-                                using container_type = std::unordered_map<uintptr_t, Polymoprhic_extensible_engine>;
-                                delete (static_cast<container_type*>(underlying_obj->ptr));
-                                break;
-                            }
-                            case Type_tag_for_input::type_in_multi_hash_map_tag: {
-                                using container_type = std::unordered_multimap<uintptr_t, Polymoprhic_extensible_engine>;
-                                delete (static_cast<container_type*>(underlying_obj->ptr));
+                                using underlying_container_specialization_and_thread_execution_policy = No_tag_template_type_info<std::forward_list<Polymoprhic_extensible_engine>>;
+                                delete (static_cast<underlying_container_specialization_and_thread_execution_policy*>(underlying_obj->ptr));
                                 break;
                             }
                             default:
