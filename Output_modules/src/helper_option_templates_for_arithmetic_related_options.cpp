@@ -906,6 +906,7 @@ namespace printing_tools {
             inline  Polymoprhic_extensible_engine
             (const std::string& string_to_read_from, std::string:size_type* pos_size,const uintptr_t size_you_can_read){
                 switch(data_type){
+                    //to be completed
                     case Type_tag::string_tag_for_15_plus_operand_ops: 
                         return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,std::string>(first_non_polymorphic_obj, second_obj); 
                     case Type_tag::uintptr_tag_for_15_plus_operand_ops: 
