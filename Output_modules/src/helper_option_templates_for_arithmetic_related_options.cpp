@@ -271,8 +271,8 @@ namespace printing_tools {
                 type_in_forward_list,
                 newly_defined_temp_type_for_new_obj,
                 newly_defined_type_for_new_obj,
-                newly_defined_temp_type_for_new_obj_that_calculates_size_itself,//requires an extra loop of N where N is the amount of sub elements in nested polymorphic engine objects
-                newly_defined_type_for_new_obj_that_calculates_size_itself,//requires an extra loop of N where N is the amount of sub elements in nested polymorphic engine objects
+                newly_defined_temp_type_for_new_obj_that_calculates_size_itself,//requires an extra loop of N where N is the amount of sub elements in nested polymorphic engine objects in a deque or vector
+                newly_defined_type_for_new_obj_that_calculates_size_itself,//requires an extra loop of N where N is the amount of sub elements in nested polymorphic engine objects in a deque or vector 
                 just_trying_to_define_a_new_type_without_making_any_objects
             };
             sturct Extented_type_info{
@@ -284,13 +284,13 @@ namespace printing_tools {
             all_elements_size_uintptr_t_index=1;
             };
             static constexpr auto indexes_to_skip = std::max(monolithic_buffer_resource_index, all_elements_size_uintptr_t_index);
-            std::vector<std::vector<Extented_type_info>> vector_containing_types;
-            std::deque<std::vector<Extented_type_info>> deque_containing_types;
-            std::list<std::vector<Extented_type_info>> list_containing_types;
-            std::forward_list<std::vector<Extented_type_info>> forward_list_containing_types;
-            std::map<uintptr_t,std::vector<Extented_type_info>> map_containing_types;
-            std::unordered_map<uintptr_t,std::vector<Extented_type_info>> hash_map_containing_types;
-            std::array<std::vector<Extented_type_info>, 100> array_containing_types{{}};
+            std::vector<std::vector<Type_tag>> vector_containing_types;
+            std::deque<std::vector<Type_tag>> deque_containing_types;
+            std::list<std::vector<Type_tag>> list_containing_types;
+            std::forward_list<std::vector<Type_tag>> forward_list_containing_types;
+            std::map<uintptr_t,std::vector<Type_tag>> map_containing_types;
+            std::unordered_map<uintptr_t,std::vector<Type_tag>> hash_map_containing_types;
+            std::array<std::vector<Type_tag>, 100> array_containing_types{{}};
 
             enum class thread_policy : uint8_t {
             unsequenced_exec,
@@ -618,8 +618,6 @@ namespace printing_tools {
                 return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<uintptr_t>>>(first_obj, second_obj); 
             case Type_tag::vector_intptr: 
                 return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<intptr_t>>>(first_obj, second_obj); 
-            case Type_tag::vector_double: 
-                return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<double>>>(first_obj, second_obj); 
             case Type_tag::vector_long_double_tag_implementation_defined_size: 
                 return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<long double>>>(first_obj, second_obj); 
             case Type_tag::nested_type_with_dynamic_container: 
@@ -653,8 +651,6 @@ namespace printing_tools {
                     return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, No_tag_nested_type_info<std::vector<uintptr_t>>,  only_arg_type_for_second_paremeter>(first_obj, second_obj); 
                 case Type_tag::vector_intptr: 
                     return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, No_tag_nested_type_info<std::vector<intptr_t>>,   only_arg_type_for_second_paremeter>(first_obj, second_obj); 
-                case Type_tag::vector_double: 
-                    return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, No_tag_nested_type_info<std::vector<double>>,     only_arg_type_for_second_paremeter>(first_obj, second_obj); 
                 case Type_tag::vector_long_double_tag_implementation_defined_size:
                     return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, No_tag_nested_type_info<std::vector<long double>>,only_arg_type_for_second_paremeter>(first_obj, second_obj); 
                 case Type_tag::nested_type_with_dynamic_container: 
@@ -944,44 +940,127 @@ namespace printing_tools {
                 }
             }
             inline  Polymoprhic_extensible_engine
-            (const std::string& string_to_read_from, std::string:size_type* pos_size,const uintptr_t size_you_can_read){
-                switch(data_type){
+            (const std::string& string_to_read_from, std::string:size_type* pos_size,Type_tag tag_arg){
+                switch(tag_arg){
                     //to be completed
                     case Type_tag::string_tag_for_15_plus_operand_ops: 
-                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,std::string>(first_non_polymorphic_obj, second_obj); 
+                        {
+                            using underlying_type_of_ptr= std::string;
+                            ptr= underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size));
+                            tag= tag_arg;
+                        }
                     case Type_tag::uintptr_tag_for_15_plus_operand_ops: 
-                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,uintptr_t>(first_non_polymorphic_obj, second_obj); 
+                        {
+                            using underlying_type_of_ptr= uintptr_t;
+                            ptr= underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size));
+                            tag= tag_arg;
+                        }
                     case Type_tag::intptr_tag_for_15_plus_operand_ops: 
-                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,intptr_t>(first_non_polymorphic_obj, second_obj); 
+                        {
+                            using underlying_type_of_ptr= intptr_t;
+                            ptr= underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size));
+                            tag= tag_arg;
+                        }                    
                     case Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops: 
-                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,long double>(first_non_polymorphic_obj, second_obj); 
+                        {
+                            using underlying_type_of_ptr= long double;
+                            ptr= underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size));
+                            tag= tag_arg;
+                        }                    
                     case Type_tag::long_double_tag_implementation_defined_size: 
-                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,long double>(first_non_polymorphic_obj, second_obj); 
+                        {
+                            using underlying_type_of_ptr= long double;
+                            ptr= underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size));
+                            tag= tag_arg;
+                        }                    
                     case Type_tag::uintptr_tag: 
-                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,uintptr_t>(first_non_polymorphic_obj, second_obj); 
+                        {
+                            using underlying_type_of_ptr= uintptr_t;
+                            ptr= underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size));
+                            tag= tag_arg;
+                        }                    
                     case Type_tag::string_tag: 
-                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,std::string>(first_non_polymorphic_obj, second_obj); 
+                        {
+                            using underlying_type_of_ptr= std::string;
+                            ptr= underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size));
+                            tag= tag_arg;
+                        }                    
                     case Type_tag::intptr_tag: 
-                        return interface_used_by_macro::interface_of_all_ops_scalar_to_scalar<op, op_action_type,only_arg_type_for_first_paremeter,intptr_t>(first_non_polymorphic_obj, second_obj); 
+                        {
+                            using underlying_type_of_ptr= uintptr_t;
+                            ptr= underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size));
+                            tag= tag_arg;
+                        }                    
                     case Type_tag::vector_string: 
-                        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<std::string>>>(first_obj, second_obj); 
+                        {
+                            using underlying_type_of_ptr= No_tag_template_type_info<std::vector<std::string>>;
+                            ptr= underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size));
+                            tag= tag_arg;
+                        }                    
                     case Type_tag::vector_uintptr: 
-                        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<uintptr_t>>>(first_obj, second_obj); 
+                        {
+                            using underlying_type_of_ptr= No_tag_template_type_info<std::vector<uintptr_t>>;
+                            ptr= underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size));
+                            tag= tag_arg;
+                        }                    
                     case Type_tag::vector_intptr: 
-                        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<intptr_t>>>(first_obj, second_obj); 
-                    case Type_tag::vector_double: 
-                        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<double>>>(first_obj, second_obj); 
+                        {
+                            using underlying_type_of_ptr= No_tag_template_type_info<std::vector<intptr_t>>;
+                            ptr= underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size));
+                            tag= tag_arg;
+                        }                                    
                     case Type_tag::vector_long_double_tag_implementation_defined_size: 
-                        return interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_potential_scalar<op, op_action_type, only_arg_type_for_first_paremeter, No_tag_nested_type_info<std::vector<long double>>>(first_obj, second_obj); 
+                        {
+                            using underlying_type_of_ptr= No_tag_template_type_info<std::vector<long double>>;
+                            ptr= underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size));
+                            tag= tag_arg;
+                        }                                 
                     case Type_tag::nested_type_with_dynamic_container: 
-                        return interface_used_by_macro::interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects<op, op_action_type, only_arg_type_for_first_paremeter, Nested_type_info>(first_obj, second_obj);
+                        {
+                            Nested_type_info underlying_obj{
+                                static_cast<Type_tag_for_input>(read_from_string<uint8_t>(string_to_read_from, pos_size)),
+                                static_cast<thread_policy>(read_from_string<uint8_t>(string_to_read_from, pos_size)),
+                                nullptr                                
+                            };
+                            switch(underlying_obj.tag){
+                                case Type_tag_for_input::array_nested_type_vector:{
+                                    using Source_and_target_type= No_tag_template_type_info<std::vector<Polymoprhic_extensible_engine>>;
+                                    tag= Type_tag::nested_type_with_dynamic_container;
+                                    ptr = copy_nested<Source_and_target_type, Type_tag_for_input::vector_containing_types>(underlying_obj);
+                                    break;
+                                    }
+                                case Type_tag_for_input::array_nested_type_deque:{
+                                    using Source_and_target_type= No_tag_template_type_info<std::deque<Polymoprhic_extensible_engine>>;
+                                    tag= Type_tag::nested_type_with_dynamic_container;
+                                    ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_deque_tag>(underlying_obj);
+                                    break;}
+                                case Type_tag_for_input::array_nested_type_list:{
+                                    using Source_and_target_type= No_tag_template_type_info<std::list<Polymoprhic_extensible_engine>>;
+                                    tag= Type_tag::nested_type_with_dynamic_container;
+                                    ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_list>(underlying_obj);
+                                    break;}
+                                case Type_tag_for_input::array_nested_type_forward_list:{
+                                    using Source_and_target_type= No_tag_template_type_info<std::forward_list<Polymoprhic_extensible_engine>>;
+                                    tag= Type_tag::nested_type_with_dynamic_container;
+                                    ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_forward_list>(underlying_obj);
+                                    break;}
+                                default:
+                                    throw std::string{"Invalid Container Tag"};
+                                    break;
+                            }
+                     //the rest of the types are currently unsupported :(
+                     //(got to finish the base of this project as fast as I can cuz i spend too much time)   
+                    default:
+                        throw std::string{"Invalid Type Tag"};
+                        break;
+                        }             
                 }
             }
 
             template<typename Underlying_container_specialization, Type_tag_for_input tag>
             requires{//the concept is weather the expression below works or not
             typename std::derived_from
-                <std::iterator_traits<Underlying_container_specialization::iterator>::iterator_category, std::input_iterator_tag>;
+                <std::iterator_traits<Underlying_container_specialization::underlying_container::iterator>::iterator_category, std::input_iterator_tag>;
             }
                 static inline void*  copy_nested(Nested_type_info source){
                     underlying_container_specialization_and_thread_execution_policy& formated_source= 
@@ -1009,7 +1088,7 @@ namespace printing_tools {
             template<typename Underlying_container_specialization, Type_tag_for_input tag>
             requires{//the concept is weather the expression below works or not
             typename std::derived_from
-                <std::iterator_traits<Underlying_container_specialization::iterator>::iterator_category, std::random_access_iterator_tag>;
+                <std::iterator_traits<Underlying_container_specialization::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
             }
                 static inline void*  copy_nested(Nested_type_info source){
 
@@ -1247,15 +1326,21 @@ namespace printing_tools {
                     }
     
             };
-
-
+            std::vector<std::vector<Extented_type_info>> vector_containing_types;
+            std::deque<std::vector<Extented_type_info>> deque_containing_types;
+            std::list<std::vector<Extented_type_info>> list_containing_types;
+            std::forward_list<std::vector<Extented_type_info>> forward_list_containing_types;
+            std::map<uintptr_t,std::vector<Extented_type_info>> map_containing_types;
+            std::unordered_map<uintptr_t,std::vector<Extented_type_info>> hash_map_containing_types;
+            std::array<std::vector<Extented_type_info>, 100> array_containing_types{{}};
             inline Polymoprhic_extensible_engine object_and_type_factory(const Extented_type_info& info, const std::string& string_to_read_from, 
                 std::string:size_type* pos )
             {
                 uintptr_t size_to_preallocate=0;
+                
                 switch(info.tag){
                     case Type_storage_facility::type_in_array_tag:
-                        
+                        Extented_type_info.index
                     case Type_storage_facility::type_in_vector_tag:
                     
                     case Type_storage_facility::type_in_deque_tag:
@@ -1267,6 +1352,15 @@ namespace printing_tools {
                     case Type_storage_facility::type_in_list:
                     
                     case Type_storage_facility::type_in_forward_list:
+
+                    case Type_storage_facility::newly_defined_temp_type_for_new_obj:
+
+                    case Type_storage_facility::newly_defined_temp_type_for_new_obj_that_calculates_size_itself:
+
+                    case Type_storage_facility::newly_defined_type_for_new_obj_that_calculates_size_itself:
+
+                    case Type_storage_facility::just_trying_to_define_a_new_type_without_making_any_objects:
+
                     
                     
                 }
