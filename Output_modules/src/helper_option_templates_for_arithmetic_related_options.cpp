@@ -685,7 +685,66 @@ namespace printing_tools {
             ptr= source.ptr;
             tag= source.tag;         
             }
+            template<typename Underlying_container_specialization, Type_tag_for_input tag>
+            requires{//the concept is weather the expression below works or not
+            typename std::derived_from
+                <std::iterator_traits<Underlying_container_specialization::underlying_container::iterator>::iterator_category, std::input_iterator_tag>;
+            }
+                static inline void*  copy_nested(Nested_type_info source){
+                    underlying_container_specialization_and_thread_execution_policy& formated_source= 
+                    *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(source->ptr));
+                    //NOTE: underlying_container_specialization is a container type.
+                    underlying_container_specialization_and_thread_execution_policy& destination_data= *(new underlying_container_specialization_and_thread_execution_policy(source->execution_policy, formated_source.size()));
+                    switch(source->execution_policy){
+                    case thread_policy::unsequenced_exec:
+                        std::copy(std::execution::unseq , formated_source.ptr.begin(), formated_source.ptr.end(), destination_data.ptr.begin(), 
+                            [](const Polymoprhic_extensible_engine source_ptr){
+                                return Polymoprhic_extensible_engine(source_ptr);
+                            
+                        });
+                    case thread_policy::unsequenced_parrallel_exec:
+                        std::copy(std::execution::par_unseq , formated_source.ptr.begin(), formated_source.ptr.end(), destination_data.ptr.begin(), 
+                            [](const Polymoprhic_extensible_engine source_ptr){
+                                return Polymoprhic_extensible_engine(source_ptr);
+                            
+                        });
+                    }
+                    return static_cast<void*>(new Nested_type_info{tag, source->execution_policy, static_cast<void*>(destination_data)}); 
 
+                }
+
+            template<typename Underlying_container_specialization, Type_tag_for_input tag>
+            requires{//the concept is weather the expression below works or not
+            typename std::derived_from
+                <std::iterator_traits<Underlying_container_specialization::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
+            }
+                static inline void*  copy_nested(Nested_type_info source){
+
+                    underlying_container_specialization_and_thread_execution_policy& formated_source= 
+                    *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(source->ptr));
+                    //NOTE: underlying_container_specialization is a container type.
+                    size_t formated_size= *(static_cast<uintptr_t*>(formated_source[monolithic_buffer_resource_index].ptr));
+                    using memory_region=std::pmr::monotonic_buffer_resource::monotonic_buffer_resource;
+                    memory_region* buffer= new memory_region(formated_size);
+                    std::pmr::polymorphic_allocator<std::byte> allocator_used{buffer};
+                    underlying_container_specialization& destination_data= *(allocator_used.new_object<underlying_container_specialization_and_thread_execution_policy>(source->execution_policy,formated_source.size()));
+                    destination_data[monolithic_buffer_resource_index] = {monolithic_buffer_resource_tag, static_cast<void*>(buffer)};
+                    destination_data[all_elements_size_uintptr_t_index]= {all_elements_size_uintptr_t_tag,static_cast<void*>(allocator_used.new_object<size_t>(formated_size))};
+                    switch(source->execution_policy){
+                    case thread_policy::unsequenced_exec:
+                        std::copy(std::execution::unseq , formated_source.ptr.begin()+indexes_to_skip, formated_source.ptr.end(), destination_data.ptr.begin()+indexes_to_skip, 
+                            [](const Polymoprhic_extensible_engine source_ptr){
+                                return Polymoprhic_extensible_engine(source_ptr, allocator_used);
+                        });
+                    case thread_policy::unsequenced_parrallel_exec:
+                        std::copy(std::execution::par_unseq , formated_source.ptr.begin()+indexes_to_skip, formated_source.ptr.end(), destination_data.ptr.begin()+indexes_to_skip, 
+                            [](const Polymoprhic_extensible_engine source_ptr){
+                                return Polymoprhic_extensible_engine(source_ptr, allocator_used);
+                        });
+                    }
+                    return static_cast<void*>(new Nested_type_info{tag, source->execution_policy, static_cast<void*>(destination_data)}); 
+
+                }
             inline Polymoprhic_extensible_engine(Polymoprhic_extensible_engine source){
                switch(source.tag){
                    /* --- High-Operand Specialized Tags --- */
@@ -939,6 +998,70 @@ namespace printing_tools {
 
                 }
             }
+
+            template<typename Underlying_container_specialization, Type_tag_for_input tag>
+            requires{//the concept is weather the expression below works or not
+            typename std::derived_from
+                <std::iterator_traits<Underlying_container_specialization::underlying_container::iterator>::iterator_category, std::input_iterator_tag>;
+            }
+                static inline void* make_nested(const std::string& string_to_read_from, std::string:size_type* pos,Type_tag tag_arg){
+                    underlying_container_specialization_and_thread_execution_policy& formated_source= 
+                    *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(source->ptr));
+                    //NOTE: underlying_container_specialization is a container type.
+                    underlying_container_specialization_and_thread_execution_policy& destination_data= *(new underlying_container_specialization_and_thread_execution_policy(source->execution_policy, formated_source.size()));
+                    switch(source->execution_policy){
+                    case thread_policy::unsequenced_exec:
+                        std::generate(std::execution::unseq , formated_source.ptr.begin(), formated_source.ptr.end(), 
+                            [](const Polymoprhic_extensible_engine source_ptr){
+                                return Polymoprhic_extensible_engine{string_to_read_from, pos, tag_arg};
+                            
+                        });
+                    case thread_policy::unsequenced_parrallel_exec:
+                        std::generate(std::execution::par_unseq , formated_source.ptr.begin(), formated_source.ptr.end(), 
+                            [](const Polymoprhic_extensible_engine source_ptr){
+                                return Polymoprhic_extensible_engine{string_to_read_from, pos, tag_arg};
+                            
+                        });
+                    }
+                    return static_cast<void*>(new Nested_type_info{tag, source->execution_policy, static_cast<void*>(destination_data)}); 
+
+                }
+
+            template<typename Underlying_container_specialization, Type_tag_for_input tag>
+            requires{//the concept is weather the expression below works or not
+            typename std::derived_from
+                <std::iterator_traits<Underlying_container_specialization::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
+            }
+                static inline void*  make_nested(const std::string& string_to_read_from, std::string:size_type* pos,Type_tag tag_arg){
+                    underlying_container_specialization_and_thread_execution_policy::underlying_container* =
+                    new storage_container{read_from_string<uint64_t>(string_to_read_from, pos)};
+                    underlying_container_specialization_and_thread_execution_policy& formated_source= 
+                    *(static_cast<underlying_container_specialization_and_thread_execution_policy*>());
+                    //NOTE: underlying_container_specialization is a container type.
+                    size_t formated_size= *(static_cast<uintptr_t*>(formated_source[monolithic_buffer_resource_index].ptr));
+                    using memory_region=std::pmr::monotonic_buffer_resource::monotonic_buffer_resource;
+                    memory_region* buffer= new memory_region(formated_size);
+                    std::pmr::polymorphic_allocator<std::byte> allocator_used{buffer};
+                    underlying_container_specialization& destination_data= *(allocator_used.new_object<underlying_container_specialization_and_thread_execution_policy>(source->execution_policy,formated_source.size()));
+                    destination_data[monolithic_buffer_resource_index] = {monolithic_buffer_resource_tag, static_cast<void*>(buffer)};
+                    destination_data[all_elements_size_uintptr_t_index]= {all_elements_size_uintptr_t_tag,static_cast<void*>(allocator_used.new_object<size_t>(formated_size))};
+                    switch(source->execution_policy){
+                    case thread_policy::unsequenced_exec:
+                        std::generate(std::execution::unseq , formated_source.ptr.begin(), formated_source.ptr.end(), 
+                            [](const Polymoprhic_extensible_engine source_ptr){
+                                return Polymoprhic_extensible_engine{string_to_read_from, pos, tag_arg};
+                            
+                        });
+                    case thread_policy::unsequenced_parrallel_exec:
+                        std::generate(std::execution::par_unseq , formated_source.ptr.begin(), formated_source.ptr.end(), 
+                            [](const Polymoprhic_extensible_engine source_ptr){
+                                return Polymoprhic_extensible_engine{string_to_read_from, pos, tag_arg};
+                            
+                        });
+                    }
+                    return static_cast<void*>(new Nested_type_info{tag, source->execution_policy, static_cast<void*>(destination_data)}); 
+
+                }
             inline  Polymoprhic_extensible_engine
             (const std::string& string_to_read_from, std::string:size_type* pos_size,Type_tag tag_arg){
                 switch(tag_arg){
@@ -1026,23 +1149,23 @@ namespace printing_tools {
                                 case Type_tag_for_input::array_nested_type_vector:{
                                     using Source_and_target_type= No_tag_template_type_info<std::vector<Polymoprhic_extensible_engine>>;
                                     tag= Type_tag::nested_type_with_dynamic_container;
-                                    ptr = copy_nested<Source_and_target_type, Type_tag_for_input::vector_containing_types>(underlying_obj);
+                                    ptr = make_nested<Source_and_target_type, Type_tag_for_input::vector_containing_types>(underlying_obj);
                                     break;
                                     }
                                 case Type_tag_for_input::array_nested_type_deque:{
                                     using Source_and_target_type= No_tag_template_type_info<std::deque<Polymoprhic_extensible_engine>>;
                                     tag= Type_tag::nested_type_with_dynamic_container;
-                                    ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_deque_tag>(underlying_obj);
+                                    ptr = make_nested<Source_and_target_type, Type_tag_for_input::type_in_deque_tag>(underlying_obj);
                                     break;}
                                 case Type_tag_for_input::array_nested_type_list:{
                                     using Source_and_target_type= No_tag_template_type_info<std::list<Polymoprhic_extensible_engine>>;
                                     tag= Type_tag::nested_type_with_dynamic_container;
-                                    ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_list>(underlying_obj);
+                                    ptr = make_nested<Source_and_target_type, Type_tag_for_input::type_in_list>(underlying_obj);
                                     break;}
                                 case Type_tag_for_input::array_nested_type_forward_list:{
                                     using Source_and_target_type= No_tag_template_type_info<std::forward_list<Polymoprhic_extensible_engine>>;
                                     tag= Type_tag::nested_type_with_dynamic_container;
-                                    ptr = copy_nested<Source_and_target_type, Type_tag_for_input::type_in_forward_list>(underlying_obj);
+                                    ptr = make_nested<Source_and_target_type, Type_tag_for_input::type_in_forward_list>(underlying_obj);
                                     break;}
                                 default:
                                     throw std::string{"Invalid Container Tag"};
@@ -1057,72 +1180,13 @@ namespace printing_tools {
                 }
             }
 
-            template<typename Underlying_container_specialization, Type_tag_for_input tag>
-            requires{//the concept is weather the expression below works or not
-            typename std::derived_from
-                <std::iterator_traits<Underlying_container_specialization::underlying_container::iterator>::iterator_category, std::input_iterator_tag>;
-            }
-                static inline void*  copy_nested(Nested_type_info source){
-                    underlying_container_specialization_and_thread_execution_policy& formated_source= 
-                    *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(source->ptr));
-                    //NOTE: underlying_container_specialization is a container type.
-                    underlying_container_specialization_and_thread_execution_policy& destination_data= *(new underlying_container_specialization_and_thread_execution_policy(source->execution_policy, formated_source.size()));
-                    switch(source->execution_policy){
-                    case thread_policy::unsequenced_exec:
-                        std::copy(std::execution::unseq , formated_source.begin(), formated_source.end(), destination_data.begin(), 
-                            [](const Polymoprhic_extensible_engine source_ptr){
-                                return Polymoprhic_extensible_engine(source_ptr);
-                            
-                        });
-                    case thread_policy::unsequenced_parrallel_exec:
-                        std::copy(std::execution::par_unseq , formated_source.begin(), formated_source.end(), destination_data.begin(), 
-                            [](const Polymoprhic_extensible_engine source_ptr){
-                                return Polymoprhic_extensible_engine(source_ptr);
-                            
-                        });
-                    }
-                    return static_cast<void*>(new Nested_type_info{tag, source->execution_policy, static_cast<void*>(destination_data)}); 
 
-                }
-
-            template<typename Underlying_container_specialization, Type_tag_for_input tag>
-            requires{//the concept is weather the expression below works or not
+            template<typename Underlying_container_specialization>
+            require{
             typename std::derived_from
                 <std::iterator_traits<Underlying_container_specialization::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
             }
-                static inline void*  copy_nested(Nested_type_info source){
-
-                    underlying_container_specialization_and_thread_execution_policy& formated_source= 
-                    *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(source->ptr));
-                    //NOTE: underlying_container_specialization is a container type.
-                    size_t formated_size= *(static_cast<uintptr_t*>(formated_source[monolithic_buffer_resource_index].ptr));
-                    using memory_region=std::pmr::monotonic_buffer_resource::monotonic_buffer_resource;
-                    memory_region* buffer= new memory_region(formated_size);
-                    std::pmr::polymorphic_allocator<std::byte> allocator_used{buffer};
-                    underlying_container_specialization& destination_data= *(allocator_used.new_object<underlying_container_specialization_and_thread_execution_policy>(source->execution_policy,formated_source.size()));
-                    destination_data[monolithic_buffer_resource_index] = {monolithic_buffer_resource_tag, static_cast<void*>(buffer)};
-                    destination_data[all_elements_size_uintptr_t_index]= {all_elements_size_uintptr_t_tag,static_cast<void*>(allocator_used.new_object<size_t>(formated_size))};
-                    switch(source->execution_policy){
-                    case thread_policy::unsequenced_exec:
-                        std::copy(std::execution::unseq , formated_source.begin()+indexes_to_skip, formated_source.end(), destination_data.begin()+indexes_to_skip, 
-                            [](const Polymoprhic_extensible_engine source_ptr){
-                                return Polymoprhic_extensible_engine(source_ptr, allocator_used);
-                        });
-                    case thread_policy::unsequenced_parrallel_exec:
-                        std::copy(std::execution::par_unseq , formated_source.begin()+indexes_to_skip, formated_source.end(), destination_data.begin()+indexes_to_skip, 
-                            [](const Polymoprhic_extensible_engine source_ptr){
-                                return Polymoprhic_extensible_engine(source_ptr, allocator_used);
-                        });
-                    }
-                    return static_cast<void*>(new Nested_type_info{tag, source->execution_policy, static_cast<void*>(destination_data)}); 
-
-                }
-            template<typename Sequence_t>
-            require{
-            typename std::derived_from
-                <std::iterator_traits<Sequence_t::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
-            }
-            inline void destruct_sequence_from_the_globally_specified_indexes_to_skip_variable(const Sequence_t& sequence_with_policy){
+            inline void destruct_sequence_from_the_globally_specified_indexes_to_skip_variable(const Underlying_container_specialization& sequence_with_policy){
                 const auto* container= sequence_with_policy.ptr;
                 switch(sequence_with_policy->execution_policy){
                     case thread_policy::unsequenced_exec:
