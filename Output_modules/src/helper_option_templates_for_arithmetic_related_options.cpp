@@ -283,7 +283,7 @@ namespace printing_tools {
             monolithic_buffer_resource_index;
             all_elements_size_uintptr_t_index=1;
             };
-            
+            static constexpr auto indexes_to_skip = std::max(monolithic_buffer_resource_index, all_elements_size_uintptr_t_index);
             std::vector<std::vector<Extented_type_info>> vector_containing_types;
             std::deque<std::vector<Extented_type_info>> deque_containing_types;
             std::list<std::vector<Extented_type_info>> list_containing_types;
@@ -350,7 +350,7 @@ namespace printing_tools {
                 
                 template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
                 requires{//the concept is weather the expression below works or not
-                typename std::common_type_t
+                typename std::derived_from
                 <std::iterator_traits<Lhs_t::underlying_container::iterator>::iterator_category, std::input_iterator_tag>;
                 }
                 inline typename std::conditional<op_action_type == true, void, bool>  
@@ -367,13 +367,31 @@ namespace printing_tools {
                                         return all_ops<Op, op_action_type, Lhs_t::value_type,Rhs_t>(lhs_sub_element,rhs);
                                 });
                         }
-                       
+                template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
+                requires{//the concept is weather the expression below works or not
+                typename std::derived_from
+                <std::iterator_traits<Lhs_t::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
+                }&&Polymorphic_object(Lhs_t::value_type)
+                inline typename std::conditional<op_action_type == true, void, bool>  
+                    op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
+                        switch(lhs->execution_policy){
+                            case thread_policy::unsequenced_exec:
+                                std::for_each(std::execution::unseq , lhs->begin()+indexes_to_skip, lhs->end(),
+                                    [](const auto& lhs_sub_element){
+                                         return all_ops<Op, op_action_type, Lhs_t::value_type,Rhs_t>(lhs_sub_element,rhs);
+                                });
+                            case thread_policy::unsequenced_parrallel_exec:
+                                std::for_each(std::execution::par_unseq , lhs->begin()+indexes_to_skip, lhs->end(),
+                                    [](const auto& lhs_sub_element){
+                                        return all_ops<Op, op_action_type, Lhs_t::value_type,Rhs_t>(lhs_sub_element,rhs);
+                                });
+                        }
     
                         }
     
                 template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
                 require{
-                    std::common_type_t(Nested_type_info, Lhs_t); //requirement is 
+                    std::derived_from(Nested_type_info, Lhs_t); //requirement is 
                     //just to make clear that Lhs_t is Nested_type_info, while keeping the interface uniform 
                 }
                 inline typename std::conditional<op_action_type == true, void, bool> 
@@ -417,9 +435,10 @@ namespace printing_tools {
                 };
 
                 namespace interface_used_by_macro_but_also_implementation_of_some_interface_used_by_macro{
+                
                 template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
                 requires{//the concept is weather the expression below works or not
-                typename std::common_type_t
+                typename std::derived_from
                 <std::iterator_traits<Rhs_t::underlying_container::iterator>::iterator_category, std::input_iterator_tag>;
                 }
                     inline typename std::conditional<op_action_type == true, void, bool>  
@@ -433,6 +452,27 @@ namespace printing_tools {
                                     });
                                 case thread_policy::unsequenced_parrallel_exec:
                                     std::for_each(std::execution::par_unseq, formated_rhs->begin(), formated_rhs->end(), Lhs_t{},
+                                        [](const auto& rhs_sub_element){
+                                            return op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
+                                    });
+                            }
+                    }
+                template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
+                requires{//the concept is weather the expression below works or not
+                typename std::derived_from
+                <std::iterator_traits<Rhs_t::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
+                }&&Polymorphic_object(Rhs_t::value_type)
+                    inline typename std::conditional<op_action_type == true, void, bool>  
+                        op_potential_scalar_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
+                        auto& formated_rhs= *(rhs->ptr);
+                            switch(rhs.execution_policy){
+                                case thread_policy::unsequenced_exec:
+                                    std::for_each(std::execution::unseq, formated_rhs->begin()+indexes_to_skip, formated_rhs->end(),
+                                        [](const auto& rhs_sub_element){
+                                            return op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
+                                    });
+                                case thread_policy::unsequenced_parrallel_exec:
+                                    std::for_each(std::execution::par_unseq, formated_rhs->begin()+indexes_to_skip, formated_rhs->end(), Lhs_t{},
                                         [](const auto& rhs_sub_element){
                                             return op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
                                     });
@@ -468,7 +508,7 @@ namespace printing_tools {
                     template<typename Op, bool op_action_type,typename Lhs_t, typename Rhs_t>
                     inline inline typename std::conditional<op_action_type == true, void, bool>  
                      require{
-                         std::common_type_t(Nested_type_info, Rhs_t); //requirement is 
+                         std::derived_from(Nested_type_info, Rhs_t); //requirement is 
                          //just to make clear that Rhs_t is Nested_type_info, while keeping the interface uniform 
                      }
                     interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects(const Polymoprhic_extensible_engine first_obj, const Polymoprhic_extensible_engine second_obj) {
@@ -940,7 +980,7 @@ namespace printing_tools {
 
             template<typename Underlying_container_specialization, Type_tag_for_input tag>
             requires{//the concept is weather the expression below works or not
-            typename std::common_type_t
+            typename std::derived_from
                 <std::iterator_traits<Underlying_container_specialization::iterator>::iterator_category, std::input_iterator_tag>;
             }
                 static inline void*  copy_nested(Nested_type_info source){
@@ -965,11 +1005,10 @@ namespace printing_tools {
                     return static_cast<void*>(new Nested_type_info{tag, source->execution_policy, static_cast<void*>(destination_data)}); 
 
                 }
-            static constexpr auto indexes_to_skip = std::max(monolithic_buffer_resource_index, all_elements_size_uintptr_t_index);
 
             template<typename Underlying_container_specialization, Type_tag_for_input tag>
             requires{//the concept is weather the expression below works or not
-            typename std::common_type_t
+            typename std::derived_from
                 <std::iterator_traits<Underlying_container_specialization::iterator>::iterator_category, std::random_access_iterator_tag>;
             }
                 static inline void*  copy_nested(Nested_type_info source){
@@ -1001,7 +1040,7 @@ namespace printing_tools {
                 }
             template<typename Sequence_t>
             require{
-            typename std::common_type_t
+            typename std::derived_from
                 <std::iterator_traits<Sequence_t::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
             }
             inline void destruct_sequence_from_the_globally_specified_indexes_to_skip_variable(const Sequence_t& sequence_with_policy){
