@@ -1136,28 +1136,40 @@ namespace printing_tools {
                         {
                             using underlying_type_of_ptr= No_tag_template_type_info<std::vector<std::string>>;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocate_and_return_vector_of_any_type_packed_in_No_tag_template_type_info_type
+                                <underlying_container::value_type:value_type>
+                                (string_to_read_from, pos_size)
+                                );
                             tag= tag_arg;
                         }                    
                     case Type_tag::vector_uintptr: 
                         {
                             using underlying_type_of_ptr= No_tag_template_type_info<std::vector<uintptr_t>>;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocate_and_return_vector_of_any_type_packed_in_No_tag_template_type_info_type
+                                <underlying_container::value_type:value_type>
+                                (string_to_read_from, pos_size)
+                                );
                             tag= tag_arg;
                         }                    
                     case Type_tag::vector_intptr: 
                         {
                             using underlying_type_of_ptr= No_tag_template_type_info<std::vector<intptr_t>>;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocate_and_return_vector_of_any_type_packed_in_No_tag_template_type_info_type
+                                <underlying_container::value_type:value_type>
+                                (string_to_read_from, pos_size)
+                                );
                             tag= tag_arg;
                         }                                    
                     case Type_tag::vector_long_double_tag_implementation_defined_size: 
                         {
                             using underlying_type_of_ptr= No_tag_template_type_info<std::vector<long double>>;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocate_and_return_vector_of_any_type_packed_in_No_tag_template_type_info_type
+                                <underlying_container::value_type:value_type>
+                                (string_to_read_from, pos_size)
+                                );
                             tag= tag_arg;
                         }                                 
                     case Type_tag::nested_type_with_dynamic_container: 
@@ -1197,8 +1209,33 @@ namespace printing_tools {
                         }             
                 }
             }
-
-
+            template<absolute_base::Is_String_Or_Numeric T>
+            static inline No_tag_template_type_info<std::vector<T>>*
+            allocate_and_return_vector_of_any_type_packed_in_No_tag_template_type_info_type
+            (const std::string& string_to_read_from,std::string:size_type* pos_size, 
+            std::pmr::polymorphic_allocator<std::byte> allocator_used){
+                auto *vec = allocator_used.new_object<No_tag_template_type_info<std::vector<T>>>
+                (read_from_string<size_t>(string_to_read_from, pos_size));
+                std::generate(vec->begin(), vec->end(),
+                    [&string_to_read_from, &pos](){
+                        return read_from_string<T>
+                        (string_to_read_from, pos_size);
+                    })
+                return vec;
+            } 
+            template<absolute_base::Is_String_Or_Numeric T>
+            static inline No_tag_template_type_info<std::vector<T>>*
+            allocate_and_return_vector_of_any_type_packed_in_No_tag_template_type_info_type
+            (const std::string& string_to_read_from,std::string:size_type* pos_size){
+                auto *vec = new No_tag_template_type_info<std::vector<T>(read_from_string<size_t>
+                (string_to_read_from, pos_size));
+                std::generate(vec->begin(), vec->end(),
+                    [&string_to_read_from, &pos](){
+                        return read_from_string<T>
+                        (string_to_read_from, pos_size);
+                    })
+                return vec;
+            } 
             inline  Polymoprhic_extensible_engine
             (const std::string& string_to_read_from, std::string:size_type* pos_size,Type_tag tag_arg,
             std::pmr::polymorphic_allocator<std::byte> allocator_used){
@@ -1208,83 +1245,96 @@ namespace printing_tools {
                         {
                             using underlying_type_of_ptr= std::string;
                             ptr= static_cast<void*>
-                                (allocator_used.<underlying_type_of_ptr>(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocator_used.new_object<underlying_type_of_ptr>(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
                             tag= tag_arg;
                         }
                     case Type_tag::uintptr_tag_for_15_plus_operand_ops: 
                         {
                             using underlying_type_of_ptr= uintptr_t;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));                            tag= tag_arg;
+                                (allocator_used.new_object<underlying_type_of_ptr>(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                            tag= tag_arg;
                         }
                     case Type_tag::intptr_tag_for_15_plus_operand_ops: 
                         {
                             using underlying_type_of_ptr= intptr_t;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocator_used.new_object<underlying_type_of_ptr>(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
                             tag= tag_arg;
                         }                    
                     case Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops: 
                         {
                             using underlying_type_of_ptr= long double;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocator_used.new_object<underlying_type_of_ptr>(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
                             tag= tag_arg;
                         }                    
                     case Type_tag::long_double_tag_implementation_defined_size: 
                         {
                             using underlying_type_of_ptr= long double;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocator_used.new_object<underlying_type_of_ptr>(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
                             tag= tag_arg;
                         }                    
                     case Type_tag::uintptr_tag: 
                         {
                             using underlying_type_of_ptr= uintptr_t;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocator_used.new_object<underlying_type_of_ptr>(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
                             tag= tag_arg;
                         }                    
                     case Type_tag::string_tag: 
                         {
                             using underlying_type_of_ptr= std::string;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocator_used.new_object<underlying_type_of_ptr>(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
                             tag= tag_arg;
                         }                    
                     case Type_tag::intptr_tag: 
                         {
                             using underlying_type_of_ptr= uintptr_t;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocator_used.new_object<underlying_type_of_ptr>(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
                             tag= tag_arg;
                         }                    
                     case Type_tag::vector_string: 
                         {
                             using underlying_type_of_ptr= No_tag_template_type_info<std::vector<std::string>>;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocate_and_return_vector_of_any_type_packed_in_No_tag_template_type_info_type
+                                <underlying_container::value_type:value_type>
+                                (string_to_read_from, pos_size,allocator_used)
+                                );
                             tag= tag_arg;
                         }                    
                     case Type_tag::vector_uintptr: 
                         {
                             using underlying_type_of_ptr= No_tag_template_type_info<std::vector<uintptr_t>>;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocate_and_return_vector_of_any_type_packed_in_No_tag_template_type_info_type
+                                <underlying_container::value_type:value_type>
+                                (string_to_read_from, pos_size,allocator_used)
+                                );
                             tag= tag_arg;
                         }                    
                     case Type_tag::vector_intptr: 
                         {
                             using underlying_type_of_ptr= No_tag_template_type_info<std::vector<intptr_t>>;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocate_and_return_vector_of_any_type_packed_in_No_tag_template_type_info_type
+                                <underlying_container::value_type:value_type>
+                                (string_to_read_from, pos_size,allocator_used)
+                                );
                             tag= tag_arg;
                         }                                    
                     case Type_tag::vector_long_double_tag_implementation_defined_size: 
                         {
                             using underlying_type_of_ptr= No_tag_template_type_info<std::vector<long double>>;
                             ptr= static_cast<void*>
-                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                                (allocate_and_return_vector_of_any_type_packed_in_No_tag_template_type_info_type
+                                <underlying_container::value_type:value_type>
+                                (string_to_read_from, pos_size,allocator_used)
+                                );
                             tag= tag_arg;
                         }                                 
                     case Type_tag::nested_type_with_dynamic_container: 
@@ -1536,13 +1586,17 @@ namespace printing_tools {
                     }
     
             };
-            std::vector<std::vector<Extented_type_info>> vector_containing_types;
-            std::deque<std::vector<Extented_type_info>> deque_containing_types;
-            std::list<std::vector<Extented_type_info>> list_containing_types;
-            std::forward_list<std::vector<Extented_type_info>> forward_list_containing_types;
-            std::map<uintptr_t,std::vector<Extented_type_info>> map_containing_types;
-            std::unordered_map<uintptr_t,std::vector<Extented_type_info>> hash_map_containing_types;
-            std::array<std::vector<Extented_type_info>, 100> array_containing_types{{}};
+            /*         
+                Object names to use in the function below. I hate finding these kind names again and
+                again, hence added this comment.
+                vector_containing_types;
+                deque_containing_types;
+                list_containing_types;
+                forward_list_containing_types;
+                map_containing_types;
+                hash_map_containing_types;
+                array_containing_types{{}};
+            */
             inline Polymoprhic_extensible_engine object_and_type_factory(const Extented_type_info& info, const std::string& string_to_read_from, 
                 std::string:size_type* pos )
             {
