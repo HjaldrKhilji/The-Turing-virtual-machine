@@ -291,7 +291,7 @@ namespace printing_tools {
             std::array<std::vector<Type_tag>, 100> array_containing_types{{}};
 
             enum class thread_policy : uint8_t {
-            unsequenced_exec,
+            single_thread_exec,
             unsequenced_parrallel_exec
             }; //notice that all operations are unsequenced
             struct Nested_type_info{
@@ -354,7 +354,7 @@ namespace printing_tools {
                 inline typename std::conditional<op_action_type == true, void, bool>  
                     op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
                         switch(lhs->execution_policy){
-                            case thread_policy::unsequenced_exec:
+                            case thread_policy::single_thread_exec:
                                 std::for_each(std::execution::unseq , lhs->begin(), lhs->end(),
                                     [](const auto& lhs_sub_element){
                                          return all_ops<Op, op_action_type, Lhs_t::value_type,Rhs_t>(lhs_sub_element,rhs);
@@ -373,7 +373,7 @@ namespace printing_tools {
                 inline typename std::conditional<op_action_type == true, void, bool>  
                     op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
                         switch(lhs->execution_policy){
-                            case thread_policy::unsequenced_exec:
+                            case thread_policy::single_thread_exec:
                                 std::for_each(std::execution::unseq , lhs->begin()+indexes_to_skip, lhs->end(),
                                     [](const auto& lhs_sub_element){
                                          return all_ops<Op, op_action_type, Lhs_t::value_type,Rhs_t>(lhs_sub_element,rhs);
@@ -443,7 +443,7 @@ namespace printing_tools {
                         op_potential_scalar_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
                         auto& formated_rhs= *(rhs->ptr);
                             switch(rhs.execution_policy){
-                                case thread_policy::unsequenced_exec:
+                                case thread_policy::single_thread_exec:
                                     std::for_each(std::execution::unseq, formated_rhs->begin(), formated_rhs->end(),
                                         [](const auto& rhs_sub_element){
                                             return op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
@@ -464,7 +464,7 @@ namespace printing_tools {
                         op_potential_scalar_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
                         auto& formated_rhs= *(rhs->ptr);
                             switch(rhs.execution_policy){
-                                case thread_policy::unsequenced_exec:
+                                case thread_policy::single_thread_exec:
                                     std::for_each(std::execution::unseq, formated_rhs->begin()+indexes_to_skip, formated_rhs->end(),
                                         [](const auto& rhs_sub_element){
                                             return op_scalar_or_collection_with_collection<Op, op_action_type, Lhs_t,Rhs_t::value_type>(lhs,rhs_sub_element);
@@ -692,19 +692,20 @@ namespace printing_tools {
                     underlying_container_specialization_and_thread_execution_policy& formated_source= 
                     *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(source->ptr));
                     //NOTE: underlying_container_specialization is a container type.
-                    underlying_container_specialization_and_thread_execution_policy& destination_data= *(new underlying_container_specialization_and_thread_execution_policy(source->execution_policy, formated_source.size()));
+                    underlying_container_specialization_and_thread_execution_policy& destination_data= 
+                    *(new underlying_container_specialization_and_thread_execution_policy
+                    (source->execution_policy, 0));
                     switch(source->execution_policy){
-                    case thread_policy::unsequenced_exec:
-                        std::copy(std::execution::unseq , formated_source.ptr.begin(), formated_source.ptr.end(), destination_data.ptr.begin(), 
-                            [](const Polymoprhic_extensible_engine source_ptr){
-                                return Polymoprhic_extensible_engine(source_ptr);
-                            
+                    case thread_policy::single_thread_exec:
+                        std::for_each(std::execution::unseq , formated_source.ptr.begin(), formated_source.ptr.end(),
+                            [&destination_data](const Polymoprhic_extensible_engine source_ptr){
+                                destination_data.ptr.push_back(Polymoprhic_extensible_engine(source_ptr));
                         });
                     case thread_policy::unsequenced_parrallel_exec:
+                        destination_data.ptr.reserve(formated_source);
                         std::copy(std::execution::par_unseq , formated_source.ptr.begin(), formated_source.ptr.end(), destination_data.ptr.begin(), 
                             [](const Polymoprhic_extensible_engine source_ptr){
                                 return Polymoprhic_extensible_engine(source_ptr);
-                            
                         });
                     }
                     return static_cast<void*>(new Nested_type_info{tag, source->execution_policy, static_cast<void*>(&destination_data)}); 
@@ -729,7 +730,7 @@ namespace printing_tools {
                     destination_data[monolithic_buffer_resource_index] = {monolithic_buffer_resource_tag, static_cast<void*>(buffer)};
                     destination_data[all_elements_size_uintptr_t_index]= {all_elements_size_uintptr_t_tag,static_cast<void*>(allocator_used.new_object<size_t>(formated_size))};
                     switch(source->execution_policy){
-                    case thread_policy::unsequenced_exec:
+                    case thread_policy::single_thread_exec:
                         std::copy(std::execution::unseq , formated_source.ptr.begin()+indexes_to_skip, formated_source.ptr.end(), destination_data.ptr.begin()+indexes_to_skip, 
                             [](const Polymoprhic_extensible_engine source_ptr){
                                 return Polymoprhic_extensible_engine(source_ptr, allocator_used);
@@ -740,7 +741,7 @@ namespace printing_tools {
                                 return Polymoprhic_extensible_engine(source_ptr, allocator_used);
                         });
                     }
-                    return static_cast<void*>(new Nested_type_info{tag, source->execution_policy, static_cast<void*>(&destination_data)}); 
+                    return static_cast<void*>(allocator_used.new_object<Nested_type_info>(tag, source->execution_policy, static_cast<void*>(&destination_data))); 
 
                 }
             inline Polymoprhic_extensible_engine(Polymoprhic_extensible_engine source){
@@ -1002,27 +1003,36 @@ namespace printing_tools {
             typename std::derived_from
                 <std::iterator_traits<Underlying_container_specialization::underlying_container::iterator>::iterator_category, std::input_iterator_tag>;
             }
-                static inline void* make_nested(const std::string& string_to_read_from, std::string:size_type* pos,Type_tag tag_arg){
-                    underlying_container_specialization_and_thread_execution_policy& formated_source= 
-                    *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(source->ptr));
-                    //NOTE: underlying_container_specialization is a container type.
-                    underlying_container_specialization_and_thread_execution_policy& destination_data= *(new underlying_container_specialization_and_thread_execution_policy(source->execution_policy, formated_source.size()));
-                    switch(source->execution_policy){
-                    case thread_policy::unsequenced_exec:
-                        std::generate(std::execution::unseq , formated_source.ptr.begin(), formated_source.ptr.end(), 
-                            [](const Polymoprhic_extensible_engine source_ptr){
-                                return Polymoprhic_extensible_engine{string_to_read_from, pos, tag_arg};
-                            
-                        });
-                    case thread_policy::unsequenced_parrallel_exec:
-                        std::generate(std::execution::par_unseq , formated_source.ptr.begin(), formated_source.ptr.end(), 
-                            [](const Polymoprhic_extensible_engine source_ptr){
-                                return Polymoprhic_extensible_engine{string_to_read_from, pos, tag_arg};
-                            
-                        });
-                    }
-                    return static_cast<void*>(new Nested_type_info{tag, source->execution_policy, static_cast<void*>(destination_data)}); 
+                static inline void* make_nested(Nested_type_info source){
+                    auto thread_policy = read_from_string<uint8_t>(string_to_read_from, pos_size);
+                    auto size_to_reserve_for_the_container= read_from_string<size_t>(string_to_read_from, pos);
+                    underlying_container_specialization& underlying_data= 
+                    *(new underlying_container_specialization_and_thread_execution_policy(thread_policy,0));
 
+                    switch(thread_policy){
+                    case thread_policy::single_thread_exec:
+                        for(int i =0; i<size_to_reserve_for_the_container; i++){
+                            underlying_data.ptr.push_back(Polymoprhic_extensible_engine
+                            {string_to_read_from, pos,static_cast<Type_tag_for_input>(read_from_string<uint8_t>
+                            (string_to_read_from, pos_size))});
+                        }
+                    case thread_policy::unsequenced_parrallel_exec:
+                        {
+                            auto  size_to_reserve_for_the_container= read_from_string<size_t>(string_to_read_from, pos);
+                            destination_data.ptr.reserve(formated_source);
+                            std::generate(std::execution::par_unseq , underlying_data.ptr.begin(), underlying_data.ptr.end(), 
+                                [&string_to_read_from, &pos](){
+                                    return Polymoprhic_extensible_engine
+                                    {string_to_read_from, pos,static_cast<Type_tag_for_input>
+                                    (read_from_string<uint8_t>(string_to_read_from, pos_size))};
+                            });
+                    }
+                    return static_cast<void*>(allocator_used.new_object<Nested_type_info>(
+                        static_cast<Type_tag_for_input>(
+                        read_from_string<uint8_t>(string_to_read_from, pos_size)),
+                        thread_policy,
+                        static_cast<void*>(&underlying_data)                                
+                    )); 
                 }
 
             template<typename Underlying_container_specialization, Type_tag_for_input tag>
@@ -1031,17 +1041,20 @@ namespace printing_tools {
                 <std::iterator_traits<Underlying_container_specialization::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
             }
                 static inline void*  make_nested(const std::string& string_to_read_from, std::string:size_type* pos,Type_tag tag_arg){
-                    size_t size_to_reserve_for_elements= read_from_string<size_t>(string_to_read_from, pos);
-                    size_t size_to_reserve_for_container= read_from_string<size_t>(string_to_read_from, pos);
-                    size_t final_size= size_to_reserve_for_elements+size_to_reserve_for_container;
+                    auto thread_policy = read_from_string<uint8_t>(string_to_read_from, pos_size);
+                    auto  size_to_reserve_for_the_elements= read_from_string<uint64_t>(string_to_read_from, pos);
+                    auto  size_to_reserve_for_the_container= read_from_string<size_t>(string_to_read_from, pos);
+                    auto  total_size_to_reserve= size_to_reserve_for_the_elements+size_to_reserve_for_the_container;
                     using memory_region=std::pmr::monotonic_buffer_resource::monotonic_buffer_resource;
-                    memory_region* buffer= new memory_region(final_size);
+                    memory_region* buffer= new memory_region(total_size_to_reserve);
                     std::pmr::polymorphic_allocator<std::byte> allocator_used{buffer};
-                    underlying_container_specialization& underlying_data= *(allocator_used.new_object<underlying_container_specialization_and_thread_execution_policy>(source->execution_policy,formated_source.size()));
+                    underlying_container_specialization& underlying_data= 
+                    *(allocator_used.new_object<underlying_container_specialization_and_thread_execution_policy>
+                    (thread_policy,size_to_reserve_for_the_container));
                     underlying_data[monolithic_buffer_resource_index] = {monolithic_buffer_resource_tag, static_cast<void*>(buffer)};
                     underlying_data[all_elements_size_uintptr_t_index]= {all_elements_size_uintptr_t_tag,static_cast<void*>(allocator_used.new_object<size_t>(final_size))};
-                    switch(source->execution_policy){
-                    case thread_policy::unsequenced_exec:
+                    switch(thread_policy){
+                    case thread_policy::single_thread_exec:
                         std::generate(std::execution::unseq , underlying_data.ptr.begin(), underlying_data.ptr.end(), 
                             [&string_to_read_from, &pos](){
                                 return Polymoprhic_extensible_engine{string_to_read_from, pos,static_cast<Type_tag_for_input>(read_from_string<uint8_t>(string_to_read_from, pos_size))};
@@ -1052,11 +1065,12 @@ namespace printing_tools {
                                 return Polymoprhic_extensible_engine{string_to_read_from, pos,static_cast<Type_tag_for_input>(read_from_string<uint8_t>(string_to_read_from, pos_size))};
                         });
                     }
-                    return static_cast<void*>(new Nested_type_info{
-                                static_cast<Type_tag_for_input>(read_from_string<uint8_t>(string_to_read_from, pos_size)),
-                                static_cast<thread_policy>(read_from_string<uint8_t>(string_to_read_from, pos_size)),
-                                static_cast<void*>(&underlying_data);                                
-                            }); 
+                    return static_cast<void*>(allocator_used.new_object<Nested_type_info>(
+                        static_cast<Type_tag_for_input>(
+                        read_from_string<uint8_t>(string_to_read_from, pos_size)),
+                        thread_policy,
+                        static_cast<void*>(&underlying_data)                                
+                    )); 
 
                 }
             inline  Polymoprhic_extensible_engine
@@ -1185,15 +1199,142 @@ namespace printing_tools {
             }
 
 
+            inline  Polymoprhic_extensible_engine
+            (const std::string& string_to_read_from, std::string:size_type* pos_size,Type_tag tag_arg,
+            std::pmr::polymorphic_allocator<std::byte> allocator_used){
+                switch(tag_arg){
+                    //to be completed
+                    case Type_tag::string_tag_for_15_plus_operand_ops: 
+                        {
+                            using underlying_type_of_ptr= std::string;
+                            ptr= static_cast<void*>
+                                (allocator_used.<underlying_type_of_ptr>(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                            tag= tag_arg;
+                        }
+                    case Type_tag::uintptr_tag_for_15_plus_operand_ops: 
+                        {
+                            using underlying_type_of_ptr= uintptr_t;
+                            ptr= static_cast<void*>
+                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));                            tag= tag_arg;
+                        }
+                    case Type_tag::intptr_tag_for_15_plus_operand_ops: 
+                        {
+                            using underlying_type_of_ptr= intptr_t;
+                            ptr= static_cast<void*>
+                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                            tag= tag_arg;
+                        }                    
+                    case Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops: 
+                        {
+                            using underlying_type_of_ptr= long double;
+                            ptr= static_cast<void*>
+                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                            tag= tag_arg;
+                        }                    
+                    case Type_tag::long_double_tag_implementation_defined_size: 
+                        {
+                            using underlying_type_of_ptr= long double;
+                            ptr= static_cast<void*>
+                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                            tag= tag_arg;
+                        }                    
+                    case Type_tag::uintptr_tag: 
+                        {
+                            using underlying_type_of_ptr= uintptr_t;
+                            ptr= static_cast<void*>
+                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                            tag= tag_arg;
+                        }                    
+                    case Type_tag::string_tag: 
+                        {
+                            using underlying_type_of_ptr= std::string;
+                            ptr= static_cast<void*>
+                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                            tag= tag_arg;
+                        }                    
+                    case Type_tag::intptr_tag: 
+                        {
+                            using underlying_type_of_ptr= uintptr_t;
+                            ptr= static_cast<void*>
+                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                            tag= tag_arg;
+                        }                    
+                    case Type_tag::vector_string: 
+                        {
+                            using underlying_type_of_ptr= No_tag_template_type_info<std::vector<std::string>>;
+                            ptr= static_cast<void*>
+                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                            tag= tag_arg;
+                        }                    
+                    case Type_tag::vector_uintptr: 
+                        {
+                            using underlying_type_of_ptr= No_tag_template_type_info<std::vector<uintptr_t>>;
+                            ptr= static_cast<void*>
+                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                            tag= tag_arg;
+                        }                    
+                    case Type_tag::vector_intptr: 
+                        {
+                            using underlying_type_of_ptr= No_tag_template_type_info<std::vector<intptr_t>>;
+                            ptr= static_cast<void*>
+                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                            tag= tag_arg;
+                        }                                    
+                    case Type_tag::vector_long_double_tag_implementation_defined_size: 
+                        {
+                            using underlying_type_of_ptr= No_tag_template_type_info<std::vector<long double>>;
+                            ptr= static_cast<void*>
+                                (new underlying_type_of_ptr(read_from_string<underlying_type_of_ptr>(string_to_read_from, pos_size)));
+                            tag= tag_arg;
+                        }                                 
+                    case Type_tag::nested_type_with_dynamic_container: 
+                        {
+                            Type_tag_for_input underlying_nested_type_tag= static_cast<Type_tag_for_input>(read_from_string<uint8_t>(string_to_read_from, pos_size));
+                            switch(underlying_nested_type_tag){
+                                case Type_tag_for_input::array_nested_type_vector:{
+                                    using Source_and_target_type= No_tag_template_type_info<std::vector<Polymoprhic_extensible_engine>>;
+                                    tag= Type_tag::nested_type_with_dynamic_container;
+                                    ptr = make_nested<Source_and_target_type, Type_tag_for_input::vector_containing_types>(underlying_obj);
+                                    break;
+                                    }
+                                case Type_tag_for_input::array_nested_type_deque:{
+                                    using Source_and_target_type= No_tag_template_type_info<std::deque<Polymoprhic_extensible_engine>>;
+                                    tag= Type_tag::nested_type_with_dynamic_container;
+                                    ptr = make_nested<Source_and_target_type, Type_tag_for_input::type_in_deque_tag>(underlying_obj);
+                                    break;}
+                                case Type_tag_for_input::array_nested_type_list:{
+                                    using Source_and_target_type= No_tag_template_type_info<std::list<Polymoprhic_extensible_engine>>;
+                                    tag= Type_tag::nested_type_with_dynamic_container;
+                                    ptr = make_nested<Source_and_target_type, Type_tag_for_input::type_in_list>(underlying_obj);
+                                    break;}
+                                case Type_tag_for_input::array_nested_type_forward_list:{
+                                    using Source_and_target_type= No_tag_template_type_info<std::forward_list<Polymoprhic_extensible_engine>>;
+                                    tag= Type_tag::nested_type_with_dynamic_container;
+                                    ptr = make_nested<Source_and_target_type, Type_tag_for_input::type_in_forward_list>(underlying_obj);
+                                    break;}
+                                default:
+                                    throw std::string{"Invalid Container Tag"};
+                                    break;
+                            }
+                     //the rest of the types are currently unsupported :(
+                     //(got to finish the base of this project as fast as I can cuz i spend too much time)   
+                    default:
+                        throw std::string{"Invalid Type Tag"};
+                        break;
+                        }             
+                }
+            }
+
+                    
             template<typename Underlying_container_specialization>
             require{
             typename std::derived_from
                 <std::iterator_traits<Underlying_container_specialization::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
             }
-            inline void destruct_sequence_from_the_globally_specified_indexes_to_skip_variable(const Underlying_container_specialization& sequence_with_policy){
+            inline void destruct_sequence_using_the_globally_specified_indexes_to_skip_variable(const Underlying_container_specialization& sequence_with_policy){
                 const auto* container= sequence_with_policy.ptr;
                 switch(sequence_with_policy->execution_policy){
-                    case thread_policy::unsequenced_exec:
+                    case thread_policy::single_thread_exec:
                         std::for_each(std::execution::unseq, container->begin()+indexes_to_skip, container->end(), 
                         [](const Polymoprhic_extensible_engine source_ptr){
                             source_ptr.~Polymoprhic_extensible_engine();
@@ -1285,7 +1426,7 @@ namespace printing_tools {
                                 using underlying_container_specialization_and_thread_execution_policy = No_tag_template_type_info<std::vector<Polymoprhic_extensible_engine>>;
                                 const underlying_container_specialization_and_thread_execution_policy& sequence_with_policy = 
                                 *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(underlying_obj->ptr));
-                                destruct_sequence_from_the_globally_specified_indexes_to_skip_variable(sequence_with_policy);
+                                destruct_sequence_using_the_globally_specified_indexes_to_skip_variable(sequence_with_policy);
                                 ~((sequence_with_policy->ptr)[monolithic_buffer_resource_index])();
                                 break;
                             }
@@ -1293,23 +1434,24 @@ namespace printing_tools {
                                 using underlying_container_specialization_and_thread_execution_policy = No_tag_template_type_info<std::deque<Polymoprhic_extensible_engine>>;
                                 const underlying_container_specialization_and_thread_execution_policy& sequence_with_policy = 
                                 *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(underlying_obj->ptr));
-                                destruct_sequence_from_the_globally_specified_indexes_to_skip_variable(sequence_with_policy);
+                                destruct_sequence_using_the_globally_specified_indexes_to_skip_variable(sequence_with_policy);
                                 ~((sequence_with_policy->ptr)[monolithic_buffer_resource_index])();                                break;
                             }
                             case Type_tag_for_input::type_in_list: {
                                 using underlying_container_specialization_and_thread_execution_policy = No_tag_template_type_info<std::list<Polymoprhic_extensible_engine>>;
                                 delete (static_cast<underlying_container_specialization_and_thread_execution_policy*>(underlying_obj->ptr));
+                                delete underlying_obj;
                                 break;
                             }
                             case Type_tag_for_input::type_in_forward_list: {
                                 using underlying_container_specialization_and_thread_execution_policy = No_tag_template_type_info<std::forward_list<Polymoprhic_extensible_engine>>;
                                 delete (static_cast<underlying_container_specialization_and_thread_execution_policy*>(underlying_obj->ptr));
+                                delete underlying_obj;
                                 break;
                             }
                             default:
                                 break; 
                         }
-                        delete underlying_obj;
                         break;
                     }
 
