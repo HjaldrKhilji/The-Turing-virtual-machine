@@ -1597,6 +1597,9 @@ namespace printing_tools {
                 hash_map_containing_types;
                 array_containing_types{{}};
             */
+            //provide pump(functions that pump to string) and type size calculation(for monolithic storage types 
+            //(deque and vectors storing polymorphic objects)) before working on the function below or 
+            //even the rest of the project
             inline Polymoprhic_extensible_engine object_and_type_factory(const Extented_type_info& info, const std::string& string_to_read_from, 
                 std::string:size_type* pos )
             {
