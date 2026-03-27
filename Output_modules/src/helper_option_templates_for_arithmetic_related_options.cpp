@@ -284,6 +284,15 @@ namespace printing_tools {
                 newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_list_tag,
                 newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_forward_list_tag,
             };
+            enum class Which_type_facility_to_change: uint8_t{
+                change_array_tag=0,
+                change_vector_tag=1,
+                change_deque_tag=2,
+                change_map_tag=3,
+                change_hash_map_tag,
+                change_list_tag,
+                change_forward_list_tag,
+            };
             enum class Which_type_facility_to_push_to: uint8_t{
                 push_to_array_tag=0,
                 push_to_vector_tag=1,
@@ -292,6 +301,15 @@ namespace printing_tools {
                 push_to_hash_map_tag,
                 push_to_list_tag,
                 push_to_forward_list_tag,
+            };
+            enum class Which_type_facility_to_pop: uint8_t{
+                pop_from_array_tag=0,
+                pop_from_vector_tag=1,
+                pop_from_deque_tag=2,
+                pop_from_map_tag=3,
+                pop_from_hash_map_tag,
+                pop_from_list_tag,
+                pop_from_forward_list_tag,
             };
             enum Monolothic_resource_index: uint8_t{
             monolithic_buffer_resource_index=0;
@@ -466,22 +484,24 @@ namespace printing_tools {
                                 (const std::string& string_to_read_from, std::string::std::size_type* pos){
                                     Which_type_facility_to_push_to where_to_push= static_cast<Type_storage_facility>(
                                         auto type_info=  get_type_info_from_string(get_type_info_from_string);
-                                        read_from_string<uint8_t>(string_to_read_from, pos);
-                                        switch(what_to_do){
-                                            case Which_type_facility_to_push_to::push_to_array_tag:
-                                                array_containing_types.at(read_from_string<size_t>(string_to_read_from, pos))= type_info;
-                                            case Which_type_facility_to_push_to::push_to_vector_tag:
-                                                vector_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= type_info;                                        
-                                            case Which_type_facility_to_push_to::push_to_deque_tag:
-                                                deque_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= type_info;                                    
-                                            case Which_type_facility_to_push_to::push_to_map_tag:
-                                                map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= type_info;                                                                            
-                                            case Which_type_facility_to_push_to::push_to_hash_map_tag:
-                                                hash_map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= type_info;                                            
-                                            case Which_type_facility_to_push_to::push_to_list_tag:
-                                                list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= type_info;                                    
-                                            case Which_type_facility_to_push_to::push_to_forward_list_tag_tag:
-                                                forward_list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= type_info;                                    
+                                        Which_type_facility_to_change facility_to_change= 
+                                        static_cast<Which_type_facility_to_change>
+                                        (read_from_string<uint8_t>(string_to_read_from, pos));
+                                        switch(facility_to_change){
+                                            case Which_type_facility_to_change::change_array_tag:
+                                                array_containing_types.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);
+                                            case Which_type_facility_to_change::change_vector_tag:
+                                                vector_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                        
+                                            case Which_type_facility_to_change::change_deque_tag:
+                                                deque_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                    
+                                            case Which_type_facility_to_change::change_map_tag:
+                                                map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                                                            
+                                            case Which_type_facility_to_change::change_hash_map_tag:
+                                                hash_map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                            
+                                            case Which_type_facility_to_change::change_list_tag:
+                                                list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                    
+                                            case Which_type_facility_to_change::change_forward_list_tag_tag:
+                                                forward_list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                    
                                             default:
                                                 throw std::string{"invalid type location!!!"};
                                             }
@@ -489,9 +509,11 @@ namespace printing_tools {
                                     inline std::vector<Type_tag> push_collection_of_types
                                     (const std::string& string_to_read_from, std::string::std::size_type* pos){
                                         Which_type_facility_to_push_to where_to_push= static_cast<Type_storage_facility>(
-                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
-                                            read_from_string<uint8_t>(string_to_read_from, pos);
-                                            switch(what_to_do){
+                                            auto type_info= get_type_info_from_string(get_type_info_from_string);
+                                            push_collection_of_types facility_to_push_to=
+                                            static_cast<push_collection_of_types>
+                                            (read_from_string<uint8_t>(string_to_read_from, pos));
+                                            switch(facility_to_push_to){
                                                 case Which_type_facility_to_push_to::push_to_vector_tag:
                                                     vector_containing_type_collections.push(type_info);                                        
                                                 case Which_type_facility_to_push_to::push_to_deque_tag:
@@ -512,19 +534,21 @@ namespace printing_tools {
                                     (const std::string& string_to_read_from, std::string::std::size_type* pos){
                                         Which_type_facility_to_push_to where_to_push= static_cast<Type_storage_facility>(
                                             auto type_info=  get_type_info_from_string(get_type_info_from_string);
-                                            read_from_string<uint8_t>(string_to_read_from, pos);
-                                            switch(what_to_do){
-                                                case Which_type_facility_to_push_to::push_to_vector_tag:                                  
+                                            Which_type_facility_to_pop facility_to_pop_from= 
+                                            static_cast<Which_type_facility_to_pop>
+                                            (read_from_string<uint8_t>(string_to_read_from, pos));
+                                            switch(facility_to_pop_from){
+                                                case Which_type_facility_to_pop::pop_from_vector_tag:                                  
                                                     pop_back_container(vector_containing_type_collections)
-                                                case Which_type_facility_to_push_to::push_to_deque_tag:  
+                                                case Which_type_facility_to_pop::pop_from_deque_tag:  
                                                     pop_back_container(deque_containing_type_collections)
-                                                case Which_type_facility_to_push_to::push_to_map_tag:                                       
+                                                case Which_type_facility_to_pop::pop_from_map_tag:                                       
                                                     pop_back_container(map_containing_type_collections)                                             
-                                                case Which_type_facility_to_push_to::push_to_hash_map_tag:                                        
+                                                case Which_type_facility_to_pop::pop_from_hash_map_tag:                                        
                                                     pop_back_container(hash_map_containing_type_collections)                                             
-                                                case Which_type_facility_to_push_to::push_to_list_tag:
+                                                case Which_type_facility_to_pop::pop_from_list_tag:
                                                     pop_back_container(list_containing_type_collections)                                             
-                                                case Which_type_facility_to_push_to::push_to_forward_list_tag_tag:
+                                                case Which_type_facility_to_pop::pop_from_forward_list_tag_tag:
                                                     pop_back_container(forward_list_containing_type_collections)                                             
                                                 default:
                                                     throw std::string{"invalid type location!!!"};
