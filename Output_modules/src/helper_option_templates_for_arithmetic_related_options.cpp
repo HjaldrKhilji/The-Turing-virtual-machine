@@ -507,7 +507,6 @@ namespace printing_tools {
                                     }
                                 inline std::vector<Type_tag> change__part_of_collection_of_types
                                 (const std::string& string_to_read_from, std::string::std::size_type* pos){
-                                    Which_type_facility_to_push_to where_to_push= static_cast<Type_storage_facility>(
                                         auto type_info=  get_type_info_from_string(get_type_info_from_string);
                                         Which_type_facility_to_change facility_to_change= 
                                         static_cast<Which_type_facility_to_change>
