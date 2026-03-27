@@ -506,6 +506,32 @@ namespace printing_tools {
                                                 throw std::string{"invalid type location!!!"};
                                             }
                                     }
+                                inline std::vector<Type_tag> change__part_of_collection_of_types
+                                (const std::string& string_to_read_from, std::string::std::size_type* pos){
+                                    Which_type_facility_to_push_to where_to_push= static_cast<Type_storage_facility>(
+                                        auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                        Which_type_facility_to_change facility_to_change= 
+                                        static_cast<Which_type_facility_to_change>
+                                        (read_from_string<uint8_t>(string_to_read_from, pos));
+                                        switch(facility_to_change){
+                                            case Which_type_facility_to_change::change_array_tag:
+                                                array_containing_types.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);
+                                            case Which_type_facility_to_change::change_vector_tag:
+                                                vector_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                        
+                                            case Which_type_facility_to_change::change_deque_tag:
+                                                deque_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                    
+                                            case Which_type_facility_to_change::change_map_tag:
+                                                map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                                                            
+                                            case Which_type_facility_to_change::change_hash_map_tag:
+                                                hash_map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                            
+                                            case Which_type_facility_to_change::change_list_tag:
+                                                list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                    
+                                            case Which_type_facility_to_change::change_forward_list_tag_tag:
+                                                forward_list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                    
+                                            default:
+                                                throw std::string{"invalid type location!!!"};
+                                            }
+                                    }
                                     inline std::vector<Type_tag> push_collection_of_types
                                     (const std::string& string_to_read_from, std::string::std::size_type* pos){
                                         Which_type_facility_to_push_to where_to_push= static_cast<Type_storage_facility>(
