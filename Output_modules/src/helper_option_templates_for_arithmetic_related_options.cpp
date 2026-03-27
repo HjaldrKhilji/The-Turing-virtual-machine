@@ -19,7 +19,7 @@ namespace printing_tools {
     namespace helper_templates_for_options {
         namespace helpers_for_arithmetic_options {
             template <absolute_base::Is_String_Or_Numeric T>
-            inline T read_from_string(const std::string& string_to_read_from, std::string::size_type* pos) {
+            inline T read_from_string(const std::string& string_to_read_from, std::string:: std::size_type* pos) {
                 if constexpr (std::is_same_v<T, std::string>) {
                     return read_string_from_string_at_a_position(string_to_read_from, pos);
                 }
@@ -29,7 +29,7 @@ namespace printing_tools {
             }
 
             template <absolute_base::Is_String_Or_Numeric T, bool read_from_x_or_y>
-            inline T read_from_string(const std::string& x, const std::string& y, std::string::size_type* x_pos, std::string::size_type* y_pos) {
+            inline T read_from_string(const std::string& x, const std::string& y, std::string:: std::size_type* x_pos, std::string:: std::size_type* y_pos) {
                 constexpr if (read_from_x_or_y) {
                     read_from_string(x, x_pos);
                 }
@@ -39,7 +39,7 @@ namespace printing_tools {
                 }
             }
             template <bool read_from_x_or_y>
-            inline bool read_from_string<bool>(const std::string& x, const std::string& y, std::string::size_type* x_pos, std::string::size_type* y_pos) {
+            inline bool read_from_string<bool>(const std::string& x, const std::string& y, std::string:: std::size_type* x_pos, std::string:: std::size_type* y_pos) {
                 constexpr if (read_from_x_or_y) {
                     absolute_base::convert_to_bool(x, x_pos);
                 }
@@ -49,7 +49,7 @@ namespace printing_tools {
                 }
             }
             template <bool read_from_x_or_y>
-            inline char read_from_string<char>(const std::string& x, const std::string& y, std::string::size_type* x_pos, std::string::size_type* y_pos) {
+            inline char read_from_string<char>(const std::string& x, const std::string& y, std::string:: std::size_type* x_pos, std::string:: std::size_type* y_pos) {
                 constexpr if (read_from_x_or_y) {
                     absolute_base::convert_to_char(x, x_pos);
                 }
@@ -59,7 +59,7 @@ namespace printing_tools {
                 }
             }
             template <>
-            inline char read_from_string<char>(const std::string& y, std::string::size_type* y_pos) {
+            inline char read_from_string<char>(const std::string& y, std::string:: std::size_type* y_pos) {
                 
                     absolute_base::convert_to_char(y, y_pos);
 
@@ -79,7 +79,7 @@ namespace printing_tools {
             }
             template <absolute_base::Numeric T>
             inline T convert_to_number(std::string source) {
-                std::string::size_type position = 0;
+                std::string:: std::size_type position = 0;
                 T result = absolute_base::read_number_from_string_at_a_position<T>(source, &position);
                 if (position != source.length()) {
                     throw std::string{ "number mixed with (non numeric) charactor while taking input for an option" };
@@ -110,7 +110,7 @@ namespace printing_tools {
                         interal_data = convert_to_target<Internal_resperentation>(arg.internal_data);
                     
                 }
-                void pump(std::string* string_to_pump_to, std::string::size_type* output_string_position) {
+                void pump(std::string* string_to_pump_to, std::string:: std::size_type* output_string_position) {
                     if constexpr (!std::is_same_v<std::string, Internal_resperentation>) {
                         std::string to_pump = std::move(internal_data);
                         *string_to_pump_to += to_pump;
@@ -262,34 +262,277 @@ namespace printing_tools {
                 return (static_cast<uint8_t>(type)>>4)+type_y;
             }
            enum class Type_storage_facility: uint8_t{
-                type_in_array_tag=0,
-                type_in_vector_tag=1,
-                type_in_deque_tag=2,
-                type_in_map_tag=3,
-                type_in_hash_map_tag,
-                type_in_list,
-                type_in_forward_list,
+                types_in_array_tag=0,
+                types_in_vector_tag=1,
+                types_in_deque_tag=2,
+                types_in_list,
+                types_in_forward_list,
+                types_in_map_tag=3,
+                types_in_hash_map_tag,
+                get_from_back_then_pop_back_from_vector_tag=1,
+                get_from_back_then_pop_back_from_deque_tag=2,
+                get_from_back_then_pop_back_from_map_tag=3,
+                get_from_back_then_pop_back_from_hash_map_tag,
+                get_from_back_then_pop_back_from_list,
+                get_from_back_then_pop_back_from_forward_list,
                 newly_defined_temp_type_for_new_obj,
-                newly_defined_type_for_new_obj,
-                just_trying_to_define_a_new_type_without_making_any_objects
+                //notice how you cant push the a array because thats obviously not possible
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_vector_tag,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_deque_tag,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_map_tag,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_hash_map_tag,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_list_tag,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_forward_list_tag,
             };
-            sturct Extented_type_info{
-                Type_storage_facility tag;
-                uintptr_t index;
+            enum class Which_type_facility_to_push_to: uint8_t{
+                push_to_array_tag=0,
+                push_to_vector_tag=1,
+                push_to_deque_tag=2,
+                push_to_map_tag=3,
+                push_to_hash_map_tag,
+                push_to_list_tag,
+                push_to_forward_list_tag,
             };
-            enum monolothic_resource_index{
-            monolithic_buffer_resource_index;
+            enum Monolothic_resource_index: uint8_t{
+            monolithic_buffer_resource_index=0;
             all_elements_size_uintptr_t_index=1;
             };
             static constexpr auto indexes_to_skip = std::max(monolithic_buffer_resource_index, all_elements_size_uintptr_t_index);
-            std::vector<std::vector<Type_tag>> vector_containing_types;
-            std::deque<std::vector<Type_tag>> deque_containing_types;
-            std::list<std::vector<Type_tag>> list_containing_types;
-            std::forward_list<std::vector<Type_tag>> forward_list_containing_types;
-            std::map<uintptr_t,std::vector<Type_tag>> map_containing_types;
-            std::unordered_map<uintptr_t,std::vector<Type_tag>> hash_map_containing_types;
-            std::array<std::vector<Type_tag>, 100> array_containing_types{{}};
-
+            template<typename class_in_monolithic_buffer_and_element_size_is_stroed>
+            static constexpr auto extra_size_to_reserve_in_monolithic_buffer= 
+            sizeof(class_in_monolithic_buffer_and_element_size_is_stroed*2)+
+            sizeof(std::pmr::monotonic_buffer_resource::monotonic_buffer_resource)+sizeof(std::size_t);
+            
+            namespace{
+                namespace size_for_monolithic_types_and_helper_functions{
+                    namespace to_be_just_in_time_computed_for_monolithic_types{
+                        std::vector<std::vector<Type_tag>> vector_containing_type_collections;
+                        std::deque<std::vector<Type_tag>> deque_containing_type_collections;
+                        std::map<uintptr_t,std::vector<Type_tag>> map_containing_type_collections;
+                        std::unordered_map<uintptr_t,std::vector<Type_tag>> hash_map_containing_type_collections;
+                        std::list<std::vector<Type_tag>> list_containing_type_collections;
+                        std::forward_list<std::vector<Type_tag>> forward_list_containing_type_collections;
+                        std::array<std::vector<Type_tag>, 100> array_containing_types{};
+                        
+                    }
+                    namespace computation_of_the_total_size{
+                            namespace helper_functions_to_get_information_for_types{
+                                inline std::vector<Type_tag> get_type_info_from_string(const std::string& string_to_read_from, std::string::std::size_type* pos){
+                                    std::vector<Type_tag> temp_type(read_from_string<size_t>(string_to_read_from, pos));
+                                    for(auto &x:temp_type){
+                                        x=read_from_string<Type_tag>(string_to_read_from, pos);
+                                    }
+                                    return temp_type;
+                                }
+                                inline std::size_t size_of_the_underlying_type_of_every_tag(Type_tag tag) {
+                                    switch (tag) {
+                                        /* --- High-Operand Specialized Tags --- */
+                                        case Type_tag::string_tag_for_15_plus_operand_ops:
+                                            return sizeof(std::string);
+                                        case Type_tag::uintptr_tag_for_15_plus_operand_ops:
+                                            return sizeof(std::uintptr_t);
+                                        case Type_tag::intptr_tag_for_15_plus_operand_ops:
+                                            return sizeof(std::intptr_t);
+                                        case Type_tag::long_double_tag_implementation_defined_size_for_15_plus_operand_ops:
+                                            return sizeof(long double);
+                                        /* --- Scalar Primitive Types --- */
+                                        case Type_tag::long_double_tag_implementation_defined_size:
+                                            return sizeof(long double);
+                                        case Type_tag::uintptr_tag:
+                                            return sizeof(std::uintptr_t);
+                                        case Type_tag::string_tag:
+                                            return sizeof(std::string);
+                                        case Type_tag::intptr_tag:
+                                            return sizeof(std::intptr_t);
+                                        /* --- Contiguous & Dynamic Containers --- */
+                                        case Type_tag::vector_string:
+                                            return sizeof(std::vector<std::string>);
+                                        case Type_tag::vector_uintptr:
+                                            return sizeof(std::vector<std::uintptr_t>);
+                                        case Type_tag::vector_intptr:
+                                            return sizeof(std::vector<std::intptr_t>);
+                                        case Type_tag::vector_long_double_tag_implementation_defined_size:
+                                            return sizeof(std::vector<long double>);
+                                        case Type_tag::nested_type_with_dynamic_container:
+                                            return sizeof(Nested_type_info);
+                                
+                                        default:
+                                            throw std::string{"size unknown"}; 
+                                    }
+                                }
+                                template<typename Container_t>
+                                requires(Container_t obj){
+                                    obj.pop_back();
+                                    obj.size();
+                                }
+                                inline void pop_back_container(Container_t& obj){
+                                    if(obj.size()!=0){
+                                        obj.pop_back();                                    
+                                    }
+                                    else{
+                                        throw std::string{"attempt to destroy an empty vector that was supposed to container lists of collections of types "}
+                                    }  
+                                }
+                                template<typename Container_t>
+                                requires(Container_t obj){
+                                    obj.back();
+                                    obj.pop_back();
+                                    obj.size();
+                                }
+                                inline void get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back(Container_t& obj){
+                                    if(obj.size()!=0){
+                                        auto temp = std::move(obj.back());
+                                        obj.pop_back();            
+                                        return temp;
+                                    }
+                                    else{
+                                        throw std::string{"attempt to destroy an empty vector that was supposed to container lists of collections of types "}
+                                    }  
+                                }
+                            }
+                            inline std::vector<Type_tag> get_type_info_from_the_specified_storage_facility
+                            (const std::string& string_to_read_from, std::string::std::size_type* pos){
+                                Type_storage_facility what_to_do= static_cast<Type_storage_facility>(
+                                    read_from_string<uint8_t>(string_to_read_from, pos);
+                                    switch(what_to_do){
+                                        case Type_storage_facility::types_in_array_tag:
+                                            return array_containing_types.at(read_from_string<size_t>(string_to_read_from, pos));
+                                        case Type_storage_facility::types_in_vector_tag:
+                                            return vector_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos));                                        
+                                        case Type_storage_facility::types_in_deque_tag:
+                                            return deque_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos));                                    
+                                        case Type_storage_facility::types_in_map_tag:
+                                            return map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos));                                                                            
+                                        case Type_storage_facility::types_in_hash_map_tag:
+                                            return hash_map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos));                                            
+                                        case Type_storage_facility::types_in_list:
+                                            return list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos));                                    
+                                        case Type_storage_facility::types_in_forward_list:
+                                            return forward_list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos));                                    
+                                        case Type_storage_facility::get_from_back_then_pop_back_from_vector_tag:
+                                            return get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
+                                                   (vector_containing_type_collections);                                    
+                                        case Type_storage_facility::get_from_back_then_pop_back_from_deque_tag:
+                                            return get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
+                                                   (deque_containing_type_collections);                            
+                                        case Type_storage_facility::get_from_back_then_pop_back_from_map_tag:
+                                            return get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
+                                                   (map_containing_type_collections);                                                                            
+                                        case Type_storage_facility::get_from_back_then_pop_back_from_hash_map_tag:
+                                            return get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
+                                                   (hash_map_containing_type_collections);                                            
+                                        case Type_storage_facility::get_from_back_then_pop_back_from_list:
+                                            return get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
+                                                   (list_containing_type_collections);                                        
+                                        case Type_storage_facility::get_from_back_then_pop_back_from_forward_list:
+                                            return get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
+                                                   (forward_list_containing_type_collections);                                      
+                                        case Type_storage_facility::newly_defined_temp_type_for_new_obj:
+                                            return get_type_info_from_string(get_type_info_from_string);
+                                        case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_vector_tag:
+                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            vector_containing_type_collections.push_back(type_info);
+                                            return type_info;
+                                        case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_deque_tag:
+                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            deque_containing_type_collections.push_back(type_info);
+                                            return type_info;
+                                        case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_list_tag:
+                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            list_containing_type_collections.push_back(type_info);
+                                            return type_info;
+                                        case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_forward_list_tag:
+                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            forward_list_containing_type_collections.push_back(type_info);
+                                            return type_info;
+                                        case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_map_tag:
+                                            {
+                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            map_containing_type_collections.push_back(type_info);
+                                            return type_info;
+                                            }
+                                        case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_hash_map_tag:
+                                            {
+                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            hash_map_containing_type_collections.push_back(type_info);
+                                            return type_info;
+                                            }
+                                        
+                                        default:
+                                            throw std::string{"invalid type location!!!"};
+                                }
+                                )
+                                inline std::vector<Type_tag> change_collection_of_types
+                                (const std::string& string_to_read_from, std::string::std::size_type* pos){
+                                    Which_type_facility_to_push_to where_to_push= static_cast<Type_storage_facility>(
+                                        auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                        read_from_string<uint8_t>(string_to_read_from, pos);
+                                        switch(what_to_do){
+                                            case Which_type_facility_to_push_to::push_to_array_tag:
+                                                array_containing_types.at(read_from_string<size_t>(string_to_read_from, pos))= type_info;
+                                            case Which_type_facility_to_push_to::push_to_vector_tag:
+                                                vector_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= type_info;                                        
+                                            case Which_type_facility_to_push_to::push_to_deque_tag:
+                                                deque_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= type_info;                                    
+                                            case Which_type_facility_to_push_to::push_to_map_tag:
+                                                map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= type_info;                                                                            
+                                            case Which_type_facility_to_push_to::push_to_hash_map_tag:
+                                                hash_map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= type_info;                                            
+                                            case Which_type_facility_to_push_to::push_to_list_tag:
+                                                list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= type_info;                                    
+                                            case Which_type_facility_to_push_to::push_to_forward_list_tag_tag:
+                                                forward_list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= type_info;                                    
+                                            default:
+                                                throw std::string{"invalid type location!!!"};
+                                            }
+                                    }
+                                    inline std::vector<Type_tag> push_collection_of_types
+                                    (const std::string& string_to_read_from, std::string::std::size_type* pos){
+                                        Which_type_facility_to_push_to where_to_push= static_cast<Type_storage_facility>(
+                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            read_from_string<uint8_t>(string_to_read_from, pos);
+                                            switch(what_to_do){
+                                                case Which_type_facility_to_push_to::push_to_vector_tag:
+                                                    vector_containing_type_collections.push(type_info);                                        
+                                                case Which_type_facility_to_push_to::push_to_deque_tag:
+                                                    deque_containing_type_collections.push(type_info);                                    
+                                                case Which_type_facility_to_push_to::push_to_map_tag:
+                                                    map_containing_type_collections.push(type_info);                                                                            
+                                                case Which_type_facility_to_push_to::push_to_hash_map_tag:
+                                                    hash_map_containing_type_collections.push(type_info);                                            
+                                                case Which_type_facility_to_push_to::push_to_list_tag:
+                                                    list_containing_type_collections.push(type_info);                                    
+                                                case Which_type_facility_to_push_to::push_to_forward_list_tag_tag:
+                                                    forward_list_containing_type_collections.push(type_info);                                    
+                                                default:
+                                                    throw std::string{"invalid type location!!!"};
+                                                }
+                                            }
+                                    inline std::vector<Type_tag> pop_from_collection_of_types
+                                    (const std::string& string_to_read_from, std::string::std::size_type* pos){
+                                        Which_type_facility_to_push_to where_to_push= static_cast<Type_storage_facility>(
+                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            read_from_string<uint8_t>(string_to_read_from, pos);
+                                            switch(what_to_do){
+                                                case Which_type_facility_to_push_to::push_to_vector_tag:                                  
+                                                    pop_back_container(vector_containing_type_collections)
+                                                case Which_type_facility_to_push_to::push_to_deque_tag:  
+                                                    pop_back_container(deque_containing_type_collections)
+                                                case Which_type_facility_to_push_to::push_to_map_tag:                                       
+                                                    pop_back_container(map_containing_type_collections)                                             
+                                                case Which_type_facility_to_push_to::push_to_hash_map_tag:                                        
+                                                    pop_back_container(hash_map_containing_type_collections)                                             
+                                                case Which_type_facility_to_push_to::push_to_list_tag:
+                                                    pop_back_container(list_containing_type_collections)                                             
+                                                case Which_type_facility_to_push_to::push_to_forward_list_tag_tag:
+                                                    pop_back_container(forward_list_containing_type_collections)                                             
+                                                default:
+                                                    throw std::string{"invalid type location!!!"};
+                                                }
+                                            }
+                                        }
+                                    }    
+                                }    
             enum class thread_policy : uint8_t {
             single_thread_exec,
             unsequenced_parrallel_exec
@@ -311,7 +554,7 @@ namespace printing_tools {
             namespace implementation_of_the_interface_used_by_macro{
             namespace scalar_to_scalar{
                 template<typename T>
-                concept Polymorphic_object = require(Lhs_t a){
+                concept Polymorphic_object = requires(Lhs_t a){
                     {Lhs_t.ptr}->std::same_as<void>;
                     {Lhs_t.tag}->std::same_as<Type_tag>;
                 };
@@ -388,8 +631,8 @@ namespace printing_tools {
                         }
     
                 template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
-                require{
-                    std::derived_from(Nested_type_info, Lhs_t); //requirement is 
+                requires{
+                    std::derived_from(Nested_type_info, Lhs_t); //requiresment is 
                     //just to make clear that Lhs_t is Nested_type_info, while keeping the interface uniform 
                 }
                 inline typename std::conditional<op_action_type == true, void, bool> 
@@ -485,7 +728,7 @@ namespace printing_tools {
 
                     template<typename Op, bool op_action_type,typename Lhs_t, typename Rhs_t>
                     inline inline typename std::conditional<op_action_type == true, void, bool>  
-                     require{
+                     requires{
 
                      }
                     interface_of_all_operations_on_potential_scaler_with_potential_scalar(const Polymoprhic_extensible_engine first_obj, const Polymoprhic_extensible_engine second_obj) {
@@ -495,7 +738,7 @@ namespace printing_tools {
                     }
                     template<typename Op, bool op_action_type,typename Lhs_t, typename Rhs_t>
                     inline inline typename std::conditional<op_action_type == true, void, bool>  
-                     require{
+                     requires{
 
                      }
                     interface_of_all_ops_scalar_to_scalar(const Polymoprhic_extensible_engine first_obj, const Polymoprhic_extensible_engine second_obj) {
@@ -505,8 +748,8 @@ namespace printing_tools {
                     }
                     template<typename Op, bool op_action_type,typename Lhs_t, typename Rhs_t>
                     inline inline typename std::conditional<op_action_type == true, void, bool>  
-                     require{
-                         std::derived_from(Nested_type_info, Rhs_t); //requirement is 
+                     requires{
+                         std::derived_from(Nested_type_info, Rhs_t); //requiresment is 
                          //just to make clear that Rhs_t is Nested_type_info, while keeping the interface uniform 
                      }
                     interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects(const Polymoprhic_extensible_engine first_obj, const Polymoprhic_extensible_engine second_obj) {
@@ -722,13 +965,13 @@ namespace printing_tools {
                     underlying_container_specialization_and_thread_execution_policy& formated_source= 
                     *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(source->ptr));
                     //NOTE: underlying_container_specialization is a container type.
-                    size_t formated_size= *(static_cast<uintptr_t*>(formated_source[monolithic_buffer_resource_index].ptr));
+                     std::size_t formated_size= *(static_cast<uintptr_t*>(formated_source[monolithic_buffer_resource_index].ptr));
                     using memory_region=std::pmr::monotonic_buffer_resource::monotonic_buffer_resource;
                     memory_region* buffer= new memory_region(formated_size);
                     std::pmr::polymorphic_allocator<std::byte> allocator_used{buffer};
                     underlying_container_specialization& destination_data= *(allocator_used.new_object<underlying_container_specialization_and_thread_execution_policy>(source->execution_policy,formated_source.size()));
                     destination_data[monolithic_buffer_resource_index] = {monolithic_buffer_resource_tag, static_cast<void*>(buffer)};
-                    destination_data[all_elements_size_uintptr_t_index]= {all_elements_size_uintptr_t_tag,static_cast<void*>(allocator_used.new_object<size_t>(formated_size))};
+                    destination_data[all_elements_size_uintptr_t_index]= {all_elements_size_uintptr_t_tag,static_cast<void*>(allocator_used.new_object< std::size_t>(formated_size))};
                     switch(source->execution_policy){
                     case thread_policy::single_thread_exec:
                         std::copy(std::execution::unseq , formated_source.ptr.begin()+indexes_to_skip, formated_source.ptr.end(), destination_data.ptr.begin()+indexes_to_skip, 
@@ -840,7 +1083,7 @@ namespace printing_tools {
                             case Type_tag_for_input::array_nested_type_vector:{
                                 using Source_and_target_type= No_tag_template_type_info<std::vector<Polymoprhic_extensible_engine>>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
-                                ptr = copy_nested<Source_and_target_type, Type_tag_for_input::vector_containing_types>(underlying_obj);
+                                ptr = copy_nested<Source_and_target_type, Type_tag_for_input::vector_containing_type_collections>(underlying_obj);
                                 break;}
                             case Type_tag_for_input::array_nested_type_deque:{
                                 using Source_and_target_type= No_tag_template_type_info<std::deque<Polymoprhic_extensible_engine>>;
@@ -968,7 +1211,7 @@ namespace printing_tools {
                             case Type_tag_for_input::array_nested_type_vector:{
                                 using Source_and_target_type= No_tag_template_type_info<std::vector<Polymoprhic_extensible_engine>>;
                                 tag= Type_tag::nested_type_with_dynamic_container;
-                                ptr = copy_nested<Source_and_target_type, Type_tag_for_input::vector_containing_types>(underlying_obj);
+                                ptr = copy_nested<Source_and_target_type, Type_tag_for_input::vector_containing_type_collections>(underlying_obj);
                                 break;}
                             case Type_tag_for_input::array_nested_type_deque:{
                                 using Source_and_target_type= No_tag_template_type_info<std::deque<Polymoprhic_extensible_engine>>;
@@ -1005,20 +1248,20 @@ namespace printing_tools {
             }
                 static inline void* make_nested(Nested_type_info source){
                     auto thread_policy = read_from_string<uint8_t>(string_to_read_from, pos_size);
-                    auto size_to_reserve_for_the_container= read_from_string<size_t>(string_to_read_from, pos);
+                    auto  std::size_to_reserve_for_the_container= read_from_string< std::size_t>(string_to_read_from, pos);
                     underlying_container_specialization& underlying_data= 
                     *(new underlying_container_specialization_and_thread_execution_policy(thread_policy,0));
 
                     switch(thread_policy){
                     case thread_policy::single_thread_exec:
-                        for(int i =0; i<size_to_reserve_for_the_container; i++){
+                        for(int i =0; i< std::size_to_reserve_for_the_container; i++){
                             underlying_data.ptr.push_back(Polymoprhic_extensible_engine
                             {string_to_read_from, pos,static_cast<Type_tag_for_input>(read_from_string<uint8_t>
                             (string_to_read_from, pos_size))});
                         }
                     case thread_policy::unsequenced_parrallel_exec:
                         {
-                            auto  size_to_reserve_for_the_container= read_from_string<size_t>(string_to_read_from, pos);
+                            auto   std::size_to_reserve_for_the_container= read_from_string< std::size_t>(string_to_read_from, pos);
                             destination_data.ptr.reserve(formated_source);
                             std::generate(std::execution::par_unseq , underlying_data.ptr.begin(), underlying_data.ptr.end(), 
                                 [&string_to_read_from, &pos](){
@@ -1040,19 +1283,19 @@ namespace printing_tools {
             typename std::derived_from
                 <std::iterator_traits<Underlying_container_specialization::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
             }
-                static inline void*  make_nested(const std::string& string_to_read_from, std::string:size_type* pos,Type_tag tag_arg){
+                static inline void*  make_nested(const std::string& string_to_read_from, std::string::std::size_type* pos,Type_tag tag_arg){
                     auto thread_policy = read_from_string<uint8_t>(string_to_read_from, pos_size);
-                    auto  size_to_reserve_for_the_elements= read_from_string<uint64_t>(string_to_read_from, pos);
-                    auto  size_to_reserve_for_the_container= read_from_string<size_t>(string_to_read_from, pos);
-                    auto  total_size_to_reserve= size_to_reserve_for_the_elements+size_to_reserve_for_the_container;
+                    auto   std::size_to_reserve_for_the_elements= read_from_string<uint64_t>(string_to_read_from, pos);
+                    auto   std::size_to_reserve_for_the_container= read_from_string< std::size_t>(string_to_read_from, pos);
+                    auto  total_ std::size_to_reserve=  std::size_to_reserve_for_the_elements+ std::size_to_reserve_for_the_container;
                     using memory_region=std::pmr::monotonic_buffer_resource::monotonic_buffer_resource;
-                    memory_region* buffer= new memory_region(total_size_to_reserve);
+                    memory_region* buffer= new memory_region(total_ std::size_to_reserve);
                     std::pmr::polymorphic_allocator<std::byte> allocator_used{buffer};
                     underlying_container_specialization& underlying_data= 
                     *(allocator_used.new_object<underlying_container_specialization_and_thread_execution_policy>
-                    (thread_policy,size_to_reserve_for_the_container));
+                    (thread_policy, std::size_to_reserve_for_the_container));
                     underlying_data[monolithic_buffer_resource_index] = {monolithic_buffer_resource_tag, static_cast<void*>(buffer)};
-                    underlying_data[all_elements_size_uintptr_t_index]= {all_elements_size_uintptr_t_tag,static_cast<void*>(allocator_used.new_object<size_t>(final_size))};
+                    underlying_data[all_elements_size_uintptr_t_index]= {all_elements_size_uintptr_t_tag,static_cast<void*>(allocator_used.new_object< std::size_t>(final_size))};
                     switch(thread_policy){
                     case thread_policy::single_thread_exec:
                         std::generate(std::execution::unseq , underlying_data.ptr.begin(), underlying_data.ptr.end(), 
@@ -1074,7 +1317,7 @@ namespace printing_tools {
 
                 }
             inline  Polymoprhic_extensible_engine
-            (const std::string& string_to_read_from, std::string:size_type* pos_size,Type_tag tag_arg){
+            (const std::string& string_to_read_from, std::string::std::size_type* pos_size,Type_tag tag_arg){
                 switch(tag_arg){
                     //to be completed
                     case Type_tag::string_tag_for_15_plus_operand_ops: 
@@ -1179,7 +1422,7 @@ namespace printing_tools {
                                 case Type_tag_for_input::array_nested_type_vector:{
                                     using Source_and_target_type= No_tag_template_type_info<std::vector<Polymoprhic_extensible_engine>>;
                                     tag= Type_tag::nested_type_with_dynamic_container;
-                                    ptr = make_nested<Source_and_target_type, Type_tag_for_input::vector_containing_types>(underlying_obj);
+                                    ptr = make_nested<Source_and_target_type, Type_tag_for_input::vector_containing_type_collections>(underlying_obj);
                                     break;
                                     }
                                 case Type_tag_for_input::array_nested_type_deque:{
@@ -1212,10 +1455,10 @@ namespace printing_tools {
             template<absolute_base::Is_String_Or_Numeric T>
             static inline No_tag_template_type_info<std::vector<T>>*
             allocate_and_return_vector_of_any_type_packed_in_No_tag_template_type_info_type
-            (const std::string& string_to_read_from,std::string:size_type* pos_size, 
+            (const std::string& string_to_read_from,std::string: std::size_type* pos_size, 
             std::pmr::polymorphic_allocator<std::byte> allocator_used){
                 auto *vec = allocator_used.new_object<No_tag_template_type_info<std::vector<T>>>
-                (read_from_string<size_t>(string_to_read_from, pos_size));
+                (read_from_string< std::size_t>(string_to_read_from, pos_size));
                 std::generate(vec->begin(), vec->end(),
                     [&string_to_read_from, &pos](){
                         return read_from_string<T>
@@ -1226,8 +1469,8 @@ namespace printing_tools {
             template<absolute_base::Is_String_Or_Numeric T>
             static inline No_tag_template_type_info<std::vector<T>>*
             allocate_and_return_vector_of_any_type_packed_in_No_tag_template_type_info_type
-            (const std::string& string_to_read_from,std::string:size_type* pos_size){
-                auto *vec = new No_tag_template_type_info<std::vector<T>(read_from_string<size_t>
+            (const std::string& string_to_read_from,std::string: std::size_type* pos_size){
+                auto *vec = new No_tag_template_type_info<std::vector<T>(read_from_string< std::size_t>
                 (string_to_read_from, pos_size));
                 std::generate(vec->begin(), vec->end(),
                     [&string_to_read_from, &pos](){
@@ -1237,7 +1480,7 @@ namespace printing_tools {
                 return vec;
             } 
             inline  Polymoprhic_extensible_engine
-            (const std::string& string_to_read_from, std::string:size_type* pos_size,Type_tag tag_arg,
+            (const std::string& string_to_read_from, std::string::std::size_type* pos_size,Type_tag tag_arg,
             std::pmr::polymorphic_allocator<std::byte> allocator_used){
                 switch(tag_arg){
                     //to be completed
@@ -1344,7 +1587,7 @@ namespace printing_tools {
                                 case Type_tag_for_input::array_nested_type_vector:{
                                     using Source_and_target_type= No_tag_template_type_info<std::vector<Polymoprhic_extensible_engine>>;
                                     tag= Type_tag::nested_type_with_dynamic_container;
-                                    ptr = make_nested<Source_and_target_type, Type_tag_for_input::vector_containing_types>(underlying_obj);
+                                    ptr = make_nested<Source_and_target_type, Type_tag_for_input::vector_containing_type_collections>(underlying_obj);
                                     break;
                                     }
                                 case Type_tag_for_input::array_nested_type_deque:{
@@ -1377,7 +1620,7 @@ namespace printing_tools {
 
                     
             template<typename Underlying_container_specialization>
-            require{
+            requires{
             typename std::derived_from
                 <std::iterator_traits<Underlying_container_specialization::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
             }
@@ -1472,7 +1715,7 @@ namespace printing_tools {
                         auto* underlying_obj = static_cast<Nested_type_info*>(ptr);
                         //all of the code below relies on recursive destructor calls
                         switch(underlying_obj->tag) {
-                            case Type_tag_for_input::vector_containing_types: {
+                            case Type_tag_for_input::vector_containing_type_collections: {
                                 using underlying_container_specialization_and_thread_execution_policy = No_tag_template_type_info<std::vector<Polymoprhic_extensible_engine>>;
                                 const underlying_container_specialization_and_thread_execution_policy& sequence_with_policy = 
                                 *(static_cast<underlying_container_specialization_and_thread_execution_policy*>(underlying_obj->ptr));
@@ -1586,50 +1829,10 @@ namespace printing_tools {
                     }
     
             };
-            /*         
-                Object names to use in the function below. I hate finding these kind names again and
-                again, hence added this comment.
-                vector_containing_types;
-                deque_containing_types;
-                list_containing_types;
-                forward_list_containing_types;
-                map_containing_types;
-                hash_map_containing_types;
-                array_containing_types{{}};
-            */
             //provide pump(functions that pump to string) and type size calculation(for monolithic storage types 
             //(deque and vectors storing polymorphic objects)) before working on the function below or 
             //even the rest of the project
-            inline Polymoprhic_extensible_engine object_and_type_factory(const Extented_type_info& info, const std::string& string_to_read_from, 
-                std::string:size_type* pos )
-            {
-                uintptr_t size_to_preallocate=0;
-                
-                switch(info.tag){
-                    case Type_storage_facility::type_in_array_tag:
-                        Extented_type_info.index
-                    case Type_storage_facility::type_in_vector_tag:
-                    
-                    case Type_storage_facility::type_in_deque_tag:
-                    
-                    case Type_storage_facility::type_in_map_tag:
-                    
-                    case Type_storage_facility::type_in_hash_map_tag:
-                    
-                    case Type_storage_facility::type_in_list:
-                    
-                    case Type_storage_facility::type_in_forward_list:
 
-                    case Type_storage_facility::newly_defined_temp_type_for_new_obj:
-
-                    case Type_storage_facility::just_trying_to_define_a_new_type_without_making_any_objects:
-
-                    case Type_storage_facility::just_trying_to_define_a_new_type_without_making_any_objects:
-                    
-                    
-                }
-      
-            }
            
             
 
@@ -1639,12 +1842,12 @@ namespace printing_tools {
 
 
 
-            Polymoprhic_extensible_engine read_polymorphically_from_string(const std::string& string_to_read_from, std::string::size_type* pos) {
+            Polymoprhic_extensible_engine read_polymorphically_from_string(const std::string& string_to_read_from, std::string:: std::size_type* pos) {
               
              
             }
             template <bool read_from_x_or_y>
-            inline Polymoprhic_extensible_engine read_polymorphically_from_string(const std::string& x, const std::string& y, std::string::size_type* x_pos, std::string::size_type* y_pos) {
+            inline Polymoprhic_extensible_engine read_polymorphically_from_string(const std::string& x, const std::string& y, std::string:: std::size_type* x_pos, std::string:: std::size_type* y_pos) {
                 constexpr if (read_from_x_or_y) {
                     read_polymorphically_from_string(x, x_pos);
                 }
