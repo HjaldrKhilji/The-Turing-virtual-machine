@@ -282,19 +282,7 @@ namespace printing_tools {
                 newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_map_tag,
                 newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_hash_map_tag,
                 newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_list_tag,
-                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_forward_list_tag,
-                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_vector_tag_non_sequentially,
-                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_deque_tag_non_sequentially,
-                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_map_tag_non_sequentially,
-                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_hash_map_tag_non_sequentially,
-                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_list_tag_non_sequentially,
-                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_forward_list_tag_non_sequentially,
-                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_vector_tag_parrellaly,
-                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_deque_tag_parrellaly,
-                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_map_tag_parrellaly,
-                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_hash_map_tag_parrellaly,
-                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_list_tag_parrellaly,
-                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_forward_list_tag_parrellaly,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_at_front_of_forward_list_tag,
             };
             enum class Which_type_facility_to_change: uint8_t{
                 change_array_tag=0,
@@ -334,19 +322,7 @@ namespace printing_tools {
                 push_to_map_tag=3,
                 push_to_hash_map_tag,
                 push_to_list_tag,
-                push_to_forward_list_tag,      
-                push_to_vector_tag_do_it_non_sequentially,
-                push_to_deque_tag_do_it_non_sequentially,
-                push_to_map_tag_do_it_non_sequentially,
-                push_to_hash_map_tag_do_it_non_sequentially,
-                push_to_list_tag_do_it_non_sequentially,
-                push_to_forward_list_tag_do_it_non_sequentially,
-                push_to_vector_tag_do_it_parrallely,
-                push_to_deque_tag_do_it_parrallely,
-                push_to_map_tag_do_it_parrallely,
-                push_to_hash_map_tag_do_it_parrallely,
-                push_to_list_tag_do_it_parrallely,
-                push_to_forward_list_tag_do_it_parrallely,
+                push_to_front_of_forward_list_tag_tag,      
             };
             enum class Which_type_facility_to_pop: uint8_t{
                 pop_from_array_tag=0,
@@ -355,7 +331,7 @@ namespace printing_tools {
                 pop_from_map_tag=3,
                 pop_from_hash_map_tag,
                 pop_from_list_tag,
-                pop_from_forward_list_tag,
+                pop_from__front_of_forward_list_tag,
             };
             enum Monolothic_resource_index: uint8_t{
             monolithic_buffer_resource_index=0;
@@ -493,6 +469,11 @@ namespace printing_tools {
                                         throw std::string{"Attempt at writing to a list of collections of types passed the end"};
                                     }
                             }
+                                template<typename Container_t>
+                                requires(Container_t obj){
+                                    obj.at(std::declval(Get_cont_type_t<Container_t>));
+                                    obj.begin()+std::declval(size_t);
+                                }
                                 inline void change_part_of_the_container_parrallely(Container_t& obj, Container_t::value_type& source_to_change_using){                                       
                                     auto index_where_the_collection_is_at= 
                                     read_from_string<Get_cont_type_t<Container_t>>(string_to_read_from, pos);
@@ -508,7 +489,8 @@ namespace printing_tools {
                                     else{
                                         throw std::string{"Attempt at writing to a list of collections of types passed the end"};
                                     }
-                            }
+                            }                                
+
                             inline std::vector<Type_tag> get_type_info_from_the_specified_storage_facility
                             (const std::string& string_to_read_from, std::string::std::size_type* pos){
                                 Type_storage_facility what_to_do= static_cast<Type_storage_facility>(
@@ -748,20 +730,30 @@ namespace printing_tools {
                     {Lhs_t.ptr}->std::same_as<void>;
                     {Lhs_t.tag}->std::same_as<Type_tag>;
                 };
+                template<typename Lhs_t, bool op_action_type>
+                struct const_qualified_if_false{
+                using type= Lhs_t;
+                }
+                template<typename Lhs_t>
+                struct const_qualified_if_false<false>{
+                using type= const Lhs_t;
+                }
+                template<typename Lhs_t>
+                using const_qualified_if_false_t = const_qualified_if_false<Lhs_t>::type;
                 template<typename Op, bool op_action_type, absolute_base::Is_String_Or_Numeric Lhs_t,absolute_base::Is_String_Or_Numeric Rhs_t>
                     inline typename std::conditional<op_action_type == true, void, bool>
-                    all_ops(Lhs_t* lhs,const Rhs_t& rhs) {
+                    all_ops(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs) {
                         //Everything will naturally use this!
                         if constexpr (op_action_type == true) {
                             *lhs = Op{}(std::ref(*lhs), std::cref(rhs)); 
                         }
                         else {
-                            return Op{}(std::ref(*Lhs_t), std::cref(rhs));;
+                            return Op{}(std::cref(*Lhs_t), std::cref(rhs));;
                         }
                     }
                 template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
                     inline typename std::conditional<op_action_type == true, void, bool>
-                    all_ops(Lhs_t* lhs,const Rhs_t& rhs) {
+                    all_ops(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs) {
                         op_generator(lhs, rhs)
                     }
 
@@ -773,7 +765,7 @@ namespace printing_tools {
                      
                 template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
                 inline typename std::conditional<op_action_type == true, void, bool>  
-                    op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
+                    op_scalar_or_collection_with_collection(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs){
                         return all_ops<Op, op_action_type, Lhs_t, Rhs_t>(lhs, rhs);
                 }
     
@@ -785,7 +777,7 @@ namespace printing_tools {
                 <std::iterator_traits<Lhs_t::underlying_container::iterator>::iterator_category, std::input_iterator_tag>;
                 }
                 inline typename std::conditional<op_action_type == true, void, bool>  
-                    op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
+                    op_scalar_or_collection_with_collection(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs){
                         switch(lhs->execution_policy){
                             case thread_policy::single_thread_exec:
                                 std::for_each(std::execution::unseq , lhs->begin(), lhs->end(),
@@ -804,7 +796,7 @@ namespace printing_tools {
                 <std::iterator_traits<Lhs_t::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
                 }&&Polymorphic_object(Lhs_t::value_type)
                 inline typename std::conditional<op_action_type == true, void, bool>  
-                    op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
+                    op_scalar_or_collection_with_collection(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs){
                         switch(lhs->execution_policy){
                             case thread_policy::single_thread_exec:
                                 std::for_each(std::execution::unseq , lhs->begin()+indexes_to_skip, lhs->end(),
@@ -827,7 +819,7 @@ namespace printing_tools {
                 }
                 inline typename std::conditional<op_action_type == true, void, bool> 
                      
-                    op_scalar_or_collection_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
+                    op_scalar_or_collection_with_collection(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs){
                 
                 switch(lhs->tag){
                     case Type_tag_for_input::array_nested_type_vector:
@@ -873,7 +865,7 @@ namespace printing_tools {
                 <std::iterator_traits<Rhs_t::underlying_container::iterator>::iterator_category, std::input_iterator_tag>;
                 }
                     inline typename std::conditional<op_action_type == true, void, bool>  
-                        op_potential_scalar_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
+                        op_potential_scalar_with_collection(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs){
                         auto& formated_rhs= *(rhs->ptr);
                             switch(rhs.execution_policy){
                                 case thread_policy::single_thread_exec:
@@ -894,7 +886,7 @@ namespace printing_tools {
                 <std::iterator_traits<Rhs_t::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
                 }&&Polymorphic_object(Rhs_t::value_type)
                     inline typename std::conditional<op_action_type == true, void, bool>  
-                        op_potential_scalar_with_collection(Lhs_t* lhs,const Rhs_t& rhs){
+                        op_potential_scalar_with_collection(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs){
                         auto& formated_rhs= *(rhs->ptr);
                             switch(rhs.execution_policy){
                                 case thread_policy::single_thread_exec:
@@ -922,7 +914,7 @@ namespace printing_tools {
 
                      }
                     interface_of_all_operations_on_potential_scaler_with_potential_scalar(const Polymoprhic_extensible_engine first_obj, const Polymoprhic_extensible_engine second_obj) {
-                    Lhs_t* formated_lhs= static_cast<Lhs_t*>(first_obj->ptr);
+                    const_qualified_if_false_t<Lhs_t>* formated_lhs= static_cast<const_qualified_if_false_t<Lhs_t>*>(first_obj->ptr);
                     Rhs_t* formated_rhs= static_cast<Rhs_t*>(second_obj->ptr);
                     implementation_of_the_interface_used_by_macro::op_potential_scalar_with_collection<Op, op_action_type>(formated_lhs, formated_rhs);
                     }
@@ -932,7 +924,7 @@ namespace printing_tools {
 
                      }
                     interface_of_all_ops_scalar_to_scalar(const Polymoprhic_extensible_engine first_obj, const Polymoprhic_extensible_engine second_obj) {
-                    Lhs_t* formated_lhs= static_cast<Lhs_t*>(first_obj->ptr);
+                    const_qualified_if_false_t<Lhs_t>* formated_lhs= static_cast<const_qualified_if_false_t<Lhs_t>*>(first_obj->ptr);
                     Rhs_t* formated_rhs= static_cast<Rhs_t*>(second_obj->ptr);
                     implementation_of_the_interface_used_by_macro::all_ops<Op, op_action_type>(formated_lhs, formated_rhs);
                     }
@@ -943,7 +935,7 @@ namespace printing_tools {
                          //just to make clear that Rhs_t is Nested_type_info, while keeping the interface uniform 
                      }
                     interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects(const Polymoprhic_extensible_engine first_obj, const Polymoprhic_extensible_engine second_obj) {
-                    Lhs_t* formated_lhs= static_cast<Lhs_t*>(first_obj->ptr);
+                    const_qualified_if_false_t<Lhs_t>* formated_lhs= static_cast<const_qualified_if_false_t<Lhs_t>*>(first_obj->ptr);
                     Rhs_t* formated_rhs= static_cast<Rhs_t*>(second_obj->ptr);
                     switch(second_obj->tag){
                     case Type_tag_for_input::array_nested_type_vector:
