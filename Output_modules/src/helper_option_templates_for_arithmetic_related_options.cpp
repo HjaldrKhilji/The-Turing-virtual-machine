@@ -323,6 +323,15 @@ namespace printing_tools {
                 push_to_list_tag,
                 push_to_front_of_forward_list_tag,      
             };
+            enum class Which_type_facility_to_insert_into_and_how: uint8_t{
+                insert_into_vector_tag=1,
+                insert_into_deque_tag=2,
+                insert_into_map_tag=3,
+                insert_into_push_to_hash_map_tag,
+                insert_into_redis_map_tag,//todo
+                insert_into_list_tag,
+                insert_into_front_of_forward_list_tag,      
+            };
             enum class Which_type_facility_to_pop: uint8_t{
                 pop_from_array_tag=0,
                 pop_from_vector_tag=1,
@@ -957,6 +966,56 @@ namespace printing_tools {
                                                 default:
                                                     throw std::string{"invalid type location!!!"};
                                                 }
+                                            }
+                                        template<Container_t>
+                                        struct iterator_subscript{
+                                        using type=std::iterator_traits<InputIt>::difference_type;
+                                        }
+
+                                        template<Container_t>
+                                        using iterator_subscript_t=iterator_subscript<Container_t>::type;
+                                        inline void insert_single_vector_list_into_list_of_collection_of_types
+                                        (const std::string& string_to_read_from, std::string::size_type* pos){
+                                                auto type_info= helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
+                                                Which_type_facility_to_insert_into_and_how facility_to_insert_into= 
+                                                static_cast<Which_type_facility_to_insert_into_and_how>
+                                                switch(facility_to_insert_into){
+                                                    case Which_type_facility_to_insert_into_and_how::insert_into_vector_tag:
+                                                        vector_containing_type_collections.insert
+                                                        (std::next(vector_containing_type_collections.begin(),
+                                                        read_from_string<iterator_subscript_t<std::decltype
+                                                        <vector_containing_type_collections>>>
+                                                        (string_to_read_from, pos)), type_info);
+                                                    case Which_type_facility_to_insert_into_and_how::insert_into_deque_tag:
+                                                        deque_containing_type_collections.insert
+                                                        (std::next(deque_containing_type_collections.begin(),
+                                                        read_from_string<iterator_subscript_t<std::decltype
+                                                        <deque_containing_type_collections>>>
+                                                        (string_to_read_from, pos)), type_info);
+                                                    case Which_type_facility_to_insert_into_and_how::insert_into_map_tag:
+                                                        map_containing_type_collections.insert
+                                                        (std::next(map_containing_type_collections.begin(),
+                                                        read_from_string<iterator_subscript_t<std::decltype
+                                                        <map_containing_type_collections>>>
+                                                        (string_to_read_from, pos)), type_info);
+                                                    case Which_type_facility_to_insert_into_and_how::insert_into_push_to_hash_map_tag:
+                                                        hash_map_containing_type_collections.insert
+                                                        (std::next(hash_map_containing_type_collections.begin(),
+                                                        read_from_string<iterator_subscript_t<std::decltype
+                                                        <hash_map_containing_type_collections>>>
+                                                        (string_to_read_from, pos)), type_info);
+                                                    case Which_type_facility_to_insert_into_and_how::insert_into_list_tag:
+                                                        list_containing_type_collections.insert
+                                                        (std::next(list_containing_type_collections.begin(),
+                                                        read_from_string<iterator_subscript_t<std::decltype
+                                                        <list_containing_type_collections>>>
+                                                        (string_to_read_from, pos)), type_info);
+                                                    case Which_type_facility_to_insert_into_and_how::insert_into_front_of_forward_list_tag:
+                                                        forward_list_containing_type_collections.insert
+                                                        (std::next(forward_list_containing_type_collections.begin(),
+                                                        read_from_string<iterator_subscript_t<std::decltype
+                                                        <forward_list_containing_type_collections>>>
+                                                        (string_to_read_from, pos)), type_info);                                                    }
                                             }
                                         }
                                     }    
