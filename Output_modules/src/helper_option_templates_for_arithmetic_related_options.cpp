@@ -383,7 +383,7 @@ namespace printing_tools {
                                 }
                                 struct Get_cont_type{
                                 using type= std::size_t;
-                                }                            
+                                }
                                 template<typename Container_t>
                                 using Get_cont_type_t= Get_cont_type<Container_t>::type;
                                 using Subscript_for_vector_of_type_tag=Get_cont_type_t<std::vector<Type_tag>>;
@@ -413,8 +413,10 @@ namespace printing_tools {
                                     auto inner_size= read_from_string<Get_cont_type<Container_t>>(string_to_read_from, pos);
                                     
                                     Container_t_outer<Container_t> temp_type(outer_size, Container_t{inner_size});
-                                    for(auto &x:temp_type){
-                                        x=read_from_string<Type_tag>(string_to_read_from, pos);
+                                    for(auto &y:temp_type){
+                                        for(auto &x: y){
+                                            x=read_from_string<Type_tag>(string_to_read_from, pos);
+                                        }
                                     }
                                     return temp_type;
                                 }
@@ -499,15 +501,15 @@ namespace printing_tools {
                                     }  
                                 }
                                 template<typename Container_t>
-                                requires(Container_t obj){
-                                    obj.pop_back();
-                                    obj.empty();
+                                inline void pop_back_container_many_times(Container_t& obj, const std::string& string_to_read_from, std::string::size_type* pos){
+                                auto index= read_from_string<Get_cont_type<Container_t>>(string_to_read_from, pos);
+                                for(int i= 0; i++<index;){pop_back_container(obj);}
                                 }
-                                inline void pop_back_container(Container_t& obj, const std::string& string_to_read_from, std::string::size_type* pos){
+                                template<typename Container_t>
+                                inline void pop_front_container_of_forward_list_many_times(Container_t& obj, const std::string& string_to_read_from, std::string::size_type* pos){
                                 auto inner_size= read_from_string<Get_cont_type<Container_t>>(string_to_read_from, pos);
-                                
+                                for(int i= 0; i++<index;){pop_front_from_forward_list(obj);}
                                 }
-                                inline void pop_back_container(Container_t& obj){
                                 template<typename Container_t>
                                 requires(Container_t obj){
                                     obj.back();
@@ -542,6 +544,21 @@ namespace printing_tools {
                                     }  
                                 }
                                 template<typename Container_t>
+                                inline void pop_back_many_times_then_get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back(Container_t& obj,  const std::string& string_to_read_from, std::string::size_type* pos){
+                                    auto index= 
+                                    read_from_string<Get_cont_type_t<Container_t>>(string_to_read_from, pos);
+                                    for(int i= 0; i++<index;){pop_back_container(obj);}
+                                    return get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back(obj);
+                                }
+                                template<typename Container_t, typename Value_type>
+                                inline void pop_front_many_times_then_get_element_at_front_then_pop_front_then_return_the_element_you_retrieved_before_pop_back(Container_t& obj,  const std::string& string_to_read_from, std::string::size_type* pos){
+                                    auto index= 
+                                    read_from_string<Get_cont_type_t<Container_t>>(string_to_read_from, pos);
+                                    for(int i= 0; i++<index;){pop_front_from_forward_list(obj);}
+                                    return get_element_at_front_then_pop_front_then_return_the_element_you_retrieved_before_pop_back(obj);
+                                    
+                                }
+                                template<typename Container_t>
                                 require(Container_t obj){
                                     obj.at(std::declval(Get_cont_type_t<Container_t>));
                                 }
@@ -563,7 +580,7 @@ namespace printing_tools {
                                     auto index_where_the_collection_is_at= 
                                     read_from_string<Get_cont_type_t<Container_t>>(string_to_read_from, pos);
                                     auto index_inside_the_collection_itself= 
-                                    read_from_string<Get_cont_type_t<Iterator_subscript_index_t<Container_t>>>(string_to_read_from, pos);
+                                    read_from_string<Iterator_subscript_index_t<Container_t>>(string_to_read_from, pos);
                                     auto collection_to_change_part_of=
                                     at_for_all_contianers(obj,index_where_the_collection_is_at));
                                     auto type_info_to_change_using= get_collection_of_types_from_string<Container_t::value>
