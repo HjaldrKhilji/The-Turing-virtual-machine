@@ -351,8 +351,12 @@ namespace printing_tools {
             static constexpr auto extra_std::size_to_reserve_in_monolithic_buffer= 
             sizeof(class_in_monolithic_buffer_and_element_size_is_stroed*2)+
             sizeof(std::pmr::monotonic_buffer_resource::monotonic_buffer_resource)+sizeof(std::size_t);
-            
+
             namespace{
+                template<Container_t>
+                struct Iterator_subscript_index_t{
+                using type=std::iterator_traits<Container_t::iterator>::difference_type;
+                }
                 namespace size_for_monolithic_types_and_helper_functions{
                     namespace to_be_just_in_time_computed_for_monolithic_types{
                         std::vector<std::vector<Type_tag>> vector_containing_type_collections;
@@ -382,15 +386,33 @@ namespace printing_tools {
                                 }                            
                                 template<typename Container_t>
                                 using Get_cont_type_t= Get_cont_type<Container_t>::type;
+                                using Subscript_for_vector_of_type_tag=Get_cont_type_t<std::vector<Type_tag>>;
                                 template<typename Container_t>
                                 require(Container_t a){
                                 a.begin();
                                 a.end();
                                 //checks to make sure the range for loop works
                                 }
-                                using Subscript_for_vector_of_type_tag=Get_cont_type_t<std::vector<Type_tag>>;
-                                inline Container_t get_type_info_from_string(const std::string& string_to_read_from, std::string::size_type* pos){
+                                inline Container_t get_collection_of_types_from_string(const std::string& string_to_read_from, std::string::size_type* pos){
                                     Container_t temp_type(read_from_string<Get_cont_type<Container_t>>(string_to_read_from, pos));
+                                    for(auto &x:temp_type){
+                                        x=read_from_string<Type_tag>(string_to_read_from, pos);
+                                    }
+                                    return temp_type;
+                                }
+                                template<typename Container_t, template Container_t_outer<typename T>>
+                                require(Container_t a, Container_t_outer<Container_t> b){
+                                a.begin();
+                                a.end();
+                                b.begin();
+                                b.end()
+                                //checks to make sure the range for loop works
+                                }
+                                inline Container_t get_list_of_collection_of_types_from_string(const std::string& string_to_read_from, std::string::size_type* pos){
+                                    auto outer_size= read_from_string<Get_cont_type<Container_t_outer<Container_t>>>(string_to_read_from, pos);
+                                    auto inner_size= read_from_string<Get_cont_type<Container_t>>(string_to_read_from, pos);
+                                    
+                                    Container_t_outer<Container_t> temp_type(outer_size, Container_t{inner_size});
                                     for(auto &x:temp_type){
                                         x=read_from_string<Type_tag>(string_to_read_from, pos);
                                     }
@@ -436,7 +458,7 @@ namespace printing_tools {
                                 requires(Container_t<Value_type> obj){
                                     obj.begin()++;
                                 }
-                                Value_type at_for_containers_that_dont_support_it(Container_t<Value_type>& obj, Get_cont_type_t<Container_t::value_type> index){
+                                Value_type at_for_containers_that_dont_support_it(Container_t<Value_type>& obj, Iterator_subscript_index_t<Container_t<Value_type>> index){
                                     if(obj.empty()){
                                         std::throw std::string{"out of bound error while subscripting an empty container that dosent support .at()"};
                                     }
@@ -478,6 +500,16 @@ namespace printing_tools {
                                 }
                                 template<typename Container_t>
                                 requires(Container_t obj){
+                                    obj.pop_back();
+                                    obj.empty();
+                                }
+                                inline void pop_back_container(Container_t& obj, const std::string& string_to_read_from, std::string::size_type* pos){
+                                auto inner_size= read_from_string<Get_cont_type<Container_t>>(string_to_read_from, pos);
+                                
+                                }
+                                inline void pop_back_container(Container_t& obj){
+                                template<typename Container_t>
+                                requires(Container_t obj){
                                     obj.back();
                                     obj.pop_back();
                                     obj.empty();
@@ -509,91 +541,58 @@ namespace printing_tools {
                                         throw std::string{"attempt to destroy an empty vector that was supposed to container lists of collections of types "}
                                     }  
                                 }
+                                template<typename Container_t>
+                                require(Container_t obj){
+                                    obj.at(std::declval(Get_cont_type_t<Container_t>));
+                                }
+                                inline Container_t::value_type& at_for_all_contianers(Container_t obj, Get_cont_type_t<Container_t> index) {
+                                   return obj.at(index);
+                                }
+                                template<typename Container_t>
+                                require(Container_t obj){
+                                    obj.next(obj, std:declval(Iterator_subscript_index_t<Container_t>));
+                                }
+                                inline Container_t::value_type& at_for_all_contianers(Container_t obj, Iterator_subscript_index_t<Container_t> index) {
+                                   return next(obj.begin(), index);
+                                }
+                                template<typename Container_t, typename execution_policy>
+                                requires(Container_t obj){
+                                    std::next(obj.begin(), std::declval<Iterator_subscript_index_t<Container_t>>);
+                                }
+                                inline void change_part_of_the_container_using_the_policy_passed(Container_t& obj,  const std::string& string_to_read_from, std::string::size_type* pos, execution_policy policy){                                       
+                                    auto index_where_the_collection_is_at= 
+                                    read_from_string<Get_cont_type_t<Container_t>>(string_to_read_from, pos);
+                                    auto index_inside_the_collection_itself= 
+                                    read_from_string<Get_cont_type_t<Iterator_subscript_index_t<Container_t>>>(string_to_read_from, pos);
+                                    auto collection_to_change_part_of=
+                                    at_for_all_contianers(obj,index_where_the_collection_is_at));
+                                    auto type_info_to_change_using= get_collection_of_types_from_string<Container_t::value>
+                                    (string_to_read_from, pos);
+                                    if(collection_to_change_part_of.size()=>(
+                                        +index_for_the_collection_itself)){
+                                        std::copy(policy,type_info_to_change_using.begin(),
+                                            type_info_to_change_using.end(),std::next(obj.begin(), index_inside_the_collection_itself));
+                                    }
+                                    else{
+                                        throw std::string{"Attempt at writing to a list of collections of types passed the end"};
+                                    }
+                            }              
 
                                 template<typename Container_t>
                                 requires(Container_t obj){
-                                    obj.at(std::declval(Get_cont_type_t<Container_t>));
-                                    obj.begin()+std::declval(std::size_t);
+                                    std::next(obj.begin(), std::declval<Iterator_subscript_index_t<Container_t>>);
                                 }
-                                inline void change_part_of_the_container_non_sequentially(Container_t& obj, Container_t::value_type& source_to_change_using){                                       
-                                    auto index_where_the_collection_is_at= 
-                                    read_from_string<Get_cont_type_t<Container_t>>(string_to_read_from, pos);
-                                    auto index_inside_the_collection_itself= 
-                                    read_from_string<Get_cont_type_t<Container_t::value_type>>(string_to_read_from, pos);
-                                    auto collection_to_change_part_of=
-                                    obj.at(index_where_the_collection_is_at);
-                                    if(collection_to_change_part_of.size()=>(
-                                        +index_for_the_collection_itself)){
-                                        std::copy(std::execution::unseq,type_info.begin(),
-                                            type_info.end(),std::next(obj.begin()+index_inside_the_collection_itself));
-                                    }
-                                    else{
-                                        throw std::string{"Attempt at writing to a list of collections of types passed the end"};
-                                    }
+                                inline void change_part_of_the_container_non_sequentially(Container_t& obj,  const std::string& string_to_read_from, std::string::size_type* pos){                                       
+                                    change_part_of_the_container_using_the_policy_passed(obj,string_to_read_from, pos, std::execution::par_unseq);
                             }
+                                
                                 template<typename Container_t>
                                 requires(Container_t obj){
-                                    obj.at(std::declval(Get_cont_type_t<Container_t>));
-                                    obj.begin()+std::declval(std::size_t);
-                                }
-                                inline void change_part_of_the_container_parrallely(Container_t& obj, Container_t::value_type& source_to_change_using){                                       
-                                    auto index_where_the_collection_is_at= 
-                                    read_from_string<Get_cont_type_t<Container_t>>(string_to_read_from, pos);
-                                    auto index_inside_the_collection_itself= 
-                                    read_from_string<Get_cont_type_t<Container_t::value_type>>(string_to_read_from, pos);
-                                    auto collection_to_change_part_of=
-                                    obj.at(index_where_the_collection_is_at);
-                                    if(collection_to_change_part_of.size()=>(
-                                        +index_for_the_collection_itself)){
-                                        std::copy(std::execution::par_unseq,type_info.begin(),
-                                            type_info.end(),std::next(obj.begin()+index_inside_the_collection_itself));
-                                    }
-                                    else{
-                                        throw std::string{"Attempt at writing to a list of collections of types passed the end"};
-                                    }
-                            }        
-                                template<typename Container_t, typename Value_type>
-                                requires(Container_t<Value_type> obj){
-                                    //for containers for whome .at() is not supported
-                                    obj.begin()+std::declval(std::size_t);
-                                }
-                                inline void change_part_of_the_container_non_sequentially(Container_t& obj, Container_t::value_type& source_to_change_using){                                       
-                                    auto index_where_the_collection_is_at= 
-                                    read_from_string<Get_cont_type_t<Container_t>>(string_to_read_from, pos);
-                                    auto index_inside_the_collection_itself= 
-                                    read_from_string<Get_cont_type_t<Container_t::value_type>>(string_to_read_from, pos);
-                                    auto collection_to_change_part_of=
-                                    at_for_containers_that_dont_support_it(obj, index_where_the_collection_is_at);
-                                    if(collection_to_change_part_of.size()=>(
-                                        +index_for_the_collection_itself)){
-                                        std::copy(std::execution::unseq,type_info.begin(),
-                                            type_info.end(),std::next(obj.begin()+index_inside_the_collection_itself));
-                                    }
-                                    else{
-                                        throw std::string{"Attempt at writing to a list of collections of types passed the end"};
-                                    }
-                            }
-                                template<typename Container_t, typename Value_type>
-                                requires(Container_t<Value_type> obj){
-                                    //for containers for whome .at() is not supported
-                                    obj.begin()+std::declval(std::size_t);
-                                }
-                                inline void change_part_of_the_container_parrallely(Container_t& obj, Container_t::value_type& source_to_change_using){                                       
-                                    auto index_where_the_collection_is_at= 
-                                    read_from_string<Get_cont_type_t<Container_t>>(string_to_read_from, pos);
-                                    auto index_inside_the_collection_itself= 
-                                    read_from_string<Get_cont_type_t<Container_t::value_type>>(string_to_read_from, pos);
-                                    auto collection_to_change_part_of=
-                                    at_for_containers_that_dont_support_it(obj, index_where_the_collection_is_at);
-                                    if(collection_to_change_part_of.size()=>(
-                                        +index_for_the_collection_itself)){
-                                        std::copy(std::execution::par_unseq,type_info.begin(),
-                                            type_info.end(),std::next(obj.begin()+index_inside_the_collection_itself));
-                                    }
-                                    else{
-                                        throw std::string{"Attempt at writing to a list of collections of types passed the end"};
-                                    }
-                            }        
+                                    std::next(obj.begin(), std::declval<Iterator_subscript_index_t<Container_t>>);
+                                        }
+                                inline void change_part_of_the_container_non_sequentially(Container_t& obj,  const std::string& string_to_read_from, std::string::size_type* pos){                                       
+                                    change_part_of_the_container_using_the_policy_passed(obj,string_to_read_from, pos, std::execution::par_unseq);
+                            }    
 
                             inline std::vector<Type_tag>& get_type_info_from_the_specified_storage_facility
                             (const std::string& string_to_read_from, std::string::size_type* pos){
@@ -648,32 +647,32 @@ namespace printing_tools {
                                             return helper_functions_to_get_information_for_types::get_element_at_front_then_pop_front_then_return_the_element_you_retrieved_before_pop_back
                                                    (forward_list_containing_type_collections);                                      
                                         case Type_storage_facility::newly_defined_temp_type_for_new_obj:
-                                            return helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
+                                            return helper_functions_to_get_information_for_types::get_collection_of_types_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                         case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_vector_tag:
-                                            auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
+                                            auto type_info=  helper_functions_to_get_information_for_types::get_collection_of_types_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             vector_containing_type_collections.push_back(std::move(type_info));
                                             return type_info;
                                         case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_deque_tag:
-                                            auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
+                                            auto type_info=  helper_functions_to_get_information_for_types::get_collection_of_types_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             deque_containing_type_collections.push_back(std::move(type_info));
                                             return type_info;
                                         case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_list_tag:
-                                            auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
+                                            auto type_info=  helper_functions_to_get_information_for_types::get_collection_of_types_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             list_containing_type_collections.push_back(std::move(type_info));
                                             return type_info;
                                         case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_at_front_of_forward_list_tag:
-                                            auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
+                                            auto type_info=  helper_functions_to_get_information_for_types::get_collection_of_types_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             forward_list_containing_type_collections.push_front(std::move(type_info));
                                             return type_info;
                                         case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_map_tag:
                                             {
-                                            auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
+                                            auto type_info=  helper_functions_to_get_information_for_types::get_collection_of_types_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             map_containing_type_collections.push_back(std::move(type_info));
                                             return type_info;
                                             }
                                         case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_hash_map_tag:
                                             {
-                                            auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
+                                            auto type_info=  helper_functions_to_get_information_for_types::get_collection_of_types_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             hash_map_containing_type_collections.push_back(std::move(type_info));
                                             return type_info;
                                             }
@@ -684,7 +683,7 @@ namespace printing_tools {
                                 )
                                 inline void change_collection_of_types
                                 (const std::string& string_to_read_from, std::string::size_type* pos){
-                                        auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
+                                        auto type_info=  helper_functions_to_get_information_for_types::get_collection_of_types_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                         Which_type_facility_to_change facility_to_change= 
                                         static_cast<Which_type_facility_to_change>
                                         (read_from_string<uint8_t>(string_to_read_from, pos));
@@ -922,7 +921,7 @@ namespace printing_tools {
                                     inline void push_to_list_of_collection_of_types
                                     (const std::string& string_to_read_from, std::string::size_type* pos){
                                         Which_type_facility_to_push_to where_to_push= static_cast<Type_storage_facility>(
-                                            auto type_info= helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
+                                            auto type_info= helper_functions_to_get_information_for_types::get_collection_of_types_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             push_collection_of_types facility_to_push_to=
                                             static_cast<push_collection_of_types>
                                             (read_from_string<uint8_t>(string_to_read_from, pos));
@@ -946,7 +945,7 @@ namespace printing_tools {
                                     inline void pop_from_list_of_collection_of_types
                                     (const std::string& string_to_read_from, std::string::size_type* pos){
                                         Which_type_facility_to_push_to where_to_push= static_cast<Type_storage_facility>(
-                                            auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
+                                            auto type_info=  helper_functions_to_get_information_for_types::get_collection_of_types_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             Which_type_facility_to_pop facility_to_pop_from= 
                                             static_cast<Which_type_facility_to_pop>
                                             (read_from_string<uint8_t>(string_to_read_from, pos));
@@ -967,53 +966,50 @@ namespace printing_tools {
                                                     throw std::string{"invalid type location!!!"};
                                                 }
                                             }
-                                        template<Container_t>
-                                        struct iterator_subscript{
-                                        using type=std::iterator_traits<InputIt>::difference_type;
-                                        }
+
 
                                         template<Container_t>
-                                        using iterator_subscript_t=iterator_subscript<Container_t>::type;
+                                        using Iterator_subscript_index_t_t=Iterator_subscript_index_t<Container_t>::type;
                                         inline void insert_single_vector_list_into_list_of_collection_of_types
                                         (const std::string& string_to_read_from, std::string::size_type* pos){
-                                                auto type_info= helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
+                                                auto type_info= helper_functions_to_get_information_for_types::get_collection_of_types_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                                 Which_type_facility_to_insert_into_and_how facility_to_insert_into= 
                                                 static_cast<Which_type_facility_to_insert_into_and_how>
                                                 switch(facility_to_insert_into){
                                                     case Which_type_facility_to_insert_into_and_how::insert_into_vector_tag:
                                                         vector_containing_type_collections.insert
                                                         (std::next(vector_containing_type_collections.begin(),
-                                                        read_from_string<iterator_subscript_t<std::decltype
+                                                        read_from_string<Iterator_subscript_index_t_t<std::decltype
                                                         <vector_containing_type_collections>>>
                                                         (string_to_read_from, pos)), type_info);
                                                     case Which_type_facility_to_insert_into_and_how::insert_into_deque_tag:
                                                         deque_containing_type_collections.insert
                                                         (std::next(deque_containing_type_collections.begin(),
-                                                        read_from_string<iterator_subscript_t<std::decltype
+                                                        read_from_string<Iterator_subscript_index_t_t<std::decltype
                                                         <deque_containing_type_collections>>>
                                                         (string_to_read_from, pos)), type_info);
                                                     case Which_type_facility_to_insert_into_and_how::insert_into_map_tag:
                                                         map_containing_type_collections.insert
                                                         (std::next(map_containing_type_collections.begin(),
-                                                        read_from_string<iterator_subscript_t<std::decltype
+                                                        read_from_string<Iterator_subscript_index_t_t<std::decltype
                                                         <map_containing_type_collections>>>
                                                         (string_to_read_from, pos)), type_info);
                                                     case Which_type_facility_to_insert_into_and_how::insert_into_push_to_hash_map_tag:
                                                         hash_map_containing_type_collections.insert
                                                         (std::next(hash_map_containing_type_collections.begin(),
-                                                        read_from_string<iterator_subscript_t<std::decltype
+                                                        read_from_string<Iterator_subscript_index_t_t<std::decltype
                                                         <hash_map_containing_type_collections>>>
                                                         (string_to_read_from, pos)), type_info);
                                                     case Which_type_facility_to_insert_into_and_how::insert_into_list_tag:
                                                         list_containing_type_collections.insert
                                                         (std::next(list_containing_type_collections.begin(),
-                                                        read_from_string<iterator_subscript_t<std::decltype
+                                                        read_from_string<Iterator_subscript_index_t_t<std::decltype
                                                         <list_containing_type_collections>>>
                                                         (string_to_read_from, pos)), type_info);
                                                     case Which_type_facility_to_insert_into_and_how::insert_into_front_of_forward_list_tag:
                                                         forward_list_containing_type_collections.insert
                                                         (std::next(forward_list_containing_type_collections.begin(),
-                                                        read_from_string<iterator_subscript_t<std::decltype
+                                                        read_from_string<Iterator_subscript_index_t_t<std::decltype
                                                         <forward_list_containing_type_collections>>>
                                                         (string_to_read_from, pos)), type_info);                                                    }
                                             }
