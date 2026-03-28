@@ -269,9 +269,9 @@ namespace printing_tools {
                 types_in_forward_list,
                 types_in_map_tag=3,
                 types_in_hash_map_tag,
-                get_from_back_then_pop_back_from_vector_tag=1,
-                get_from_back_then_pop_back_from_deque_tag=2,
-                get_from_back_then_pop_back_from_map_tag=3,
+                get_from_back_then_pop_back_from_vector_tag,
+                get_from_back_then_pop_back_from_deque_tag,
+                get_from_back_then_pop_back_from_map_tag,
                 get_from_back_then_pop_back_from_hash_map_tag,
                 get_from_back_then_pop_back_from_list,
                 get_from_back_then_pop_back_from_forward_list,
@@ -283,6 +283,18 @@ namespace printing_tools {
                 newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_hash_map_tag,
                 newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_list_tag,
                 newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_forward_list_tag,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_vector_tag_non_sequentially,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_deque_tag_non_sequentially,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_map_tag_non_sequentially,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_hash_map_tag_non_sequentially,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_list_tag_non_sequentially,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_forward_list_tag_non_sequentially,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_vector_tag_parrellaly,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_deque_tag_parrellaly,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_map_tag_parrellaly,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_hash_map_tag_parrellaly,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_list_tag_parrellaly,
+                newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_forward_list_tag_parrellaly,
             };
             enum class Which_type_facility_to_change: uint8_t{
                 change_array_tag=0,
@@ -291,16 +303,50 @@ namespace printing_tools {
                 change_map_tag=3,
                 change_hash_map_tag,
                 change_list_tag,
-                change_forward_list_tag,
+                change_forward_list_tag
+            };            
+            enum class Which_type_facility_to_change_part_of_and_how: uint8_t{
+                change_array_tag=0,
+                change_vector_tag=1,
+                change_deque_tag=2,
+                change_map_tag=3,
+                change_hash_map_tag,
+                change_list_tag,
+                change_forward_list_tag, 
+                change_array_tag_do_it_non_sequentially,
+                change_vector_tag_do_it_non_sequentially,
+                change_deque_tag_do_it_non_sequentially,
+                change_map_tag_do_it_non_sequentially,
+                change_hash_map_tag_do_it_non_sequentially,
+                change_list_tag_do_it_non_sequentially,
+                change_forward_list_tag_do_it_non_sequentially,
+                change_array_tag_do_it_parrallely,
+                change_vector_tag_do_it_parrallely,
+                change_deque_tag_do_it_parrallely,
+                change_map_tag_do_it_parrallely=3,
+                change_hash_map_tag_do_it_parrallely,
+                change_list_tag_do_it_parrallely,
+                change_forward_list_tag_do_it_parrallely,
             };
-            enum class Which_type_facility_to_push_to: uint8_t{
-                push_to_array_tag=0,
+            enum class Which_type_facility_to_push_to_and_how: uint8_t{
                 push_to_vector_tag=1,
                 push_to_deque_tag=2,
                 push_to_map_tag=3,
                 push_to_hash_map_tag,
                 push_to_list_tag,
-                push_to_forward_list_tag,
+                push_to_forward_list_tag,      
+                push_to_vector_tag_do_it_non_sequentially,
+                push_to_deque_tag_do_it_non_sequentially,
+                push_to_map_tag_do_it_non_sequentially,
+                push_to_hash_map_tag_do_it_non_sequentially,
+                push_to_list_tag_do_it_non_sequentially,
+                push_to_forward_list_tag_do_it_non_sequentially,
+                push_to_vector_tag_do_it_parrallely,
+                push_to_deque_tag_do_it_parrallely,
+                push_to_map_tag_do_it_parrallely,
+                push_to_hash_map_tag_do_it_parrallely,
+                push_to_list_tag_do_it_parrallely,
+                push_to_forward_list_tag_do_it_parrallely,
             };
             enum class Which_type_facility_to_pop: uint8_t{
                 pop_from_array_tag=0,
@@ -326,8 +372,8 @@ namespace printing_tools {
                     namespace to_be_just_in_time_computed_for_monolithic_types{
                         std::vector<std::vector<Type_tag>> vector_containing_type_collections;
                         std::deque<std::vector<Type_tag>> deque_containing_type_collections;
-                        std::map<uintptr_t,std::vector<Type_tag>> map_containing_type_collections;
-                        std::unordered_map<uintptr_t,std::vector<Type_tag>> hash_map_containing_type_collections;
+                        std::map<size_t,std::vector<Type_tag>> map_containing_type_collections;
+                        std::unordered_map<size_t,std::vector<Type_tag>> hash_map_containing_type_collections;
                         std::list<std::vector<Type_tag>> list_containing_type_collections;
                         std::forward_list<std::vector<Type_tag>> forward_list_containing_type_collections;
                         std::array<std::vector<Type_tag>, 100> array_containing_types{};
@@ -335,8 +381,13 @@ namespace printing_tools {
                     }
                     namespace computation_of_the_total_size{
                             namespace helper_functions_to_get_information_for_types{
-                                inline std::vector<Type_tag> get_type_info_from_string(const std::string& string_to_read_from, std::string::std::size_type* pos){
-                                    std::vector<Type_tag> temp_type(read_from_string<size_t>(string_to_read_from, pos));
+                                template<typename Container_t>
+                                require(Container_t a){
+                                a.begin();
+                                a.end();
+                                }
+                                inline Container_t get_type_info_from_string(const std::string& string_to_read_from, std::string::std::size_type* pos){
+                                    Container_t temp_type(read_from_string<size_t>(string_to_read_from, pos));
                                     for(auto &x:temp_type){
                                         x=read_from_string<Type_tag>(string_to_read_from, pos);
                                     }
@@ -407,6 +458,56 @@ namespace printing_tools {
                                         throw std::string{"attempt to destroy an empty vector that was supposed to container lists of collections of types "}
                                     }  
                                 }
+                                template<typename Container_t>
+                                struct Get_cont_type{
+                                using type= std::size_t;
+                                }
+                                template<typename Container_t>
+                                requires{
+                                    using a= Container_t::size_type;
+                                }
+                                struct Get_cont_type{
+                                using type= std::size_t;
+                                }                            
+                                template<typename Container_t>
+                                using Get_cont_type_t= Get_cont_type<Container_t>::type;
+
+                                template<typename Container_t>
+                                requires(Container_t obj){
+                                    obj.at(std::declval(Get_cont_type_t<Container_t>));
+                                    obj.begin()+std::declval(size_t);
+                                }
+                                inline void change_part_of_the_container_non_sequentially(Container_t& obj, Container_t::value_type& source_to_change_using){                                       
+                                    auto index_where_the_collection_is_at= 
+                                    read_from_string<Get_cont_type_t<Container_t>>(string_to_read_from, pos);
+                                    auto index_inside_the_collection_itself= 
+                                    read_from_string<Get_cont_type_t<Container_t::value_type>>(string_to_read_from, pos);
+                                    auto collection_to_change_part_of=
+                                    obj.at(index_where_the_collection_is_at);
+                                    if(collection_to_change_part_of.size()=>(
+                                        +index_for_the_collection_itself)){
+                                        std::copy(std::execution::unseq,type_info.begin(),
+                                            type_info.end(),obj.begin()+index_inside_the_collection_itself);
+                                    }
+                                    else{
+                                        throw std::string{"Attempt at writing to a list of collections of types passed the end"};
+                                    }
+                            }
+                                inline void change_part_of_the_container_parrallely(Container_t& obj, Container_t::value_type& source_to_change_using){                                       
+                                    auto index_where_the_collection_is_at= 
+                                    read_from_string<Get_cont_type_t<Container_t>>(string_to_read_from, pos);
+                                    auto index_inside_the_collection_itself= 
+                                    read_from_string<Get_cont_type_t<Container_t::value_type>>(string_to_read_from, pos);
+                                    auto collection_to_change_part_of=
+                                    obj.at(index_where_the_collection_is_at);
+                                    if(collection_to_change_part_of.size()=>(
+                                        +index_for_the_collection_itself)){
+                                        std::copy(std::execution::par_unseq,type_info.begin(),
+                                            type_info.end(),obj.begin()+index_inside_the_collection_itself);
+                                    }
+                                    else{
+                                        throw std::string{"Attempt at writing to a list of collections of types passed the end"};
+                                    }
                             }
                             inline std::vector<Type_tag> get_type_info_from_the_specified_storage_facility
                             (const std::string& string_to_read_from, std::string::std::size_type* pos){
@@ -414,64 +515,78 @@ namespace printing_tools {
                                     read_from_string<uint8_t>(string_to_read_from, pos);
                                     switch(what_to_do){
                                         case Type_storage_facility::types_in_array_tag:
-                                            return array_containing_types.at(read_from_string<size_t>(string_to_read_from, pos));
+                                            return array_containing_types.at(read_from_string
+                                                <Get_cont_type_t<decltype(array_containing_types)>>
+                                                (string_to_read_from, pos));
                                         case Type_storage_facility::types_in_vector_tag:
-                                            return vector_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos));                                        
+                                            return vector_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(vector_containing_type_collections)>>
+                                                (string_to_read_from, pos));                                        
                                         case Type_storage_facility::types_in_deque_tag:
-                                            return deque_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos));                                    
+                                            return deque_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(deque_containing_type_collections)>>
+                                                (string_to_read_from, pos));   
                                         case Type_storage_facility::types_in_map_tag:
-                                            return map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos));                                                                            
+                                            return map_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(map_containing_type_collections)>>
+                                                (string_to_read_from, pos)); 
                                         case Type_storage_facility::types_in_hash_map_tag:
-                                            return hash_map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos));                                            
+                                            return hash_map_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(hash_map_containing_type_collections)>>
+                                                (string_to_read_from, pos));   
                                         case Type_storage_facility::types_in_list:
-                                            return list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos));                                    
+                                            return list_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(list_containing_type_collections)>>
+                                                (string_to_read_from, pos));
                                         case Type_storage_facility::types_in_forward_list:
-                                            return forward_list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos));                                    
+                                            return forward_list_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(forward_list_containing_type_collections)>>
+                                                (string_to_read_from, pos));   
                                         case Type_storage_facility::get_from_back_then_pop_back_from_vector_tag:
-                                            return get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
+                                            return helper_functions_to_get_information_for_types::get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
                                                    (vector_containing_type_collections);                                    
                                         case Type_storage_facility::get_from_back_then_pop_back_from_deque_tag:
-                                            return get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
+                                            return helper_functions_to_get_information_for_types::get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
                                                    (deque_containing_type_collections);                            
                                         case Type_storage_facility::get_from_back_then_pop_back_from_map_tag:
-                                            return get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
+                                            return helper_functions_to_get_information_for_types::get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
                                                    (map_containing_type_collections);                                                                            
                                         case Type_storage_facility::get_from_back_then_pop_back_from_hash_map_tag:
-                                            return get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
+                                            return helper_functions_to_get_information_for_types::get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
                                                    (hash_map_containing_type_collections);                                            
                                         case Type_storage_facility::get_from_back_then_pop_back_from_list:
-                                            return get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
+                                            return helper_functions_to_get_information_for_types::get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
                                                    (list_containing_type_collections);                                        
                                         case Type_storage_facility::get_from_back_then_pop_back_from_forward_list:
-                                            return get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
+                                            return helper_functions_to_get_information_for_types::get_element_at_back_then_pop_back_then_return_the_element_you_retrieved_before_pop_back
                                                    (forward_list_containing_type_collections);                                      
                                         case Type_storage_facility::newly_defined_temp_type_for_new_obj:
-                                            return get_type_info_from_string(get_type_info_from_string);
+                                            return helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                         case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_vector_tag:
-                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             vector_containing_type_collections.push_back(type_info);
                                             return type_info;
                                         case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_deque_tag:
-                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             deque_containing_type_collections.push_back(type_info);
                                             return type_info;
                                         case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_list_tag:
-                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             list_containing_type_collections.push_back(type_info);
                                             return type_info;
                                         case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_forward_list_tag:
-                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             forward_list_containing_type_collections.push_back(type_info);
                                             return type_info;
                                         case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_map_tag:
                                             {
-                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             map_containing_type_collections.push_back(type_info);
                                             return type_info;
                                             }
                                         case Type_storage_facility::newly_defined_permenant_type_for_new_obj_type_to_be_pushed_to_hash_map_tag:
                                             {
-                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             hash_map_containing_type_collections.push_back(type_info);
                                             return type_info;
                                             }
@@ -482,50 +597,77 @@ namespace printing_tools {
                                 )
                                 inline std::vector<Type_tag> change_collection_of_types
                                 (const std::string& string_to_read_from, std::string::std::size_type* pos){
-                                        auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                        auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                         Which_type_facility_to_change facility_to_change= 
                                         static_cast<Which_type_facility_to_change>
                                         (read_from_string<uint8_t>(string_to_read_from, pos));
                                         switch(facility_to_change){
-                                            case Which_type_facility_to_change::change_array_tag:
-                                                array_containing_types.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);
-                                            case Which_type_facility_to_change::change_vector_tag:
-                                                vector_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                        
-                                            case Which_type_facility_to_change::change_deque_tag:
-                                                deque_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                    
-                                            case Which_type_facility_to_change::change_map_tag:
-                                                map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                                                            
-                                            case Which_type_facility_to_change::change_hash_map_tag:
-                                                hash_map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                            
-                                            case Which_type_facility_to_change::change_list_tag:
-                                                list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                    
-                                            case Which_type_facility_to_change::change_forward_list_tag_tag:
-                                                forward_list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                    
+                                        case Type_storage_facility::types_in_array_tag:
+                                            array_containing_types.at(read_from_string
+                                                <Get_cont_type_t<decltype(array_containing_types)>>
+                                                (string_to_read_from, pos))= std::move(type_info);
+                                        case Type_storage_facility::types_in_vector_tag:
+                                            vector_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(vector_containing_type_collections)>>
+                                                (string_to_read_from, pos))= std::move(type_info);                                        
+                                        case Type_storage_facility::types_in_deque_tag:
+                                            deque_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(deque_containing_type_collections)>>
+                                                (string_to_read_from, pos))= std::move(type_info);   
+                                        case Type_storage_facility::types_in_map_tag:
+                                            map_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(map_containing_type_collections)>>
+                                                (string_to_read_from, pos))= std::move(type_info); 
+                                        case Type_storage_facility::types_in_hash_map_tag:
+                                            hash_map_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(hash_map_containing_type_collections)>>
+                                                (string_to_read_from, pos))= std::move(type_info);   
+                                        case Type_storage_facility::types_in_list:
+                                            list_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(list_containing_type_collections)>>
+                                                (string_to_read_from, pos))= std::move(type_info);
+                                        case Type_storage_facility::types_in_forward_list:
+                                            forward_list_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(forward_list_containing_type_collections)>>
+                                                (string_to_read_from, pos))= std::move(type_info);   
                                             default:
                                                 throw std::string{"invalid type location!!!"};
                                             }
                                     }
-                                inline std::vector<Type_tag> change__part_of_collection_of_types
+                                inline std::vector<Type_tag> change_part_of_collection_of_types
                                 (const std::string& string_to_read_from, std::string::std::size_type* pos){
-                                        auto type_info=  get_type_info_from_string(get_type_info_from_string);
                                         Which_type_facility_to_change facility_to_change= 
                                         static_cast<Which_type_facility_to_change>
                                         (read_from_string<uint8_t>(string_to_read_from, pos));
                                         switch(facility_to_change){
-                                            case Which_type_facility_to_change::change_array_tag:
-                                                array_containing_types.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);
-                                            case Which_type_facility_to_change::change_vector_tag:
-                                                vector_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                        
-                                            case Which_type_facility_to_change::change_deque_tag:
-                                                deque_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                    
-                                            case Which_type_facility_to_change::change_map_tag:
-                                                map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                                                            
-                                            case Which_type_facility_to_change::change_hash_map_tag:
-                                                hash_map_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                            
-                                            case Which_type_facility_to_change::change_list_tag:
-                                                list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                    
-                                            case Which_type_facility_to_change::change_forward_list_tag_tag:
-                                                forward_list_containing_type_collections.at(read_from_string<size_t>(string_to_read_from, pos))= std::move(type_info);                                    
+                                        case Type_storage_facility::types_in_array_tag:
+                                            array_containing_types.at(read_from_string
+                                                <Get_cont_type_t<decltype(array_containing_types)>>
+                                                (string_to_read_from, pos))= helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
+                                        case Type_storage_facility::types_in_vector_tag:
+                                            vector_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(vector_containing_type_collections)>>
+                                                (string_to_read_from, pos))= helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);                                        
+                                        case Type_storage_facility::types_in_deque_tag:
+                                            deque_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(deque_containing_type_collections)>>
+                                                (string_to_read_from, pos))= helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);   
+                                        case Type_storage_facility::types_in_map_tag:
+                                            map_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(map_containing_type_collections)>>
+                                                (string_to_read_from, pos))= helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos); 
+                                        case Type_storage_facility::types_in_hash_map_tag:
+                                            hash_map_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(hash_map_containing_type_collections)>>
+                                                (string_to_read_from, pos))= helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);   
+                                        case Type_storage_facility::types_in_list:
+                                            list_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(list_containing_type_collections)>>
+                                                (string_to_read_from, pos))= helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
+                                        case Type_storage_facility::types_in_forward_list:
+                                            forward_list_containing_type_collections.at(read_from_string
+                                                <Get_cont_type_t<decltype(forward_list_containing_type_collections)>>
+                                                (string_to_read_from, pos))= helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);                            
                                             default:
                                                 throw std::string{"invalid type location!!!"};
                                             }
@@ -533,7 +675,7 @@ namespace printing_tools {
                                     inline std::vector<Type_tag> push_collection_of_types
                                     (const std::string& string_to_read_from, std::string::std::size_type* pos){
                                         Which_type_facility_to_push_to where_to_push= static_cast<Type_storage_facility>(
-                                            auto type_info= get_type_info_from_string(get_type_info_from_string);
+                                            auto type_info= helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             push_collection_of_types facility_to_push_to=
                                             static_cast<push_collection_of_types>
                                             (read_from_string<uint8_t>(string_to_read_from, pos));
@@ -557,23 +699,23 @@ namespace printing_tools {
                                     inline std::vector<Type_tag> pop_from_collection_of_types
                                     (const std::string& string_to_read_from, std::string::std::size_type* pos){
                                         Which_type_facility_to_push_to where_to_push= static_cast<Type_storage_facility>(
-                                            auto type_info=  get_type_info_from_string(get_type_info_from_string);
+                                            auto type_info=  helper_functions_to_get_information_for_types::get_type_info_from_string<std::vector<Type_tag>>(string_to_read_from, pos);
                                             Which_type_facility_to_pop facility_to_pop_from= 
                                             static_cast<Which_type_facility_to_pop>
                                             (read_from_string<uint8_t>(string_to_read_from, pos));
                                             switch(facility_to_pop_from){
                                                 case Which_type_facility_to_pop::pop_from_vector_tag:                                  
-                                                    pop_back_container(vector_containing_type_collections)
+                                                    helper_functions_to_get_information_for_types::pop_back_container(vector_containing_type_collections)
                                                 case Which_type_facility_to_pop::pop_from_deque_tag:  
-                                                    pop_back_container(deque_containing_type_collections)
+                                                    helper_functions_to_get_information_for_types::pop_back_container(deque_containing_type_collections)
                                                 case Which_type_facility_to_pop::pop_from_map_tag:                                       
-                                                    pop_back_container(map_containing_type_collections)                                             
+                                                    helper_functions_to_get_information_for_types::pop_back_container(map_containing_type_collections)                                             
                                                 case Which_type_facility_to_pop::pop_from_hash_map_tag:                                        
-                                                    pop_back_container(hash_map_containing_type_collections)                                             
+                                                    helper_functions_to_get_information_for_types::pop_back_container(hash_map_containing_type_collections)                                             
                                                 case Which_type_facility_to_pop::pop_from_list_tag:
-                                                    pop_back_container(list_containing_type_collections)                                             
+                                                    helper_functions_to_get_information_for_types::pop_back_container(list_containing_type_collections)                                             
                                                 case Which_type_facility_to_pop::pop_from_forward_list_tag_tag:
-                                                    pop_back_container(forward_list_containing_type_collections)                                             
+                                                    helper_functions_to_get_information_for_types::pop_back_container(forward_list_containing_type_collections)                                             
                                                 default:
                                                     throw std::string{"invalid type location!!!"};
                                                 }
