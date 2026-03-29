@@ -376,16 +376,68 @@ namespace printing_tools {
             static constexpr auto extra_size_reserve_in_monolithic_buffer= 
             sizeof(class_in_which_monolithic_buffer_and_element_size_is_stored*2)+
             sizeof(std::pmr::monotonic_buffer_resource::monotonic_buffer_resource)+sizeof(std::size_t);
-
+            enum class Thread_policy_t : uint8_t {
+            single_thread_exec,
+            unsequenced_parrallel_exec
+            }; //notice that all operations are unsequenced
+            struct Nested_type_info{
+                Type_tag_for_input tag;
+                Thread_policy_t execution_policy;
+                void* ptr;
+            };
+            template<typename T>
+            struct No_tag_template_type_info{
+            using underlying_container= t;
+            Thread_policy_t execution_policy;
+            T ptr;
+            //Nested_type_info resolves to  No_tag_template_type_info
+            //vectors of primitive types and strings are wrapped inside No_tag_template_type_info
+            };
             namespace{
+                /*To truly understand how i finished this whole namespace you have to realize that I spent 3 days on it
+                , but even then could only finish the logical framework(base implementation functions) and 
+                around (5-8) interface functions. Then I asked AI to finish the rest, while writing the number and task of each 
+                interface functions to be finished right next to the apropriate enums. This technique worked becuase 
+                in just 2 commits, most of the work was complete. This further complements the long standing foundational
+                notion that AI is only good at pattern recognitionm, and that humans are still important for providing 
+                the base for the pattern recognition tool to scan and then replicate. This also leads to the thought that
+                what if programming could be revolutionarized with a namespace to enum mapping, that is that there would be 
+                enum classes provide a class of actions, and enemurators name each one of them, then namespaces provide
+                interface to the each of those enemurators actions of a enum class on a specific context or obj.
+                ofcourse namespaces can still be used for grouping those interface functions, but a new construct would exist, 
+                to map enum classees to these actions by taking a object or a group of objects as arguments. Each
+                action would have its own requirements just like templates can have using C++ concepts. You should probably 
+                provide some samples to better help AI. Now The usefulness of this expands as the scale does.
+                Implementations functions should ofcourse be able to  use other interface functions, in order to 
+                scale well and to allow for recursive patterns in these structures.
+                most useful application of such programming style would probably be in programming networking protocols, but 
+                even without AI this technique can enhance languages, if compilers found a way to support it. Think of 
+                it as templates 2.0 with actions in the enum class chosen at runtime, just like in my program. AI
+                is a black box and i cant just claim that I found a great way to use it, but what i can say is that 
+                AI would in some way make us invent faith in it, precisely because its a black box. Religions
+                as we know it are faith and we all agree to disagree becuase its faith that makes us agree on 
+                a religion. The same could be said about AI in a few years, with each person claiming that his
+                technique is the best. This all bowls down to the points:
+                1. programming languages should support more advance forms of run time polymorphism to avoid
+                blind faith in the capabilities of AI.
+                2. Tools should be invented to Monitor and study every neural network path of a these large
+                language models.
+                The second point might be far fetched since AI models are billions of complex transformations, but
+                if we as human beings unite, we can monitor and figure out what those transformations mean and how to
+                utilize them. The first step would probably to invent programming languages specifically for creating,
+                ,deploying, managing, and mantaining these large language models.
+                I know that this comment should not exist here, but i spent 2-3 months on this single file, 
+                and since its almsot done, I thought I should spend a few minutes on what I learned in this 
+                long journey.
+                */
+                
                 template<typename Container_t>
                 struct Iterator_subscript_index{
                 using type=typename std::iterator_traits<typename Container_t::iterator>::difference_type;
                 };
                 template<typename Container_t>
                 using Iterator_subscript_index_t= Iterator_subscript_index<Container_t>::type;
-                struct Type_tag{}; // forward decl for compilation
-                struct Nested_type_info{}; // forward decl
+                
 
                 struct Type_info_t{
                     std::vector<Type_tag> type_info_of_all;
@@ -394,7 +446,6 @@ namespace printing_tools {
                 };
                 namespace type_information_storage_facilities_and_functions_to_access_them{
                     namespace type_information_storage_facilities{
-                        // Fixed std::map and std::unordered_map declarations to be valid std::vector to support push_back/at usage in logic
                         std::vector<Type_info_t> vector_containing_type_collections;
                         std::deque<Type_info_t> deque_containing_type_collections;
                         std::vector<Type_info_t> map_containing_type_collections; 
@@ -1306,24 +1357,8 @@ namespace printing_tools {
                         }
                     }
                 }
-```
-            enum class Thread_policy_t : uint8_t {
-            single_thread_exec,
-            unsequenced_parrallel_exec
-            }; //notice that all operations are unsequenced
-            struct Nested_type_info{
-                Type_tag_for_input tag;
-                Thread_policy_t execution_policy;
-                void* ptr;
-            };
-            template<typename T>
-            struct No_tag_template_type_info{
-            using underlying_container= t;
-            Thread_policy_t execution_policy;
-            T ptr;
-            //Nested_type_info resolves to  No_tag_template_type_info
-            //vectors of primitive types and strings are wrapped inside No_tag_template_type_info
-            };
+
+
             namespace polymorphic_extensible_engine{
             namespace implementation_of_the_interface_used_by_macro{
             namespace scalar_to_scalar{
