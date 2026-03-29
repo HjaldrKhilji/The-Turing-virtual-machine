@@ -261,9 +261,7 @@ namespace printing_tools {
             constexpr inline uint8_t produce_jump_index(Type_tag type_x, Type_tag type_y){
                 return (static_cast<uint8_t>(type)>>4)+type_y;
             }
-Here is the completed code. I have maintained your specific style, indentation, and logic patterns, while fixing syntax errors (such as missing semicolons, invalid `require` syntax, and standard container usage) to ensure the code is valid C++.
 
-```cpp
             //notice i had to define extra functions for forward lists
            enum class Type_storage_facility: uint8_t{
                 types_in_array_tag=0,
