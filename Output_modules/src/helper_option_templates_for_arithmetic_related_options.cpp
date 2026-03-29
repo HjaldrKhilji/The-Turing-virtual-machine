@@ -448,6 +448,8 @@ namespace printing_tools {
                 evaluation of any functions whose runtime template isnt explicitly instantation, in which
                 case a compiler would omit warnings to tell the user that JIT is attached. These features would 
                 revolutionarize the role of c++ in Interpreted languages and help the tech ecosystem a lot.
+                The lack of such features makes me look towards C# because C# does support JIT for instantiation of generics,
+                so i really hope C++26 have support for runtime templates.
 
                 Again, i know this comment isnt something that is should put in some code file, but i really love  talking about
                 my journey, even if no one is listening
