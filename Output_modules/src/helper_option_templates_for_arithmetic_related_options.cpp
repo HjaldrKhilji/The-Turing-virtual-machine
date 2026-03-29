@@ -429,6 +429,30 @@ namespace printing_tools {
                 I know that this comment should not exist here, but i spent 2-3 months on this single file, 
                 and since its almsot done, I thought I should spend a few minutes on what I learned in this 
                 long journey.
+                In shorter words, the issues with current runtime polymorphism is:
+                there is no way to do single dispatch based on value since functions cant be overloaded using values and 
+                virtual functions cant be templates.
+                Single Dispatch is too expensive for systems programming, in particular, ddr4/ddr5 rams have very high throughput,
+                which infers that fetching a vtable pointer will fill the cache with junk around vtable pointer meanhwile 
+                ddr5 latency isnt high as well, so any fetch for data that might be far far away is discouraged.
+                In my case, i couldve first made a base class providing a virtual function call(Func F, Args... args)
+                then derieved classes of that base class would implement that function by making the first argument in args be
+                the desired container class that i want to pass. Then using a factory function i return a  base class unique ptr to a
+                allocated derieved class, the dereived class would be chosen based on switch case statements. In the end to implement
+                the push, pop, change, etc functions, i could just called the factory function and then used the resulting unique ptr
+                to pass a implementation function as F(and its arguments) to the pointer->call() function.
+                The reason that i avoided all this was because of the over head of new and delete, and the overhead of accessing 
+                the vtable ptr.
+                A fix might be to provide run time templates: func_a<><runtime template arguments> or 
+                template_func_a<template args><runtime template arguments>. A JIT compiler would exist for lazy 
+                evaluation of any functions whose runtime template isnt explicitly instantation, in which
+                case a compiler would omit warnings to tell the user that JIT is attached. These features would 
+                revolutionarize the role of c++ in Interpreted languages and help the tech ecosystem a lot.
+
+                Again, i know this comment isnt something that is should put in some code file, but i really love  talking about
+                my journey, even if no one is listening
+                
+                
                 */
                 
                 template<typename Container_t>
