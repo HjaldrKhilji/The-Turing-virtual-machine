@@ -1832,7 +1832,7 @@ namespace printing_tools {
                 using const_qualified_if_false_t = const_qualified_if_false<Lhs_t>::type;
                 template<typename Op, bool op_action_type, std::is_arithmetic Lhs_t>
                     inline typename std::conditional<op_action_type == true, void, bool>
-                    all_ops(const_qualified_if_false_t<Lhs_t>* lhs,const std::string& rhs) {
+                    all_ops(const_qualified_if_false_t<op_action_type, Lhs_t>* lhs,const std::string& rhs) {
                         if constexpr (op_action_type == true) {
                             if constexpr (std::is_same_v<Op, std::plus>){
                                 *lhs = Op{}(std::to_string(*lhs), std::cref(rhs)); 
@@ -1847,7 +1847,7 @@ namespace printing_tools {
                 }
                 template<typename Op, bool op_action_type, absolute_base::Is_String_Or_Numeric Lhs_t,std::is_arithmetic Rhs_t>
                     inline typename std::conditional<op_action_type == true, void, bool>
-                    all_ops(const_qualified_if_false_t<std::string>* lhs,const Rhs_t& rhs) {
+                    all_ops(const_qualified_if_false_t<op_action_type, std::string>* lhs,const Rhs_t& rhs) {
                         //Everything will naturally use this!
                         if constexpr (op_action_type == true) {
                             if constexpr (std::is_same_v<Op, std::plus>){
@@ -1863,7 +1863,7 @@ namespace printing_tools {
                     }
                 template<typename Op, bool op_action_type, absolute_base::Is_String_Or_Numeric Lhs_t,absolute_base::Is_String_Or_Numeric Rhs_t>
                     inline typename std::conditional<op_action_type == true, void, bool>
-                    all_ops(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs) {
+                    all_ops(const_qualified_if_false_t<op_action_type, Lhs_t>* lhs,const Rhs_t& rhs) {
                         //Everything will naturally use this!
                         if constexpr (op_action_type == true) {
                             *lhs = Op{}(std::ref(*lhs), std::cref(rhs)); 
@@ -1874,7 +1874,7 @@ namespace printing_tools {
                     }
                 template<typename Op, bool op_action_type, typename Lhs_t,typename Rhs_t>
                     inline typename std::conditional<op_action_type == true, void, bool>
-                    all_ops(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs) {
+                    all_ops(const_qualified_if_false_t<op_action_type, Lhs_t>* lhs,const Rhs_t& rhs) {
                         op_generator(lhs, rhs)
                     }
 
@@ -1886,7 +1886,7 @@ namespace printing_tools {
                      
                 template<typename Op, bool op_action_type, typename Lhs_t, typename Rhs_t>
                 inline typename std::conditional<op_action_type == true, void, bool>  
-                    op_scalar_or_collection_with_collection(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs){
+                    op_scalar_or_collection_with_collection(const_qualified_if_false_t<op_action_type, Lhs_t>* lhs,const Rhs_t& rhs){
                         return all_ops<Op, op_action_type, Lhs_t, Rhs_t>(lhs, rhs);
                 }
     
@@ -1898,7 +1898,7 @@ namespace printing_tools {
                 <std::iterator_traits<Lhs_t::underlying_container::iterator>::iterator_category, std::input_iterator_tag>;
                 }
                 inline typename std::conditional<op_action_type == true, void, bool>  
-                    op_scalar_or_collection_with_collection(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs){
+                    op_scalar_or_collection_with_collection(const_qualified_if_false_t<op_action_type, Lhs_t>* lhs,const Rhs_t& rhs){
                         switch(lhs->execution_policy){
                             case Thread_policy_t::single_thread_exec:
                                 std::for_each(std::execution::unseq , lhs->begin(), lhs->end(),
@@ -1917,7 +1917,7 @@ namespace printing_tools {
                 <std::iterator_traits<Lhs_t::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
                 }&&Polymorphic_object(Lhs_t::value_type)
                 inline typename std::conditional<op_action_type == true, void, bool>  
-                    op_scalar_or_collection_with_collection(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs){
+                    op_scalar_or_collection_with_collection(const_qualified_if_false_t<op_action_type, Lhs_t>* lhs,const Rhs_t& rhs){
                         switch(lhs->execution_policy){
                             case Thread_policy_t::single_thread_exec:
                                 std::for_each(std::execution::unseq , lhs->begin()+indexes_to_skip, lhs->end(),
@@ -1940,7 +1940,7 @@ namespace printing_tools {
                 }
                 inline typename std::conditional<op_action_type == true, void, bool> 
                      
-                    op_scalar_or_collection_with_collection(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs){
+                    op_scalar_or_collection_with_collection(const_qualified_if_false_t<op_action_type, Lhs_t>* lhs,const Rhs_t& rhs){
                 
                 switch(lhs->tag){
                     case Type_tag_for_input::array_nested_type_vector:
@@ -1986,7 +1986,7 @@ namespace printing_tools {
                 <std::iterator_traits<Rhs_t::underlying_container::iterator>::iterator_category, std::input_iterator_tag>;
                 }
                     inline typename std::conditional<op_action_type == true, void, bool>  
-                        op_potential_scalar_with_collection(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs){
+                        op_potential_scalar_with_collection(const_qualified_if_false_t<op_action_type, Lhs_t>* lhs,const Rhs_t& rhs){
                         auto& formated_rhs= *(rhs->ptr);
                             switch(rhs.execution_policy){
                                 case Thread_policy_t::single_thread_exec:
@@ -2007,7 +2007,7 @@ namespace printing_tools {
                 <std::iterator_traits<Rhs_t::underlying_container::iterator>::iterator_category, std::random_access_iterator_tag>;
                 }&&Polymorphic_object(Rhs_t::value_type)
                     inline typename std::conditional<op_action_type == true, void, bool>  
-                        op_potential_scalar_with_collection(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs){
+                        op_potential_scalar_with_collection(const_qualified_if_false_t<op_action_type, Lhs_t>* lhs,const Rhs_t& rhs){
                         auto& formated_rhs= *(rhs->ptr);
                             switch(rhs.execution_policy){
                                 case Thread_policy_t::single_thread_exec:
@@ -2035,7 +2035,7 @@ namespace printing_tools {
 
                      }
                     interface_of_all_operations_on_potential_scaler_with_potential_scalar(const Polymoprhic_extensible_engine first_obj, const Polymoprhic_extensible_engine second_obj) {
-                    const_qualified_if_false_t<Lhs_t>* formated_lhs= static_cast<const_qualified_if_false_t<Lhs_t>*>(first_obj->ptr);
+                    const_qualified_if_false_t<op_action_type, Lhs_t>* formated_lhs= static_cast<const_qualified_if_false_t<op_action_type, Lhs_t>*>(first_obj->ptr);
                     Rhs_t* formated_rhs= static_cast<Rhs_t*>(second_obj->ptr);
                     implementation_of_the_interface_used_by_macro::op_potential_scalar_with_collection<Op, op_action_type>(formated_lhs, formated_rhs);
                     }
@@ -2045,7 +2045,7 @@ namespace printing_tools {
 
                      }
                     interface_of_all_ops_scalar_to_scalar(const Polymoprhic_extensible_engine first_obj, const Polymoprhic_extensible_engine second_obj) {
-                    const_qualified_if_false_t<Lhs_t>* formated_lhs= static_cast<const_qualified_if_false_t<Lhs_t>*>(first_obj->ptr);
+                    const_qualified_if_false_t<op_action_type, Lhs_t>* formated_lhs= static_cast<const_qualified_if_false_t<op_action_type, Lhs_t>*>(first_obj->ptr);
                     Rhs_t* formated_rhs= static_cast<Rhs_t*>(second_obj->ptr);
                     implementation_of_the_interface_used_by_macro::all_ops<Op, op_action_type>(formated_lhs, formated_rhs);
                     }
@@ -2056,7 +2056,7 @@ namespace printing_tools {
                          //just to make clear that Rhs_t is Nested_type_info, while keeping the interface uniform 
                      }
                     interface_of_all_operations_on_potential_scaler_with_collections_of_polymorphic_engine_objects(const Polymoprhic_extensible_engine first_obj, const Polymoprhic_extensible_engine second_obj) {
-                    const_qualified_if_false_t<Lhs_t>* formated_lhs= static_cast<const_qualified_if_false_t<Lhs_t>*>(first_obj->ptr);
+                    const_qualified_if_false_t<op_action_type, Lhs_t>* formated_lhs= static_cast<const_qualified_if_false_t<op_action_type, Lhs_t>*>(first_obj->ptr);
                     Rhs_t* formated_rhs= static_cast<Rhs_t*>(second_obj->ptr);
                     switch(second_obj->tag){
                     case Type_tag_for_input::array_nested_type_vector:
@@ -3235,22 +3235,42 @@ namespace printing_tools {
 
 
                 
-            
+            //explicitly instantiating everything here because I just dont want this impossible to conquer file to stay in my head 
+            //any longer:
 
             //arithemetic ops:
-            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
-            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
-            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
-            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
-            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
-            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
-            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
-            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
-            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
-            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
-            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
-            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
-            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            
+            template <typename T>
+            struct exponentiation {
+                T operator()(const T& base, const T& exp) const {
+                    return std::pow(base, exp);
+                }
+            };
+            
+            // Arithmetic Ops
+            template void op_generator<std::plus, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template void op_generator<std::minus, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template void op_generator<std::multiplies, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template void op_generator<std::divides, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template void op_generator<std::modulus, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            
+            // Exponentiation (using the custom wrapper)
+            template void op_generator<exponentiation, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            
+            // Bitwise Ops
+            template void op_generator<std::bit_and, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template void op_generator<std::bit_or, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template void op_generator<std::bit_xor, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template void op_generator<std::shift_left, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template void op_generator<std::shift_right, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            // comparision ops:
+            template void op_generator<std::equal_to, false, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template void op_generator<std::not_equal_to, false, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template void op_generator<std::greater, false, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template void op_generator<std::less, false, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template void op_generator<std::greater_equal, false, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template void op_generator<std::less_equal, false, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            //didnt use weak ordering to avoid code bloat to get a more close to the metal behaviour for floating points
             Polymoprhic_extensible_engine read_polymorphically_from_string(const std::string& string_to_read_from, std::string:: std::size_type* pos) {
               Polymoprhic_extensible_engine(string_to_read_from, pos);
             }
