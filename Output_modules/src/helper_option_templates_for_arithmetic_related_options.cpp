@@ -1803,96 +1803,7 @@ namespace printing_tools {
                                                 }
                                             }
 
-                                enum class actions: uint8_t{
-                                    change_collection_of_types_tag=0,
-                                    change_many_collections_of_types_tag=1,
-                                    change_single_element_at_index_in_collection_of_types_tag=2,
-                                    push_to_collection_of_types_tag,
-                                    push_same_many_to_collection_of_types_tag,
-                                    push_many_newly_read_to_collection_of_types_tag,
-                                    pop_from_collection_of_types_tag,
-                                    pop_many_from_collection_of_types_tag,
-                                    insert_into_collection_of_types_tag,
-                                    insert_same_many_into_collection_of_types_tag,
-                                    insert_many_newly_read_into_collection_of_types_tag,
-                                    change_part_of_lists_of_collection_of_types_tag,
-                                    push_to_list_of_collection_of_types_tag,
-                                    push_same_many_to_list_of_collection_of_types_tag,
-                                    push_many_newly_read_to_list_of_collection_of_types_tag,
-                                    pop_from_list_of_collection_of_types_tag,
-                                    pop_many_from_list_of_collection_of_types_tag,
-                                    insert_into_list_of_collection_of_types_tag,
-                                    insert_same_many_into_list_of_collection_of_types_tag,
-                                    insert_many_newly_read_into_list_of_collection_of_types_tag
-                                };
 
-                                inline void execute_action(const std::string& string_to_read_from, std::string::size_type* pos){
-                                    actions what_to_do= static_cast<actions>(read_from_string<uint8_t>(string_to_read_from, pos));
-                                    switch(what_to_do){
-                                        case actions::change_collection_of_types_tag:
-                                            change_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::change_many_collections_of_types_tag:
-                                            change_many_collections_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::change_single_element_at_index_in_collection_of_types_tag:
-                                            change_single_element_at_index_in_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::push_to_collection_of_types_tag:
-                                            push_to_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::push_same_many_to_collection_of_types_tag:
-                                            push_same_many_to_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::push_many_newly_read_to_collection_of_types_tag:
-                                            push_many_newly_read_to_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::pop_from_collection_of_types_tag:
-                                            pop_from_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::pop_many_from_collection_of_types_tag:
-                                            pop_many_from_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::insert_into_collection_of_types_tag:
-                                            insert_into_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::insert_same_many_into_collection_of_types_tag:
-                                            insert_same_many_into_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::insert_many_newly_read_into_collection_of_types_tag:
-                                            insert_many_newly_read_into_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::change_part_of_lists_of_collection_of_types_tag:
-                                            change_part_of_lists_of_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::push_to_list_of_collection_of_types_tag:
-                                            push_to_list_of_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::push_same_many_to_list_of_collection_of_types_tag:
-                                            push_same_many_to_list_of_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::push_many_newly_read_to_list_of_collection_of_types_tag:
-                                            push_many_newly_read_to_list_of_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::pop_from_list_of_collection_of_types_tag:
-                                            pop_from_list_of_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::pop_many_from_list_of_collection_of_types_tag:
-                                            pop_many_from_list_of_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::insert_into_list_of_collection_of_types_tag:
-                                            insert_into_list_of_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::insert_same_many_into_list_of_collection_of_types_tag:
-                                            insert_same_many_into_list_of_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        case actions::insert_many_newly_read_into_list_of_collection_of_types_tag:
-                                            insert_many_newly_read_into_list_of_collection_of_types(string_to_read_from, pos);
-                                            break;
-                                        default:
-                                            throw std::string{"invalid action!!!"};
-                                    }
-                                }
                             }    
                         }    
 
@@ -1919,6 +1830,37 @@ namespace printing_tools {
                 }
                 template<typename Lhs_t>
                 using const_qualified_if_false_t = const_qualified_if_false<Lhs_t>::type;
+                template<typename Op, bool op_action_type, std::is_arithmetic Lhs_t>
+                    inline typename std::conditional<op_action_type == true, void, bool>
+                    all_ops(const_qualified_if_false_t<Lhs_t>* lhs,const std::string& rhs) {
+                        if constexpr (op_action_type == true) {
+                            if constexpr (std::is_same_v<Op, std::plus>){
+                                *lhs = Op{}(std::to_string(*lhs), std::cref(rhs)); 
+                            }
+                            else{
+                                throw std::string{"attempt to do an operation other than plus while right hand side operand is string but left hand side isnt"};
+                            }
+                        }
+                        else {
+                            *lhs = Op{}(std::to_string(*lhs), std::cref(rhs)); 
+                        }
+                }
+                template<typename Op, bool op_action_type, absolute_base::Is_String_Or_Numeric Lhs_t,std::is_arithmetic Rhs_t>
+                    inline typename std::conditional<op_action_type == true, void, bool>
+                    all_ops(const_qualified_if_false_t<std::string>* lhs,const Rhs_t& rhs) {
+                        //Everything will naturally use this!
+                        if constexpr (op_action_type == true) {
+                            if constexpr (std::is_same_v<Op, std::plus>){
+                                *lhs = Op{}(std::ref(*lhs), std::to_string(rhs)); 
+                            }
+                            else{
+                                throw std::string{"attempt to do an operation other than plus while left hand side operand is string but right hand side isnt"};
+                            }
+                        }
+                        else {
+                            return Op{}(std::cref(*Lhs_t), std::to_string(rhs));;
+                        }
+                    }
                 template<typename Op, bool op_action_type, absolute_base::Is_String_Or_Numeric Lhs_t,absolute_base::Is_String_Or_Numeric Rhs_t>
                     inline typename std::conditional<op_action_type == true, void, bool>
                     all_ops(const_qualified_if_false_t<Lhs_t>* lhs,const Rhs_t& rhs) {
@@ -3127,7 +3069,7 @@ namespace printing_tools {
             };
 
 
-                template<typename Op, ternary_state op_action_type, absolute_base::Is_String_Or_Numeric Lhs_t>
+                template<typename Op, bool op_action_type, absolute_base::Is_String_Or_Numeric Lhs_t>
                 inline typename std::conditional<op_action_type == true, void, bool>
                     op_generator(Lhs_t& first_arg,const Polymoprhic_extensible_engine second_arg){
                         constexpr if(std::is_same_v(Lhs_t, uintptr_t)){
@@ -3143,7 +3085,7 @@ namespace printing_tools {
                         runtime_branching_using_only_second_arg<Op, op_action_type, std::string>(first_arg,second_arg);
                         }
                     }
-                  template<typename Op, ternary_state op_action_type, absolute_base::Is_String_Or_Numeric Rhs_t>
+                  template<typename Op, bool op_action_type, absolute_base::Is_String_Or_Numeric Rhs_t>
                   inline typename std::conditional<op_action_type == true, void, bool>
                     op_generator(const Polymoprhic_extensible_engine first_arg,const Rhs_t& second_arg){
                         constexpr if(std::is_same_v(Lhs_t, uintptr_t)){
@@ -3159,7 +3101,7 @@ namespace printing_tools {
                         runtime_branching_using_only_first_arg<Op, op_action_type, std::string>(first_arg,second_arg);
                         }
                     }
-                template<typename Op, ternary_state op_action_type>
+                template<typename Op, bool op_action_type>
                 inline typename std::conditional<op_action_type == true, void, bool>
                     void_op_generator(const Polymoprhic_extensible_engine first_arg,const Polymoprhic_extensible_engine second_arg){
                     switch(produce_jump_index(first_arg.tag, second_arg.tag)){
@@ -3197,10 +3139,97 @@ namespace printing_tools {
                     }
     
             };
-            //provide pump(functions that pump to string) and type size calculation(for monolithic storage types 
-            //(deque and vectors storing polymorphic objects)) before working on the function below or 
-            //even the rest of the project
+            //todo :provide pump(functions that pump to string)
+                                enum class actions: uint8_t{
+                                    change_collection_of_types_tag=0,
+                                    change_many_collections_of_types_tag=1,
+                                    change_single_element_at_index_in_collection_of_types_tag=2,
+                                    push_to_collection_of_types_tag,
+                                    push_same_many_to_collection_of_types_tag,
+                                    push_many_newly_read_to_collection_of_types_tag,
+                                    pop_from_collection_of_types_tag,
+                                    pop_many_from_collection_of_types_tag,
+                                    insert_into_collection_of_types_tag,
+                                    insert_same_many_into_collection_of_types_tag,
+                                    insert_many_newly_read_into_collection_of_types_tag,
+                                    change_part_of_lists_of_collection_of_types_tag,
+                                    push_to_list_of_collection_of_types_tag,
+                                    push_same_many_to_list_of_collection_of_types_tag,
+                                    push_many_newly_read_to_list_of_collection_of_types_tag,
+                                    pop_from_list_of_collection_of_types_tag,
+                                    pop_many_from_list_of_collection_of_types_tag,
+                                    insert_into_list_of_collection_of_types_tag,
+                                    insert_same_many_into_list_of_collection_of_types_tag,
+                                    insert_many_newly_read_into_list_of_collection_of_types_tag
+                                };
 
+                                inline void execute_action(const std::string& string_to_read_from, std::string::size_type* pos){
+                                    actions what_to_do= static_cast<actions>(read_from_string<uint8_t>(string_to_read_from, pos));
+                                    switch(what_to_do){
+                                        case actions::change_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::change_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::change_many_collections_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::change_many_collections_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::change_single_element_at_index_in_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::change_single_element_at_index_in_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::push_to_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::push_to_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::push_same_many_to_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::push_same_many_to_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::push_many_newly_read_to_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::push_many_newly_read_to_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::pop_from_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::pop_from_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::pop_many_from_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::pop_many_from_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::insert_into_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::insert_into_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::insert_same_many_into_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::insert_same_many_into_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::insert_many_newly_read_into_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::insert_many_newly_read_into_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::change_part_of_lists_of_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::change_part_of_lists_of_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::push_to_list_of_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::push_to_list_of_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::push_same_many_to_list_of_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::push_same_many_to_list_of_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::push_many_newly_read_to_list_of_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::push_many_newly_read_to_list_of_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::pop_from_list_of_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::pop_from_list_of_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::pop_many_from_list_of_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::pop_many_from_list_of_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::insert_into_list_of_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::insert_into_list_of_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::insert_same_many_into_list_of_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::insert_same_many_into_list_of_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        case actions::insert_many_newly_read_into_list_of_collection_of_types_tag:
+                                            type_information_storage_facilities_and_functions_to_access_them::main_interface_to_get_type_information::insert_many_newly_read_into_list_of_collection_of_types(string_to_read_from, pos);
+                                            break;
+                                        default:
+                                            throw std::string{"invalid action!!!"};
+                                    }
+                                }
            
             
 
@@ -3208,11 +3237,22 @@ namespace printing_tools {
                 
             
 
-
-
+            //arithemetic ops:
+            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+            template op_generator<std::plus,true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
             Polymoprhic_extensible_engine read_polymorphically_from_string(const std::string& string_to_read_from, std::string:: std::size_type* pos) {
-              
-             
+              Polymoprhic_extensible_engine(string_to_read_from, pos);
             }
             template <bool read_from_x_or_y>
             inline Polymoprhic_extensible_engine read_polymorphically_from_string(const std::string& x, const std::string& y, std::string:: std::size_type* x_pos, std::string:: std::size_type* y_pos) {
