@@ -422,7 +422,8 @@ namespace printing_tools {
                 blind faith in the capabilities of AI.
                 2. Tools should be invented to Monitor and study every neural network path of a these large
                 language models.
-                The second point might be far fetched since AI models are billions of complex transformations, but
+                The second point might be far fetched since AI models are hundreds of complex transformations(each
+                taking billions of inputs nodes and producing billions of output nodes, but
                 if we as human beings unite, we can monitor and figure out what those transformations mean and how to
                 utilize them. The first step would probably to invent programming languages specifically for creating,
                 ,deploying, managing, and mantaining these large language models.
@@ -440,7 +441,8 @@ namespace printing_tools {
                 the desired container class that i want to pass. Then using a factory function i return a  base class unique ptr to a
                 allocated derieved class, the dereived class would be chosen based on switch case statements. In the end to implement
                 the push, pop, change, etc functions, i could just called the factory function and then used the resulting unique ptr
-                to pass a implementation function as F(and its arguments) to the pointer->call() function.
+                to pass a implementation function as F(and its arguments) to the pointer->call() function, or to use std::variant, 
+                where the types are of container refrences.
                 The reason that i avoided all this was because of the over head of new and delete, and the overhead of accessing 
                 the vtable ptr.
                 A fix might be to provide run time templates: func_a<><runtime template arguments> or 
@@ -449,7 +451,8 @@ namespace printing_tools {
                 case a compiler would omit warnings to tell the user that JIT is attached. These features would 
                 revolutionarize the role of c++ in Interpreted languages and help the tech ecosystem a lot.
                 The lack of such features makes me look towards C# because C# does support JIT for instantiation of generics,
-                so i really hope C++26 have support for runtime templates.
+                so i really hope C++26 have support for runtime templates. There are many other fixes that i mailed to the cpp
+                standard comittee.
 
                 Again, i know this comment isnt something that is should put in some code file, but i really love  talking about
                 my journey, even if no one is listening
