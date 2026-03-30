@@ -3247,22 +3247,19 @@ namespace printing_tools {
                 }
             };
             
-            // Arithmetic Ops
             template void op_generator<std::plus, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
             template void op_generator<std::minus, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
             template void op_generator<std::multiplies, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
             template void op_generator<std::divides, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
             template void op_generator<std::modulus, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
-            
-            // Exponentiation (using the custom wrapper)
             template void op_generator<exponentiation, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
             
-            // Bitwise Ops
             template void op_generator<std::bit_and, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
             template void op_generator<std::bit_or, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
             template void op_generator<std::bit_xor, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
             template void op_generator<std::shift_left, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
             template void op_generator<std::shift_right, true, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+
             // comparision ops:
             template void op_generator<std::equal_to, false, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
             template void op_generator<std::not_equal_to, false, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
@@ -3270,6 +3267,7 @@ namespace printing_tools {
             template void op_generator<std::less, false, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
             template void op_generator<std::greater_equal, false, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
             template void op_generator<std::less_equal, false, Polymoprhic_extensible_engine, Polymoprhic_extensible_engine>();
+
             //didnt use weak ordering to avoid code bloat to get a more close to the metal behaviour for floating points
             Polymoprhic_extensible_engine read_polymorphically_from_string(const std::string& string_to_read_from, std::string:: std::size_type* pos) {
               Polymoprhic_extensible_engine(string_to_read_from, pos);
