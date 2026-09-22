@@ -1,3 +1,4 @@
+I am planing to rewrite every part of this tool as a separate tool with its own repo, so this thing can become an achievable reality rather than just day dreaming.
 BIG NOTE: THE TOOL ISNT MEANT TO BE HUMAN READABLE OR FOR HUMANS, I WILL MAKE ANOTHER TOOL USING THIS ENGINE THAT TRANSLATE 
 HUMAN READABLE FORMAT INTO THIS ONE.
 
