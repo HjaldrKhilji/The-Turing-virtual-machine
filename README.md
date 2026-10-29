@@ -1,1 +1,1 @@
-reference for many other future repositories meant to be coordinated to fullfil the purpose of this one.
+reference for many other future repositories meant to be coordinated to fullfil the purpose of this one. Basically, this repo failed.
